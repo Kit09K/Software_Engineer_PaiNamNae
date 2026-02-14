@@ -1,0 +1,71 @@
+name: Deploy PaiNamNae Full System
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  # -----------------------------------------------------------------
+  # JOB 1: VM (แก้เรื่อง Git 128)
+  # -----------------------------------------------------------------
+  deploy-vm:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Update VM Docker Containers
+        run: |
+          # ดึง .env เดิมมาใช้
+          cp ~/Project_painamnae/PaiNamNaeWebApp/.env .
+
+          docker compose down --remove-orphans
+          
+          # รัน Docker จากโค้ดใหม่ที่ GitHub โหลดมาให้
+          docker compose --profile prod up -d --build
+          
+          docker image prune -f
+
+  # -----------------------------------------------------------------
+  # JOB 2: Hestia (แก้เรื่อง Path FTP)
+  # -----------------------------------------------------------------
+  deploy-hestia:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: |
+          cd frontend
+          rm -rf package-lock.json node_modules
+          npm install
+
+      - name: Build Static Site
+        env:
+          NUXT_PUBLIC_API_BASE: "https://api.kit09k.online/api/"
+        run: |
+          cd frontend
+          npm run generate
+          # สร้าง .htaccess
+          echo "RewriteEngine On" > .output/public/.htaccess
+          echo "RewriteBase /" >> .output/public/.htaccess
+          echo "RewriteRule ^index\.html$ - [L]" >> .output/public/.htaccess
+          echo "RewriteCond %{REQUEST_FILENAME} !-f" >> .output/public/.htaccess
+          echo "RewriteCond %{REQUEST_FILENAME} !-d" >> .output/public/.htaccess
+          echo "RewriteRule . /index.html [L]" >> .output/public/.htaccess
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./frontend/.output/public/
+          server-dir: /home/csse0168/web/painamnae2-3.cpkku.com/public_html/
+          dangerous-clean-slate: true
