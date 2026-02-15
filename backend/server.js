@@ -12,7 +12,7 @@ const { errorHandler } = require('./src/middlewares/errorHandler');
 const ApiError = require('./src/utils/ApiError')
 const { metricsMiddleware } = require('./src/middlewares/metrics');
 const ensureAdmin = require('./src/bootstrap/ensureAdmin');
-
+const deleteRoutes = require('./routes/delete.routes');
 const app = express();
 promClient.collectDefaultMetrics();
 
