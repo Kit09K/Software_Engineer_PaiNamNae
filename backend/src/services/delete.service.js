@@ -11,7 +11,7 @@ class DeleteService {
         deleteBookings = false,
         sendEmailCopy = false
     ) {
-        const deleteRequest = await prisma.deletionrequest.create({
+        const deleteRequest = await prisma.deletionRequest.create({
             data: {
                 userId : userId,
                 deleteAccount : deleteAccount,
@@ -19,13 +19,14 @@ class DeleteService {
                 deleteRoutes : deleteRoutes,
                 deleteBookings : deleteBookings,
                 sendEmailCopy : sendEmailCopy,
+                status: 'PENDING'
             },
         });
         return deleteRequest;
     }
     // get delete request by user id
     static async getDeleteRequestByUserId(userId) {
-        const deleteRequest = await prisma.deletionrequest.findFirst({
+        const deleteRequest = await prisma.deletionRequest.findFirst({
             where: { userId },
         });
         if (!deleteRequest) {
@@ -37,7 +38,10 @@ class DeleteService {
     static async markDeleteUserData(userId, deleteRequest) {
         const markedUser = await prisma.user.update({
             where: { id: userId },
-            data: { isDeleted: deleteRequest.deleteAccount },
+            data: { 
+                isDeleted: deleteRequest.deleteAccount,
+                deletedAt: new Date()
+            },
         });
         return markedUser;
     }

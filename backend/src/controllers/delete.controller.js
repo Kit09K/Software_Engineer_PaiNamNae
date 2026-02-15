@@ -5,6 +5,7 @@ const RouteService = require("../services/route.service");
 const BookingService = require("../services/booking.service");
 const UserService = require("../services/user.service");
 const ApiError = require("../utils/ApiError");
+const EmailService = require("../services/email.service");
 
 class DeleteController {
     // POST /delete/account
