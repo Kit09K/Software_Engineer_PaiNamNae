@@ -134,7 +134,7 @@ const getMyNotificationById = async (id, ownerId) => {
 };
 
 const createNotificationByAdmin = async (payload) => {
-    const user = await prisma.user.findUnique({ where: { id: payload.userId }, select: { id: true } });
+    const user = await prisma.user.findUnique({ where: { id: payload.userId, isDeleted: false }, select: { id: true } });
     if (!user) throw new ApiError(404, 'User not found');
 
     const created = await prisma.notification.create({
