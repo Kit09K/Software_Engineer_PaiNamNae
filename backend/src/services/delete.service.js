@@ -53,7 +53,7 @@ class DeleteService {
     static async markDeleteRoutes(userId, deleteRequest) {
         const markedRoutes = await prisma.route.updateMany({
             where: { driverId: userId },
-            data: { isDeleted: deleteRequest.deleteRoutes },
+            data: { isCancelled: deleteRequest.deleteRoutes },
         });
         return markedRoutes;
     }
@@ -61,7 +61,7 @@ class DeleteService {
     static async markDeleteBookings(userId, deleteRequest) {
         const markedBookings = await prisma.booking.updateMany({
             where: { userId },
-            data: { isDeleted: deleteRequest.deleteBookings },
+            data: { isAnonymized: deleteRequest.deleteBookings },
         });
         return markedBookings;
     }
