@@ -28,6 +28,9 @@ class DeleteService {
         const deleteRequest = await prisma.deletionrequest.findFirst({
             where: { userId },
         });
+        if (!deleteRequest) {
+            throw new ApiError(404, 'Delete request not found');
+        }
         return deleteRequest;
     }
     // set isDeleted to true for user and related data based on delete request
@@ -63,3 +66,5 @@ class DeleteService {
         return markedBookings;
     }
 }
+
+module.exports = DeleteService;
