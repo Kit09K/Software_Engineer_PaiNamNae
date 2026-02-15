@@ -1,6 +1,6 @@
 const prisma = require("../utils/prisma");
 const ApiError = require('../utils/ApiError');
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const SALT_ROUNDS = 10;
 
 const searchUsers = async (opts = {}) => {
