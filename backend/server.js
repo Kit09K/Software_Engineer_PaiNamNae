@@ -31,6 +31,7 @@ const corsOptions = {
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
+            console.log(`Blocked by CORS! Origin: ${origin}`);
             console.log('Blocked by CORS!'); // <-- ดูว่าติดตรงนี้หรือเปล่า
             callback(new Error('Not allowed by CORS'));
         }
