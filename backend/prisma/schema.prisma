@@ -88,11 +88,11 @@ model User {
   notification          Notification[]
   createdRoutes         Route[]             @relation("DriverRoutes")
   bookings              Booking[]           @relation("PassengerBookings")
-  
-  // เพิ่ม
+
   isDeleted   Boolean  @default(false)
   deletedAt   DateTime?
-  
+
+
   @@index([role])
   @@index([isActive])
   @@index([isVerified])
@@ -114,8 +114,7 @@ model DriverVerification {
   status              VerificationStatus @default(PENDING)
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
-  
-  // เพิ่ม
+
   isDeleted   Boolean  @default(false)
 
   @@index([status])
@@ -159,9 +158,8 @@ model Vehicle {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  // เพิ่ม
   isDeleted   Boolean  @default(false)
-  
+
   routes        Route[]
 
   @@index([userId])
@@ -196,8 +194,7 @@ model Route {
   steps           Json?       @db.Json
   createdAt       DateTime    @default(now())
   updatedAt     DateTime @updatedAt
-  
-  // เพิ่ม
+
   isCancelled Boolean @default(false)
   cancelReason String?
 
@@ -224,17 +221,14 @@ model Booking {
   pickupLocation  Json          @db.Json
   dropoffLocation Json          @db.Json
   createdAt       DateTime      @default(now())
-  
-  //เพิ่ม
+
   isAnonymized   Boolean  @default(false)
   passengerName String?
-  
 }
 
-//เพิ่ม
 model DeletionRequest {
   id               String   @id @default(uuid())
-  userId           String
+  userId           String   
   deleteAccount    Boolean
   deleteVehicles   Boolean
   deleteRoutes     Boolean
