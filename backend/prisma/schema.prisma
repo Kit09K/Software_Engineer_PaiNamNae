@@ -60,6 +60,18 @@ enum NotificationType {
   ROUTE
 }
 
+enum LogAction {
+  LOGIN
+  LOGOUT
+  ACCESS_SENSITIVE_DATA     // เช่น การดูรูปบัตรประชาชน
+  CREATE_DATA               // เช่น สร้างเส้นทางใหม่
+  UPDATE_DATA               // เช่น แก้ไขข้อมูลส่วนตัว
+  DELETE_DATA               // เช่น การทำ Soft Delete
+  APPROVE_VERIFICATION      // Admin อนุมัติเอกสาร
+  REJECT_VERIFICATION       // Admin ปฏิเสธเอกสาร
+  SOS_TRIGGERED             // การกดปุ่มฉุกเฉิน
+}
+
 model User {
   id                    String   @id @default(cuid())
   username              String   @unique
@@ -89,10 +101,12 @@ model User {
   createdRoutes         Route[]             @relation("DriverRoutes")
   bookings              Booking[]           @relation("PassengerBookings")
 
+  systemLogs            SystemLog[]
+  
+  // เพิ่ม
   isDeleted   Boolean  @default(false)
   deletedAt   DateTime?
-
-
+  
   @@index([role])
   @@index([isActive])
   @@index([isVerified])
@@ -114,7 +128,8 @@ model DriverVerification {
   status              VerificationStatus @default(PENDING)
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
-
+  
+  // เพิ่ม
   isDeleted   Boolean  @default(false)
 
   @@index([status])
@@ -158,8 +173,9 @@ model Vehicle {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  // เพิ่ม
   isDeleted   Boolean  @default(false)
-
+  
   routes        Route[]
 
   @@index([userId])
@@ -194,7 +210,8 @@ model Route {
   steps           Json?       @db.Json
   createdAt       DateTime    @default(now())
   updatedAt     DateTime @updatedAt
-
+  
+  // เพิ่ม
   isCancelled Boolean @default(false)
   cancelReason String?
 
@@ -221,14 +238,17 @@ model Booking {
   pickupLocation  Json          @db.Json
   dropoffLocation Json          @db.Json
   createdAt       DateTime      @default(now())
-
+  
+  //เพิ่ม
   isAnonymized   Boolean  @default(false)
   passengerName String?
+  
 }
 
+//เพิ่ม
 model DeletionRequest {
   id               String   @id @default(uuid())
-  userId           String   
+  userId           String
   deleteAccount    Boolean
   deleteVehicles   Boolean
   deleteRoutes     Boolean
@@ -238,4 +258,22 @@ model DeletionRequest {
   status           String   // PENDING, COMPLETED
   requestedAt      DateTime @default(now())
   completedAt      DateTime?
+}
+
+//Add SystemLog
+model SystemLog {
+  id               String   @id @default(cuid())
+  timestamp        DateTime @default(now())
+  userId           String?
+  user             User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action           LogAction
+  ipAddress        String
+  userAgent        String?
+  targetTable      String?
+  targetId         String?
+  details          Json?          @db.Json
+
+  @@index([userId])
+  @@index([action])
+  @@index([timestamp])
 }
