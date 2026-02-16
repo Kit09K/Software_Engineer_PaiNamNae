@@ -34,6 +34,7 @@ async function checkAndApplyPassengerSuspension(passengerId, opts = {}) {
     // พฤติกรรมเดิม (ไม่ใช้ใน flow ใหม่ แต่เก็บไว้เผื่อที่อื่นเรียก)
     cancelCount = await prisma.booking.count({
       where: {
+        isAnonymized: false,
         passengerId,
         status: "CANCELLED",
         cancelledBy: "PASSENGER",
@@ -45,7 +46,7 @@ async function checkAndApplyPassengerSuspension(passengerId, opts = {}) {
   if (cancelCount >= PASSENGER_CANCEL_LIMIT) {
     const until = addDays(new Date(), SUSPEND_DAYS);
     await prisma.user.update({
-      where: { id: passengerId },
+      where: { id: passengerId, isDeleted: false },
       data: { passengerSuspendedUntil: until },
     });
 
@@ -78,6 +79,7 @@ async function checkAndApplyDriverSuspension(driverId, opts = {}) {
       status: "CANCELLED",
       cancelledBy: "DRIVER",
       cancelledAt: { gte: since },
+      isCancelled: false,
     },
   });
 
@@ -86,7 +88,7 @@ async function checkAndApplyDriverSuspension(driverId, opts = {}) {
   if (cancelCount >= DRIVER_CANCEL_LIMIT) {
     const until = addDays(new Date(), SUSPEND_DAYS);
     await prisma.user.update({
-      where: { id: driverId },
+      where: { id: driverId,isDeleted: false },
       data: { driverSuspendedUntil: until },
     });
 

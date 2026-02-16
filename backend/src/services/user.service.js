@@ -1,6 +1,6 @@
 const prisma = require("../utils/prisma");
 const ApiError = require('../utils/ApiError');
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const SALT_ROUNDS = 10;
 
 const searchUsers = async (opts = {}) => {
@@ -36,6 +36,7 @@ const searchUsers = async (opts = {}) => {
                 { phoneNumber: { contains: q, mode: 'insensitive' } },
             ]
         } : {}),
+        isDeleted: false // add this line to exclude deleted users
     };
 
     const skip = (page - 1) * limit;
@@ -69,11 +70,11 @@ const searchUsers = async (opts = {}) => {
 };
 
 const getUserByEmail = async (email) => {
-    return await prisma.user.findUnique({ where: { email } })
+    return await prisma.user.findUnique({ where: { email, isDeleted: false } })
 }
 
 const getUserByUsername = async (username) => {
-    return await prisma.user.findUnique({ where: { username } })
+    return await prisma.user.findUnique({ where: { username, isDeleted: false } })
 }
 
 const comparePassword = async (user, plainPassword) => {
@@ -83,7 +84,8 @@ const comparePassword = async (user, plainPassword) => {
 const getAllUsers = async () => {
     const users = await prisma.user.findMany({
         where: {
-            isActive: true
+            isActive: true,
+            isDeleted: false
         }
     })
 
@@ -104,7 +106,7 @@ const getAllUsers = async () => {
 }
 
 const getUserById = async (id) => {
-    const user = await prisma.user.findUnique({ where: { id } })
+    const user = await prisma.user.findUnique({ where: { id, isDeleted: false } })
 
     if (!user) {
         throw new ApiError(404, 'User not found');
@@ -116,7 +118,7 @@ const getUserById = async (id) => {
 
 const getUserPublicById = async (id) => {
     const user = await prisma.user.findUnique({
-        where: { id },
+        where: { id ,isDeleted: false},
         select: {
             id: true, firstName: true, lastName: true,
             profilePicture: true, role: true, isVerified: true,
@@ -171,7 +173,7 @@ const createUser = async (data) => {
 }
 
 const updatePassword = async (userId, currentPassword, newPassword) => {
-    const userWithPassword = await prisma.user.findUnique({ where: { id: userId } });
+    const userWithPassword = await prisma.user.findUnique({ where: { id: userId, isDeleted: false } });
 
     if (!userWithPassword) {
         return { success: false, error: 'USER_NOT_FOUND' };
@@ -186,7 +188,7 @@ const updatePassword = async (userId, currentPassword, newPassword) => {
     const hashedNewPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
 
     await prisma.user.update({
-        where: { id: userId },
+        where: { id: userId, isDeleted: false },
         data: { password: hashedNewPassword },
     });
 
@@ -194,14 +196,14 @@ const updatePassword = async (userId, currentPassword, newPassword) => {
 };
 
 const updateUserProfile = async (id, data) => {
-    const updatedUser = await prisma.user.update({ where: { id }, data });
+    const updatedUser = await prisma.user.update({ where: { id, isDeleted: false }, data });
 
     const { password, ...safeUser } = updatedUser;
     return safeUser;
 };
 
 const deleteUser = async (id) => {
-    const deletedUser = await prisma.user.delete({ where: { id } });
+    const deletedUser = await prisma.user.delete({ where: { id, isDeleted: false } });
 
     const { password, ...safeDeletedUser } = deletedUser;
     return safeDeletedUser;
