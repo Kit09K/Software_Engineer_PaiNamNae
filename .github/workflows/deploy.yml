@@ -58,7 +58,8 @@ jobs:
       - name: Build Static Site & Generate .htaccess
         env:
           # ฝัง URL Backend เข้าไปใน Frontend ตอน Build เลย
-          NUXT_PUBLIC_API_BASE: "https://api.kit09k.online/api/"
+          NUXT_PUBLIC_API_BASE: ${{ secrets.NUXT_PUBLIC_API_BASE }}
+          NUXT_PUBLIC_GOOGLE_MAPS_KEY: ${{ secrets.NUXT_PUBLIC_GOOGLE_MAPS_KEY }}
         run: |
           cd frontend
           npm run generate
