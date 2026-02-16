@@ -27,6 +27,7 @@ const baseInclude = {
 
 const getAllRoutes = async () => {
   return prisma.route.findMany({
+    where: { isCancelled: false },
     include: baseInclude,
     orderBy: { createdAt: 'desc' }
   });
@@ -96,6 +97,7 @@ const searchRoutes = async (opts) => {
         },
       ]
     } : {}),
+    isCancelled: false
   };
 
   const skip = (page - 1) * limit;
@@ -220,7 +222,7 @@ const searchRoutesByEndpointProximity = async (opts = {}) => {
   // ดึงรายละเอียดพร้อม include ตาม id ที่คัดแล้ว
   const data = idList.length
     ? await prisma.route.findMany({
-      where: { id: { in: idList } },
+      where: { id: { in: idList }, isCancelled: false },
       include: {
         driver: { select: { id: true, firstName: true, lastName: true, gender: true, profilePicture: true, isVerified: true } },
         vehicle: { select: { vehicleModel: true, vehicleType: true, photos: true, amenities: true } },
@@ -240,7 +242,7 @@ const searchRoutesByEndpointProximity = async (opts = {}) => {
 
 const getRouteById = async (id) => {
   return prisma.route.findUnique({
-    where: { id },
+    where: { id ,isCancelled: false},
     include: {
       bookings: {
         include: {
@@ -262,7 +264,8 @@ const getRouteById = async (id) => {
 const getMyRoutes = async (driverId) => {
   return prisma.route.findMany({
     where: {
-      driverId
+      driverId,
+      isCancelled: false
     },
     include: {
 
@@ -293,14 +296,14 @@ const createRoute = async (data) => {
 
 const updateRoute = async (id, data) => {
   return prisma.route.update({
-    where: { id },
+    where: { id, isCancelled: false },
     data
   });
 };
 
 const deleteRoute = async (id) => {
   await prisma.route.delete({
-    where: { id }
+    where: { id, isCancelled: false }
   });
   return { id }
 };
@@ -309,7 +312,7 @@ const cancelRoute = async (routeId, driverId, opts = {}) => {
   const { reason } = opts;
 
   const route = await prisma.route.findUnique({
-    where: { id: routeId },
+    where: { id: routeId, isCancelled: false },
     include: {
       driver: { select: { id: true } },
       bookings: {
@@ -331,7 +334,7 @@ const cancelRoute = async (routeId, driverId, opts = {}) => {
   await prisma.$transaction(async (tx) => {
     //ยกเลิก Route
     await tx.route.update({
-      where: { id: routeId },
+      where: { id: routeId, isCancelled: false },
       data: {
         status: RouteStatus.CANCELLED,
         cancelledBy: 'DRIVER',
@@ -342,7 +345,7 @@ const cancelRoute = async (routeId, driverId, opts = {}) => {
     if (affected.length) {
       //ยกเลิก Booking ที่ค้างทั้งหมด
       await tx.booking.updateMany({
-        where: { routeId, status: { in: [BookingStatus.PENDING, BookingStatus.CONFIRMED] } },
+        where: {isAnonymized: false, routeId, status: { in: [BookingStatus.PENDING, BookingStatus.CONFIRMED] } },
         data: {
           status: BookingStatus.CANCELLED,
           cancelledBy: 'DRIVER',
