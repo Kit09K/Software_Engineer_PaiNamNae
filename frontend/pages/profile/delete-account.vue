@@ -102,6 +102,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import { useAuth } from '@/composables/useAuth'
 
 const selectAll = ref(false)
 const selectedItems = ref([]) // เก็บ index หรือ id ของสิ่งที่จะลบ
@@ -110,6 +111,7 @@ const isLoading = ref(false) // เพิ่มสถานะ Loading
 const showConfirmModal = ref(false)
 const confirmInput = ref('')
 const { $api } = useNuxtApp()
+const { logout } = useAuth()
 
 // รายละเอียดรายการย่อย (แนะนำว่าในใช้งานจริงควรมี 'id')
 const dataItems = ref([
@@ -169,6 +171,9 @@ const confirmDelete = async () => {
             sendEmailCopy: sendEmail.value
         }
     })
+
+        logout()
+
         alert('ลบข้อมูลเรียบร้อยแล้ว')
         selectedItems.value = []
         selectAll.value = false
