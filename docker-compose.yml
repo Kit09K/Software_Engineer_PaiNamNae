@@ -10,11 +10,14 @@ services:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
       POSTGRES_DB: painamnae_db
+    ports:
+       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - painamnae-net
 
+  # 2. Backend (Express.js)
   backend:
     build: ./backend
     container_name: painamnae-backend
@@ -23,10 +26,11 @@ services:
       - db
     ports:
       - "8080:3000"
-    env_file: .env  
+    env_file: .env        
     networks:
       - painamnae-net
 
+  # 3. Frontend
   frontend:
     build: ./frontend
     container_name: painamnae-frontend
@@ -35,10 +39,9 @@ services:
       - backend
     ports:
       - "3000:3000"
-    env_file: .env  
+    env_file: .env         
     networks:
       - painamnae-net
-
 
 volumes:
   postgres_data:
