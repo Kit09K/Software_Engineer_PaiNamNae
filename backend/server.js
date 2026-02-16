@@ -1,5 +1,5 @@
 require("dotenv").config();
-
+require('./src/utils/HardDelete');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');

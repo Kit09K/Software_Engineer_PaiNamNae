@@ -19,7 +19,9 @@ class DeleteService {
                 deleteRoutes : deleteRoutes,
                 deleteBookings : deleteBookings,
                 sendEmailCopy : sendEmailCopy,
-                status: 'PENDING'
+                status: 'PENDING',
+                requestedAt : new Date(),
+                completedAt : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // set completion time to 90 days later,
             },
         });
         return deleteRequest;
