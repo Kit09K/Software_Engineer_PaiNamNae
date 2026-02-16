@@ -48,7 +48,7 @@
                 <NuxtLink to="/profile/delete-account" class="block px-4 py-2 text-sm font-semibold rounded-md text-red-600 hover:bg-red-50"
                     :class="isActive('/profile/delete-account') ? 'font-semibold text-white-100 bg-red-100' : ''">
                     <div class="flex items-center">
-                        <!-- คุณสามารถใส่ Icon ถังขยะตรงนี้ได้ -->
+                        <!-- Icon ถังขยะ-->
                         <span>ลบข้อมูลบัญชี</span>
                     </div>
                 </NuxtLink>
