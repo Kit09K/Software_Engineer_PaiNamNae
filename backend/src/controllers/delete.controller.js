@@ -64,7 +64,7 @@ class DeleteController {
                 await EmailService.sendEmail({
                     to: email,
                     subject: "Your Account Deletion Request Has Been Processed",
-                    text: `Dear ${req.user.name},\n\nYour account deletion request has been processed successfully. All your data has been removed from our system.\n\nThank you for using our service.`,
+                    text: `Dear ${email},\n\nYour account deletion request has been processed successfully. All your data has been removed from our system.\n\nThank you for using our service.`,
                     attachments: [{
                         filename: 'delete-receipt.json',
                         content: JSON.stringify(backupData, null, 2)
