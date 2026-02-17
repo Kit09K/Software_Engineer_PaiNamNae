@@ -57,7 +57,7 @@ class DeleteController {
             }
             if (deleteRequest.deleteBookings) {
                 backupData.bookings = await BookingService.getMyBookings(userId);
-                await DeleteService.markDeleteBookings(userId, deleteRequest);
+                await DeleteService.markDeleteBookings(userId);
             }
 
             if (deleteRequest.sendEmailCopy) {
