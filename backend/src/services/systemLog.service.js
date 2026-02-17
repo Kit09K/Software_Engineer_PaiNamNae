@@ -79,8 +79,23 @@ const getLogById = async (logId) => {
   });
 };
 
+// ฟังก์ชันสำหรับลบ Log ที่เก่าเกินกว่ากำหนด (เช่น 90 วัน) ใช้เพื่อรักษาขนาดฐานข้อมูลโดยที่ยังปฏิบัติตาม พ.ร.บ. คอมพิวเตอร์
+const cleanupOldLogs = async () => {
+  const ninetyDaysAgo = new Date();
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+
+  return await prisma.systemLog.deleteMany({
+    where: {
+      timestamp: {
+        lt: ninetyDaysAgo, // ลบข้อมูลที่น้อยกว่า 90 วันที่แล้ว
+      },
+    },
+  });
+};
+
 module.exports = {
   createLog,
   queryLogs,
   getLogById,
+  cleanupOldLogs,
 };
