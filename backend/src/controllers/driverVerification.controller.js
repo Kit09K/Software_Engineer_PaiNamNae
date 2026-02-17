@@ -1,11 +1,23 @@
 const asyncHandler = require("express-async-handler");
 const verifService = require("../services/driverVerification.service");
+const systemLogService = require("../services/systemLog.service");
 const ApiError = require("../utils/ApiError");
 const { uploadToCloudinary } = require("../utils/cloudinary");
 const notifService = require('../services/notification.service');
 
 const adminListVerifications = asyncHandler(async (req, res) => {
   const result = await verifService.searchVerifications(req.query);
+
+  // บันทึก Log เมื่อ Admin เข้าถึงรายการข้อมูลคนขับ (PDPA Compliance)
+  await systemLogService.createLog({
+    userId: req.user.sub,
+    action: 'ACCESS_SENSITIVE_DATA',
+    targetTable: 'DriverVerification',
+    ipAddress: req.ip || req.connection.remoteAddress,
+    userAgent: req.get('User-Agent'),
+    details: { query: req.query, message: 'Admin viewed verification list' }
+  });
+
   res.status(200).json({
     success: true,
     message: "Driver verifications (admin) retrieved successfully",
@@ -74,6 +86,17 @@ const createVerification = asyncHandler(async (req, res) => {
   }
 
   await notifService.createNotificationByAdmin(notifPayload)
+
+  // บันทึกเมื่อ User ส่งเอกสารใหม่ (พ.ร.บ. คอมพิวเตอร์)
+  await systemLogService.createLog({
+    userId: req.user.sub,
+    action: 'CREATE_DATA',
+    targetTable: 'DriverVerification',
+    targetId: newRec.id,
+    ipAddress: req.ip || req.connection.remoteAddress,
+    userAgent: req.get('User-Agent'),
+    details: { status: 'PENDING_APPROVAL' }
+  });
 
   res.status(201).json({
     success: true,
@@ -213,6 +236,17 @@ const updateVerificationStatus = asyncHandler(async (req, res) => {
     console.error('Failed to create verification notification:', e);
   }
 
+  // บันทึก Log การตัดสินใจของ Admin (Audit Trail สำคัญมาก)
+  await systemLogService.createLog({
+    userId: req.user.sub, // ใครเป็นคนอนุมัติ
+    action: status === 'APPROVED' ? 'APPROVE_VERIFICATION' : 'REJECT_VERIFICATION',
+    targetTable: 'DriverVerification',
+    targetId: id,
+    ipAddress: req.ip || req.connection.remoteAddress,
+    userAgent: req.get('User-Agent'),
+    details: { oldStatus: 'PENDING', newStatus: status }
+  });
+
   res.status(200).json({
     success: true,
     message: `Driver verification status updated to ${status}`,
@@ -251,6 +285,17 @@ const adminDeleteVerification = asyncHandler(async (req, res) => {
   if (!existing) throw new ApiError(404, "Verification not found");
 
   await verifService.deleteVerificationByAdmin(id);
+
+  // บันทึกเมื่อ Admin ลบข้อมูล (Data Privacy Compliance)
+  await systemLogService.createLog({
+    userId: req.user.sub,
+    action: 'DELETE_DATA',
+    targetTable: 'DriverVerification',
+    targetId: id,
+    ipAddress: req.ip || req.connection.remoteAddress,
+    userAgent: req.get('User-Agent'),
+    details: { message: 'Admin deleted driver verification record' }
+  });
 
   res.status(200).json({
     success: true,

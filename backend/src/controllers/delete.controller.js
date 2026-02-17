@@ -4,6 +4,7 @@ const VehicleService = require("../services/vehicle.service");
 const RouteService = require("../services/route.service");
 const BookingService = require("../services/booking.service");
 const UserService = require("../services/user.service");
+const systemLogService = require("../services/systemLog.service");
 const ApiError = require("../utils/ApiError");
 const EmailService = require("../services/email.service");
 
@@ -29,6 +30,24 @@ class DeleteController {
             sendEmailCopy
         );
 
+        // บันทึก Log เมื่อมีการส่งคำขอเลิกใช้งาน/ลบข้อมูล (Compliance: PDPA Right to be forgotten)
+        await systemLogService.createLog({
+            userId,
+            action: 'DELETE_DATA',
+            targetTable: 'DeletionRequest',
+            targetId: deleteReq.id,
+            ipAddress,
+            userAgent,
+            details: { 
+                type: 'REQUEST_SUBMITTED',
+                options: { deleteAccount, deleteVehicles, deleteRoutes, deleteBookings }
+            }
+        });
+
+        res.status(201).json({
+            message: "Delete request created successfully",
+        });
+
         try {
             const backupData = {
                 requestDetails: deleteReq,
@@ -38,8 +57,9 @@ class DeleteController {
                 bookings: []
             };
 
-
             const deleteRequest = await DeleteService.getDeleteRequestByUserId(userId);
+            
+            // ประมวลผลลบข้อมูลส่วนต่างๆ
             if (deleteRequest.deleteAccount) {
                 backupData.userData = await UserService.getUserById(userId);
                 await DeleteService.markDeleteUserData(userId);
@@ -54,8 +74,23 @@ class DeleteController {
             }
             if (deleteRequest.deleteBookings) {
                 backupData.bookings = await BookingService.getMyBookings(userId);
-                await DeleteService.markDeleteBookings(userId);
+                await DeleteService.markDeleteBookings(userId, deleteRequest);
             }
+
+            // บันทึก Log เมื่อระบบประมวลผลการลบ (Soft Delete) เสร็จสมบูรณ์
+            await systemLogService.createLog({
+                userId,
+                action: 'DELETE_DATA',
+                targetTable: 'User',
+                targetId: userId,
+                ipAddress,
+                userAgent,
+                details: { 
+                    type: 'PROCESS_COMPLETED',
+                    status: 'SUCCESS',
+                    requestId: deleteReq.id 
+                }
+            });
 
             if (deleteRequest.sendEmailCopy) {
                 await EmailService.sendEmail({
@@ -74,10 +109,15 @@ class DeleteController {
         
         catch (error) {
             console.error("Error processing delete request:", error);
+
+            // บันทึก Log กรณีการลบผิดพลาด เพื่อให้ Admin ตรวจสอบได้
+            await systemLogService.createLog({
+                userId,
+                action: 'DELETE_DATA',
+                ipAddress,
+                details: { type: 'PROCESS_FAILED', error: error.message }
+            });
         }
-    res.status(201).json({
-            message: "Delete request created successfully",
-        });
 
     })    
 }
