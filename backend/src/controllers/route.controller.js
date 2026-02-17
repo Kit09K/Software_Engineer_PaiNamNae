@@ -1,6 +1,5 @@
 const asyncHandler = require("express-async-handler");
 const routeService = require("../services/route.service");
-const systemLogService = require("../services/systemLog.service");
 const vehicleService = require("../services/vehicle.service");
 const ApiError = require("../utils/ApiError");
 const verifService = require("../services/driverVerification.service");
@@ -24,19 +23,8 @@ const listRoutes = asyncHandler(async (req, res) => {
   });
 });
 
-// เก็บ Log เมื่อ Admin เรียกดูรายการเส้นทางทั้งหมด (PDPA: Access Log)
 const adminListRoutes = asyncHandler(async (req, res) => {
   const result = await routeService.searchRoutes(req.query);
-
-  await systemLogService.createLog({
-    userId: req.user.sub,
-    action: 'ACCESS_SENSITIVE_DATA',
-    targetTable: 'Route',
-    ipAddress: req.ip || req.connection.remoteAddress,
-    userAgent: req.get('User-Agent'),
-    details: { query: req.query, message: 'Admin listed all routes' }
-  });
-
   res.status(200).json({
     success: true,
     message: "Routes (admin) retrieved successfully",
@@ -137,18 +125,6 @@ const createRoute = asyncHandler(async (req, res) => {
   }
 
   const newRoute = await routeService.createRoute(payload);
-
-  // บันทึกเมื่อมีการสร้างเส้นทางใหม่ (พ.ร.บ. คอมพิวเตอร์: ระบุตัวตนคนทำและเวลา)
-  await systemLogService.createLog({
-    userId: req.user.sub,
-    action: 'CREATE_DATA',
-    targetTable: 'Route',
-    targetId: newRoute.id,
-    ipAddress: req.ip || req.connection.remoteAddress,
-    userAgent: req.get('User-Agent'),
-    details: { start: payload.startLocation, end: payload.endLocation }
-  });
-
   res.status(201).json({
     success: true,
     message: "Route created successfully",
@@ -268,18 +244,6 @@ const updateRoute = asyncHandler(async (req, res) => {
   }
 
   const updated = await routeService.updateRoute(id, payload);
-
-  // บันทึกเมื่อมีการแก้ไขเส้นทาง (Audit Trail)
-  await systemLogService.createLog({
-    userId: req.user.sub,
-    action: 'UPDATE_DATA',
-    targetTable: 'Route',
-    targetId: id,
-    ipAddress: req.ip || req.connection.remoteAddress,
-    userAgent: req.get('User-Agent'),
-    details: { updatedFields: Object.keys(req.body) }
-  });
-
   res.status(200).json({
     success: true,
     message: "Route updated successfully",
@@ -492,18 +456,6 @@ const adminDeleteRoute = asyncHandler(async (req, res) => {
   if (!existing) throw new ApiError(404, "Route not found");
 
   const result = await routeService.deleteRoute(id);
-
-  // บันทึกเมื่อ Admin ลบเส้นทาง (ความโปร่งใสในการจัดการข้อมูล)
-  await systemLogService.createLog({
-    userId: req.user.sub,
-    action: 'DELETE_DATA',
-    targetTable: 'Route',
-    targetId: id,
-    ipAddress: req.ip || req.connection.remoteAddress,
-    userAgent: req.get('User-Agent'),
-    details: { reason: 'Admin hard/soft delete' }
-  });
-
   res.status(200).json({
     success: true,
     message: "Route (by admin) deleted successfully",
@@ -517,18 +469,6 @@ const cancelRoute = asyncHandler(async (req, res) => {
   const { reason } = req.body;
 
   const result = await routeService.cancelRoute(id, driverId, { reason });
-  
-  // บันทึกการยกเลิกเส้นทาง (สำคัญมากกรณีมีการจองแล้ว)
-  await systemLogService.createLog({
-    userId: driverId,
-    action: 'UPDATE_DATA',
-    targetTable: 'Route',
-    targetId: id,
-    ipAddress: req.ip || req.connection.remoteAddress,
-    userAgent: req.get('User-Agent'),
-    details: { status: 'CANCELLED', cancelReason: reason }
-  });
-
   res.status(200).json({
     success: true,
     message: "Route cancelled successfully",

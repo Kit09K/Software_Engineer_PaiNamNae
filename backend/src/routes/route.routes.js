@@ -3,7 +3,6 @@ const validate = require("../middlewares/validate");
 const { protect, requireAdmin } = require("../middlewares/auth");
 const requireDriverVerified = require('../middlewares/driverVerified');
 const routeController = require("../controllers/route.controller");
-const { logActivity } = require('../middlewares/logging');
 const {
   idParamSchema,
   createRouteSchema,
@@ -17,8 +16,8 @@ const {
 
 const router = express.Router();
 
-// 1. Admin Routes 
-// GET /routes/admin
+// --- Admin Routes ---
+//GET /routes/admin
 router.get(
   "/admin",
   protect,
@@ -27,7 +26,7 @@ router.get(
   routeController.adminListRoutes
 );
 
-// GET /routes/admin/driver/:driverId
+//GET /routes/admin/driver/:driverId
 router.get(
   "/admin/driver/:driverId",
   protect,
@@ -35,6 +34,7 @@ router.get(
   validate({ params: adminDriverIdParamSchema }),
   routeController.adminGetRoutesByDriver
 )
+
 
 // GET /routes/admin/:id
 router.get(
@@ -50,7 +50,6 @@ router.post(
   "/admin",
   protect,
   requireAdmin,
-  logActivity('CREATE_DATA', 'Route'),
   validate({ body: createRouteByAdminSchema }),
   routeController.adminCreateRoute
 );
@@ -60,7 +59,6 @@ router.put(
   "/admin/:id",
   protect,
   requireAdmin,
-  logActivity('UPDATE_DATA', 'Route'),
   validate({ params: idParamSchema, body: updateRouteByAdminSchema }),
   routeController.adminUpdateRoute
 );
@@ -70,12 +68,11 @@ router.delete(
   "/admin/:id",
   protect,
   requireAdmin,
-  logActivity('DELETE_DATA', 'Route'),
   validate({ params: idParamSchema }),
   routeController.adminDeleteRoute
 );
 
-// 2. Public Driver Routes 
+// --- Public Routes ---
 // GET /routes
 router.get(
   "/",
@@ -102,7 +99,6 @@ router.post(
   "/",
   protect,
   requireDriverVerified,
-  logActivity('CREATE_DATA', 'Route'),
   validate({ body: createRouteSchema }),
   routeController.createRoute
 );
@@ -112,7 +108,6 @@ router.put(
   "/:id",
   protect,
   requireDriverVerified,
-  logActivity('UPDATE_DATA', 'Route'),
   validate({ params: idParamSchema, body: updateRouteSchema }),
   routeController.updateRoute
 );
@@ -122,7 +117,6 @@ router.patch(
   "/:id/cancel",
   protect,
   requireDriverVerified,
-  logActivity('UPDATE_DATA', 'Route'),
   validate({ params: idParamSchema, body: cancelRouteSchema }),
   routeController.cancelRoute
 );
@@ -132,7 +126,6 @@ router.delete(
   "/:id",
   protect,
   requireDriverVerified,
-  logActivity('DELETE_DATA', 'Route'),
   validate({ params: idParamSchema }),
   routeController.deleteRoute
 );

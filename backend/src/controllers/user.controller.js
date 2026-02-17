@@ -1,23 +1,11 @@
 const asyncHandler = require('express-async-handler');
 const userService = require("../services/user.service");
-const systemLogService = require("../services/systemLog.service");
 const ApiError = require('../utils/ApiError');
 const { uploadToCloudinary } = require('../utils/cloudinary');
 const notifService = require('../services/notification.service');
 
-// เก็บ Log เมื่อ Admin เรียกดูรายการผู้ใช้ (สอดคล้อง PDPA เรื่องการเข้าถึงข้อมูล)
 const adminListUsers = asyncHandler(async (req, res) => {
     const result = await userService.searchUsers(req.query);
-
-    await systemLogService.createLog({
-        userId: req.user.sub,
-        action: 'ACCESS_SENSITIVE_DATA',
-        targetTable: 'User',
-        ipAddress: req.ip || req.connection.remoteAddress,
-        userAgent: req.get('User-Agent'),
-        details: { query: req.query, message: 'Admin listed users' }
-    });
-
     res.status(200).json({
         success: true,
         message: "Users (admin) retrieved",
@@ -65,10 +53,9 @@ const getMyUser = asyncHandler(async (req, res) => {
         success: true,
         message: "User retrieved",
         data: data
-    });
-});
+    })
 
-// เก็บ Log เมื่อมีการสร้างผู้ใช้ใหม่ (เพื่อระบุ IP ต้นทางตาม พ.ร.บ. คอมพิวเตอร์)
+})
 const createUser = asyncHandler(async (req, res) => {
     const userData = req.body;
 
@@ -102,16 +89,6 @@ const createUser = asyncHandler(async (req, res) => {
     }
 
     await notifService.createNotificationByAdmin(notifPayload)
-
-    await systemLogService.createLog({
-        userId: newUser.id,
-        action: 'CREATE_DATA',
-        targetTable: 'User',
-        targetId: newUser.id,
-        ipAddress: req.ip || req.connection.remoteAddress,
-        userAgent: req.get('User-Agent'),
-        details: { status: 'SUCCESS' }
-    });
 
     res.status(201).json({
         success: true,
@@ -151,20 +128,8 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
     });
 });
 
-// เก็บ Log เมื่อ Admin แก้ไขข้อมูลผู้ใช้ (Audit Trail)
 const adminUpdateUser = asyncHandler(async (req, res) => {
     const updatedUser = await userService.updateUserProfile(req.params.id, req.body);
-    
-    await systemLogService.createLog({
-        userId: req.user.sub, // Admin เป็นคนทำ
-        action: 'UPDATE_DATA',
-        targetTable: 'User',
-        targetId: req.params.id,
-        ipAddress: req.ip || req.connection.remoteAddress,
-        userAgent: req.get('User-Agent'),
-        details: { updatedFields: Object.keys(req.body) }
-    });
-    
     res.status(200).json({
         success: true,
         message: "User updated by admin",
@@ -172,20 +137,8 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
     });
 });
 
-// เก็บ Log เมื่อมีการลบผู้ใช้ (สอดคล้องกับ DeletionRequest และ Audit Trail)
 const adminDeleteUser = asyncHandler(async (req, res) => {
     const deletedUser = await userService.deleteUser(req.params.id);
-    
-    await systemLogService.createLog({
-        userId: req.user.sub,
-        action: 'DELETE_DATA',
-        targetTable: 'User',
-        targetId: req.params.id,
-        ipAddress: req.ip || req.connection.remoteAddress,
-        userAgent: req.get('User-Agent'),
-        details: { method: 'SOFT_DELETE' }
-    });
-    
     res.status(200).json({
         success: true,
         message: "User deleted successfully.",
@@ -193,7 +146,6 @@ const adminDeleteUser = asyncHandler(async (req, res) => {
     });
 });
 
-// เก็บ Log เมื่อมีการเปลี่ยนสถานะ Active หรือการ Verify (สำคัญมาก)
 const setUserStatus = asyncHandler(async (req, res) => {
     const { isActive, isVerified } = req.body
 
@@ -241,16 +193,6 @@ const setUserStatus = asyncHandler(async (req, res) => {
         }
     }
 
-    await systemLogService.createLog({
-        userId: req.user.sub,
-        action: isVerified !== undefined ? 'APPROVE_VERIFICATION' : 'UPDATE_DATA',
-        targetTable: 'User',
-        targetId: req.params.id,
-        ipAddress: req.ip || req.connection.remoteAddress,
-        userAgent: req.get('User-Agent'),
-        details: { isActive, isVerified }
-    });
-
     res.status(200).json({ success: true, message: "User status updated", data: updatedUser });
 });
 
@@ -265,4 +207,5 @@ module.exports = {
     adminUpdateUser,
     adminDeleteUser,
     setUserStatus,
+
 };
