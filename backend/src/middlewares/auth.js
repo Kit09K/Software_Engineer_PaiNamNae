@@ -18,6 +18,8 @@ const protect = asyncHandler(async (req, res, next) => {
             req.user = {
                 sub: decoded.sub,
                 role: decoded.role,
+                email: decoded.email,
+                id: decoded.sub
             };
 
             next();

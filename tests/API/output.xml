@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.4.1 (Python 3.14.0 on win32)" generated="2026-02-17T23:10:18.431409" rpa="false" schemaversion="5">
+<suite id="s1" name="testAPI" source="D:\Year 3 term 2\Software Engineering\Software_Engineer_PaiNamNae\tests\API\testAPI.robot">
+<kw name="Create API Session" type="SETUP">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2026-02-17T23:10:18.530476" level="INFO">Creating Session using : alias=api, url=http://localhost:3000/api, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=True,                     debug=0 </msg>
+<arg>api</arg>
+<arg>${BASE_URL}</arg>
+<arg>verify=True</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2026-02-17T23:10:18.530295" elapsed="0.000328"/>
+</kw>
+<status status="PASS" start="2026-02-17T23:10:18.529891" elapsed="0.000804"/>
+</kw>
+<test id="s1-t1" name="User Can Delete Account Successfully" line="23">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2026-02-17T23:10:18.531131" level="INFO">Creating Session using : alias=api, url=http://localhost:3000/api, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>api</arg>
+<arg>${BASE_URL}</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2026-02-17T23:10:18.531021" elapsed="0.000210"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-17T23:10:18.531700" level="INFO">${login_body} = {'email': 'test@test.com', 'password': '123456'}</msg>
+<var>${login_body}</var>
+<arg>email=test@test.com</arg>
+<arg>password=123456</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-17T23:10:18.531371" elapsed="0.000349"/>
+</kw>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2026-02-17T23:10:18.542801" level="INFO">POST Request : url=http://localhost:3000/api/auth/login 
+ path_url=/api/auth/login 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '48', 'Content-Type': 'application/json'} 
+ body=b'{"email": "test@test.com", "password": "123456"}' 
+ </msg>
+<msg time="2026-02-17T23:10:18.542901" level="INFO">POST Response : url=http://localhost:3000/api/auth/login 
+ status=404, reason=Page not found: /api/auth/login 
+ headers={'content-type': 'application/json', 'x-content-type-options': 'nosniff', 'x-frame-options': 'DENY', 'referrer-policy': 'no-referrer', 'content-security-policy': "script-src 'none'; frame-ancestors 'none';", 'cache-control': 'no-cache', 'Date': 'Tue, 17 Feb 2026 16:10:18 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5', 'Content-Length': '238'} 
+ body={
+  "error": true,
+  "url": "http://localhost:3000/api/auth/login",
+  "statusCode": 404,
+  "statusMessage": "Page not found: /api/auth/login",
+  "message": "Page not found: /api/auth/login",
+  "data": {
+    "path": "/api/auth/login"
+  }
+} 
+ </msg>
+<msg time="2026-02-17T23:10:18.543035" level="FAIL">HTTPError: 404 Client Error: Page not found: /api/auth/login for url: http://localhost:3000/api/auth/login</msg>
+<var>${login}</var>
+<arg>api</arg>
+<arg>/auth/login</arg>
+<arg>json=${login_body}</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="FAIL" start="2026-02-17T23:10:18.531879" elapsed="0.012478">HTTPError: 404 Client Error: Page not found: /api/auth/login for url: http://localhost:3000/api/auth/login</status>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${login.status_code}</arg>
+<arg>200</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="NOT RUN" start="2026-02-17T23:10:18.544595" elapsed="0.000023"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<var>${token}</var>
+<arg>${login.json()['data']['token']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="NOT RUN" start="2026-02-17T23:10:18.544747" elapsed="0.000013"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<var>${headers}</var>
+<arg>Authorization=Bearer ${token}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="NOT RUN" start="2026-02-17T23:10:18.544873" elapsed="0.000012"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<var>${delete_body}</var>
+<arg>deleteAccount=${True}</arg>
+<arg>deleteVehicles=${False}</arg>
+<arg>deleteRoutes=${False}</arg>
+<arg>deleteBookings=${False}</arg>
+<arg>sendEmailCopy=${False}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="NOT RUN" start="2026-02-17T23:10:18.544982" elapsed="0.000011"/>
+</kw>
+<kw name="POST On Session" owner="RequestsLibrary">
+<var>${res}</var>
+<arg>api</arg>
+<arg>/delete/account</arg>
+<arg>json=${delete_body}</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="NOT RUN" start="2026-02-17T23:10:18.545110" elapsed="0.000013"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${res.status_code}</arg>
+<arg>201</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="NOT RUN" start="2026-02-17T23:10:18.545220" elapsed="0.000011"/>
+</kw>
+<status status="FAIL" start="2026-02-17T23:10:18.530743" elapsed="0.014717">HTTPError: 404 Client Error: Page not found: /api/auth/login for url: http://localhost:3000/api/auth/login</status>
+</test>
+<status status="FAIL" start="2026-02-17T23:10:18.432381" elapsed="0.113943"/>
+</suite>
+<statistics>
+<total>
+<stat pass="0" fail="1" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="testAPI" id="s1" pass="0" fail="1" skip="0">testAPI</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

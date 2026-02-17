@@ -23,6 +23,7 @@ const searchBookingsAdmin = async (opts = {}) => {
   } = opts;
 
   const where = {
+    isAnonymized: false,
     ...(status && { status }),
     ...(routeId && { routeId }),
     ...(passengerId && { passengerId }),
@@ -75,7 +76,7 @@ const searchBookingsAdmin = async (opts = {}) => {
           }
         }
       ]
-    } : {})
+    } : {}),
   };
 
   const skip = (page - 1) * limit;
@@ -109,7 +110,7 @@ const searchBookingsAdmin = async (opts = {}) => {
 
 const adminCreateBooking = async (data) => {
   return prisma.$transaction(async (tx) => {
-    const route = await tx.route.findUnique({ where: { id: data.routeId } });
+    const route = await tx.route.findUnique({ where: { id: data.routeId, isCancelled: false } });
     if (!route) throw new ApiError(404, 'Route not found');
 
     // ป้องกันการจองให้คนขับเอง
@@ -135,11 +136,11 @@ const adminCreateBooking = async (data) => {
     });
 
     const updatedRoute = await tx.route.update({
-      where: { id: data.routeId },
+      where: { id: data.routeId, isCancelled: false },
       data: { availableSeats: { decrement: data.numberOfSeats } },
     });
     if (updatedRoute.availableSeats === 0) {
-      await tx.route.update({ where: { id: data.routeId }, data: { status: RouteStatus.FULL } });
+      await tx.route.update({ where: { id: data.routeId, isCancelled: false }, data: { status: RouteStatus.FULL } });
     }
     return booking;
   });
@@ -148,7 +149,7 @@ const adminCreateBooking = async (data) => {
 const adminUpdateBooking = async (id, patch) => {
   return prisma.$transaction(async (tx) => {
     const existing = await tx.booking.findUnique({
-      where: { id }, include: { route: true }
+      where: { id, isAnonymized: false }, include: { route: true }
     });
     if (!existing) throw new ApiError(404, 'Booking not found');
 
@@ -163,26 +164,26 @@ const adminUpdateBooking = async (id, patch) => {
     // helper คืนที่นั่งให้ route
     const refundSeats = async (routeId, seats) => {
       const r = await tx.route.update({
-        where: { id: routeId },
+        where: { id: routeId, isCancelled: false },
         data: { availableSeats: { increment: seats } },
       });
       if (r.status === RouteStatus.FULL && r.availableSeats > 0) {
-        await tx.route.update({ where: { id: routeId }, data: { status: RouteStatus.AVAILABLE } });
+        await tx.route.update({ where: { id: routeId, isCancelled: false }, data: { status: RouteStatus.AVAILABLE } });
       }
     };
     // helper จองที่นั่งจาก route (ตรวจเงื่อนไข)
     const reserveSeats = async (routeId, seats, passengerId) => {
-      const r = await tx.route.findUnique({ where: { id: routeId } });
+      const r = await tx.route.findUnique({ where: { id: routeId, isCancelled: false } });
       if (!r) throw new ApiError(404, 'Route not found');
       if (r.driverId === passengerId) throw new ApiError(400, 'Driver cannot book their own route.');
       if (r.status !== RouteStatus.AVAILABLE) throw new ApiError(400, 'This route is no longer available.');
       if (r.availableSeats < seats) throw new ApiError(400, 'Not enough seats available on this route.');
       const updated = await tx.route.update({
-        where: { id: routeId },
+        where: { id: routeId, isCancelled: false },
         data: { availableSeats: { decrement: seats } },
       });
       if (updated.availableSeats === 0) {
-        await tx.route.update({ where: { id: routeId }, data: { status: RouteStatus.FULL } });
+        await tx.route.update({ where: { id: routeId, isCancelled: false }, data: { status: RouteStatus.FULL } });
       }
     };
 
@@ -198,7 +199,7 @@ const adminUpdateBooking = async (id, patch) => {
 
     // อัปเดตข้อมูล booking
     const updated = await tx.booking.update({
-      where: { id },
+      where: { id, isAnonymized: false },
       data: {
         routeId: targetRouteId,
         passengerId: targetPassengerId,
@@ -217,7 +218,7 @@ const createBooking = async (data, passengerId) => {
   return prisma.$transaction(async (tx) => {
 
     const route = await tx.route.findUnique({
-      where: { id: data.routeId },
+      where: { id: data.routeId, isCancelled: false },
     });
 
     if (!route) {
@@ -246,7 +247,7 @@ const createBooking = async (data, passengerId) => {
     });
 
     const updatedRoute = await tx.route.update({
-      where: { id: data.routeId },
+      where: { id: data.routeId, isCancelled: false },
       data: {
         availableSeats: {
           decrement: data.numberOfSeats,
@@ -256,7 +257,7 @@ const createBooking = async (data, passengerId) => {
 
     if (updatedRoute.availableSeats === 0) {
       await tx.route.update({
-        where: { id: data.routeId },
+        where: { id: data.routeId, isCancelled: false },
         data: { status: RouteStatus.FULL },
       });
     }
@@ -283,7 +284,7 @@ const createBooking = async (data, passengerId) => {
 
 const getMyBookings = async (passengerId) => {
   return prisma.booking.findMany({
-    where: { passengerId },
+    where: { passengerId, isAnonymized: false },
     include: {
       route: {
         include: {
@@ -315,14 +316,14 @@ const getMyBookings = async (passengerId) => {
 
 const getBookingById = async (id) => {
   return prisma.booking.findUnique({
-    where: { id },
+    where: { id, isAnonymized: false },
     include: { route: true, passenger: true },
   });
 };
 
 const updateBookingStatus = async (id, status, userId) => {
   const booking = await prisma.booking.findUnique({
-    where: { id },
+    where: { id, isAnonymized: false },
     include: { route: true },
   });
   if (!booking) throw new ApiError(404, 'Booking not found');
@@ -332,7 +333,7 @@ const updateBookingStatus = async (id, status, userId) => {
 
   return prisma.$transaction(async (tx) => {
     const updated = await tx.booking.update({
-      where: { id },
+      where: { id, isAnonymized: false },
       data: { status },
     });
 
@@ -345,7 +346,7 @@ const updateBookingStatus = async (id, status, userId) => {
         routeUpdates.status = RouteStatus.AVAILABLE;
       }
       await tx.route.update({
-        where: { id: booking.route.id },
+        where: { id: booking.route.id, isCancelled: false },
         data: routeUpdates,
       });
 
@@ -381,7 +382,7 @@ const cancelBooking = async (id, passengerId, opts = {}) => {
   const { reason } = opts;
 
   const booking = await prisma.booking.findUnique({
-    where: { id },
+    where: { id, isAnonymized: false },
     include: { route: true },
   });
   if (!booking) throw new ApiError(404, 'Booking not found');
@@ -394,7 +395,7 @@ const cancelBooking = async (id, passengerId, opts = {}) => {
 
   const updated = await prisma.$transaction(async (tx) => {
     const updatedBooking = await tx.booking.update({
-      where: { id },
+      where: { id, isAnonymized: false },
       data: {
         status: BookingStatus.CANCELLED,
         cancelledAt: new Date(),
@@ -411,7 +412,7 @@ const cancelBooking = async (id, passengerId, opts = {}) => {
       routeUpdates.status = RouteStatus.AVAILABLE;
     }
     await tx.route.update({
-      where: { id: booking.route.id },
+      where: { id: booking.route.id, isCancelled: false },
       data: routeUpdates,
     });
 
@@ -439,7 +440,7 @@ const cancelBooking = async (id, passengerId, opts = {}) => {
 
 const deleteBooking = async (id, userId) => {
   const booking = await prisma.booking.findUnique({
-    where: { id },
+    where: { id, isAnonymized: false },
     include: { route: true },
   });
   if (!booking) throw new ApiError(404, 'Booking not found');
@@ -461,7 +462,7 @@ const deleteBooking = async (id, userId) => {
 
 const adminDeleteBooking = async (id) => {
   const booking = await prisma.booking.findUnique({
-    where: { id },
+    where: { id, isAnonymized: false },
     include: { route: true },
   });
   if (!booking) throw new ApiError(404, 'Booking not found');
@@ -479,13 +480,13 @@ const adminDeleteBooking = async (id) => {
           routeUpdates.status = RouteStatus.AVAILABLE;
         }
         await tx.route.update({
-          where: { id: booking.route.id },
+          where: { id: booking.route.id, isCancelled: false },
           data: routeUpdates,
         });
       }
     }
 
-    await tx.booking.delete({ where: { id } });
+    await tx.booking.delete({ where: { id, isAnonymized: false } });
     return { id };
   });
 };

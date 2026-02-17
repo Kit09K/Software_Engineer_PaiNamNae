@@ -1,5 +1,5 @@
 require("dotenv").config();
-
+require('./src/utils/HardDelete');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -8,11 +8,11 @@ const promClient = require('prom-client');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./src/config/swagger');
 const routes = require('./src/routes');
+const deleteRoutes = require('./src/routes/delete.routes');
 const { errorHandler } = require('./src/middlewares/errorHandler');
 const ApiError = require('./src/utils/ApiError')
 const { metricsMiddleware } = require('./src/middlewares/metrics');
 const ensureAdmin = require('./src/bootstrap/ensureAdmin');
-
 const app = express();
 promClient.collectDefaultMetrics();
 
@@ -31,6 +31,7 @@ const corsOptions = {
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
+            console.log(`Blocked by CORS! Origin: ${origin}`);
             console.log('Blocked by CORS!'); // <-- ดูว่าติดตรงนี้หรือเปล่า
             callback(new Error('Not allowed by CORS'));
         }

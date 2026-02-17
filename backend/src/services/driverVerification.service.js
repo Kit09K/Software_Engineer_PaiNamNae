@@ -53,6 +53,7 @@ const searchVerifications = async (opts = {}) => {
         }
       ]
     } : {}),
+    isDeleted: false,
   };
 
   const skip = (page - 1) * limit;
@@ -89,13 +90,14 @@ const searchVerifications = async (opts = {}) => {
 
 const getVerificationByUser = async (userId) => {
   return prisma.driverVerification.findUnique({
-    where: { userId },
+    where: { userId, isDeleted: false },
     include: { user: true },
   });
 };
 
 const getAllVerifications = async () => {
   return prisma.driverVerification.findMany({
+    where: { isDeleted: false },
     include: { user: true },
     orderBy: { createdAt: 'desc' },
   });
@@ -103,7 +105,7 @@ const getAllVerifications = async () => {
 
 const getVerificationById = async (id) => {
   return prisma.driverVerification.findUnique({
-    where: { id },
+    where: { id, isDeleted: false },
     include: { user: true },
   });
 };
@@ -130,7 +132,7 @@ const updateVerification = async (id, data) => {
     status: 'PENDING'
   };
   return prisma.driverVerification.update({
-    where: { id },
+    where: { id, isDeleted: false },
     data: updatePayload,
   });
 
@@ -138,7 +140,7 @@ const updateVerification = async (id, data) => {
 
 const updateVerificationByAdmin = async (id, data) => {
   return prisma.driverVerification.update({
-    where: { id },
+    where: { id, isDeleted: false },
     data,
     include: { user: true },
   });
@@ -147,12 +149,12 @@ const updateVerificationByAdmin = async (id, data) => {
 const deleteVerificationByAdmin = async (id) => {
   return prisma.$transaction(async (tx) => {
     // หา record ก่อน ถ้าไม่เจอ ให้รีเทิร์น null ไปให้ controller ตัดสินใจ 404
-    const existing = await tx.driverVerification.findUnique({ where: { id } });
+    const existing = await tx.driverVerification.findUnique({ where: { id, isDeleted: false } });
     if (!existing) return null;
 
     // ย้อนสถานะ user ให้กลับเป็นผู้โดยสารและไม่ verified
     await tx.user.update({
-      where: { id: existing.userId },
+      where: { id: existing.userId, isDeleted: false },
       data: { role: 'PASSENGER', isVerified: false },
     });
 
@@ -163,7 +165,7 @@ const deleteVerificationByAdmin = async (id) => {
     });
 
     // ลบ verification record
-    await tx.driverVerification.delete({ where: { id } });
+    await tx.driverVerification.delete({ where: { id, isDeleted: false } });
 
     return true;
   });
@@ -172,18 +174,18 @@ const deleteVerificationByAdmin = async (id) => {
 const updateVerificationStatus = async (id, status) => {
   return prisma.$transaction(async (tx) => {
     const verification = await tx.driverVerification.update({
-      where: { id },
+      where: { id, isDeleted: false },
       data: { status },
     });
     if (status === 'APPROVED') {
       await tx.user.update({
-        where: { id: verification.userId },
+        where: { id: verification.userId, isDeleted: false },
         data: { isVerified: true, role: 'DRIVER' },
       });
     }
     else if (status === 'REJECTED') {
       await tx.user.update({
-        where: { id: verification.userId },
+        where: { id: verification.userId, isDeleted: false },
         data: {
           role: 'PASSENGER',
           isVerified: false,
@@ -194,6 +196,7 @@ const updateVerificationStatus = async (id, status) => {
         where: {
           driverId: verification.userId,
           status: 'AVAILABLE',
+          isCancelled: false,
         },
         data: {
           status: 'CANCELLED',
@@ -206,7 +209,7 @@ const updateVerificationStatus = async (id, status) => {
 
 const canCreateRoutes = async (userId) => {
   const rec = await prisma.driverVerification.findUnique({
-    where: { userId },
+    where: { userId, isDeleted: false },
     select: { status: true },
   });
   return rec?.status === 'APPROVED' || rec?.status === 'PENDING';

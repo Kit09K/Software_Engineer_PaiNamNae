@@ -89,6 +89,10 @@ model User {
   createdRoutes         Route[]             @relation("DriverRoutes")
   bookings              Booking[]           @relation("PassengerBookings")
 
+  isDeleted   Boolean  @default(false)
+  deletedAt   DateTime?
+
+
   @@index([role])
   @@index([isActive])
   @@index([isVerified])
@@ -110,6 +114,8 @@ model DriverVerification {
   status              VerificationStatus @default(PENDING)
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
+
+  isDeleted   Boolean  @default(false)
 
   @@index([status])
   @@index([createdAt])
@@ -152,6 +158,8 @@ model Vehicle {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  isDeleted   Boolean  @default(false)
+
   routes        Route[]
 
   @@index([userId])
@@ -187,6 +195,9 @@ model Route {
   createdAt       DateTime    @default(now())
   updatedAt     DateTime @updatedAt
 
+  isCancelled Boolean @default(false)
+  cancelReason String?
+
   bookings        Booking[]
 
   @@index([driverId])
@@ -210,4 +221,21 @@ model Booking {
   pickupLocation  Json          @db.Json
   dropoffLocation Json          @db.Json
   createdAt       DateTime      @default(now())
+
+  isAnonymized   Boolean  @default(false)
+  passengerName String?
+}
+
+model DeletionRequest {
+  id               String   @id @default(uuid())
+  userId           String   
+  deleteAccount    Boolean
+  deleteVehicles   Boolean
+  deleteRoutes     Boolean
+  deleteBookings   Boolean
+  sendEmailCopy    Boolean
+
+  status           String   // PENDING, COMPLETED
+  requestedAt      DateTime @default(now())
+  completedAt      DateTime?
 }

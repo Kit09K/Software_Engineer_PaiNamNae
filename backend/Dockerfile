@@ -1,6 +1,6 @@
-FROM node:22-alpine
+FROM node:20-slim
 
-RUN apk add --no-cache openssl
+RUN apt-get update -y && apt-get install -y openssl
 
 WORKDIR /app
 
@@ -10,6 +10,6 @@ RUN npm install
 COPY . .
 
 RUN npx prisma generate
-EXPOSE 8000
+EXPOSE 3000
 CMD ["sh", "-c", "npx prisma db push && npm start"]
 # CMD ["npm", "start"]

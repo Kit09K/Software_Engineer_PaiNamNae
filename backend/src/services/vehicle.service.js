@@ -17,6 +17,7 @@ const buildVehicleWhere = (opts = {}) => {
   } = opts;
 
   return {
+    isDeleted: false,
     ...(userId && { userId }),
     ...(vehicleType && {
       vehicleType: { contains: vehicleType, mode: "insensitive" },
@@ -58,7 +59,7 @@ const searchMyVehicles = async (ownerId, opts) => {
     sortOrder = "desc",
     ...filters
   } = opts || {};
-  const where = buildVehicleWhere({ ...filters, userId: ownerId });
+  const where = buildVehicleWhere({ ...filters, userId: ownerId ,isDeleted: false});
 
   const skip = (page - 1) * limit,
     take = limit;
@@ -87,7 +88,7 @@ const searchVehiclesAdmin = async (opts) => {
     sortOrder = "desc",
     ...filters
   } = opts || {};
-  const where = buildVehicleWhere(filters);
+  const where = buildVehicleWhere({ ...filters, isDeleted: false });
   const skip = (page - 1) * limit,
     take = limit;
 
@@ -114,13 +115,13 @@ const searchVehiclesAdmin = async (opts) => {
 
 const getAllVehicles = async (userId) => {
   return prisma.vehicle.findMany({
-    where: { userId },
+    where: { userId, isDeleted: false },
     orderBy: { createdAt: "desc" },
   });
 };
 
 const getVehicleById = async (vehicleId, userId) => {
-  const v = await prisma.vehicle.findUnique({ where: { id: vehicleId } });
+  const v = await prisma.vehicle.findUnique({ where: { id: vehicleId, isDeleted: false } });
   if (!v || v.userId !== userId) {
     throw new ApiError(404, "Vehicle not found or access denied");
   }
@@ -131,18 +132,18 @@ const createVehicle = async (data, userId) => {
   if (data.isDefault) {
     // reset previous default
     await prisma.vehicle.updateMany({
-      where: { userId, isDefault: true },
+      where: { userId, isDefault: true, isDeleted: false },
       data: { isDefault: false },
     });
   }
   return prisma.vehicle.create({
-    data: { ...data, userId },
+    data: { ...data, userId, isDeleted: false },
   });
 };
 
 const updateVehicle = async (vehicleId, userId, updateData) => {
   return prisma.$transaction(async (tx) => {
-    const existing = await tx.vehicle.findUnique({ where: { id: vehicleId } });
+    const existing = await tx.vehicle.findUnique({ where: { id: vehicleId, isDeleted: false } });
     if (!existing || existing.userId !== userId) {
       throw new ApiError(404, "Vehicle not found or access denied");
     }
@@ -165,19 +166,19 @@ const updateVehicle = async (vehicleId, userId, updateData) => {
 
 const deleteVehicle = async (vehicleId, userId) => {
   const existingVehicle = await prisma.vehicle.findFirst({
-    where: { id: vehicleId, userId },
+    where: { id: vehicleId, userId, isDeleted: false},
   });
   if (!existingVehicle) {
     throw new Error("Vehicle not found or access denied");
   }
 
-  await prisma.vehicle.delete({ where: { id: vehicleId } });
+  await prisma.vehicle.delete({ where: { id: vehicleId, isDeleted: false } });
   return { id: vehicleId };
 };
 
 const setDefaultVehicle = async (vehicleId, userId) => {
   const vehicleToSetDefault = await prisma.vehicle.findFirst({
-    where: { id: vehicleId, userId },
+    where: { id: vehicleId, userId, isDeleted: false },
   });
   if (!vehicleToSetDefault) {
     throw new Error("Vehicle not found or access denied");
@@ -189,11 +190,11 @@ const setDefaultVehicle = async (vehicleId, userId) => {
 
   return prisma.$transaction(async (tx) => {
     await tx.vehicle.updateMany({
-      where: { userId, isDefault: true },
+      where: { userId, isDefault: true, isDeleted: false },
       data: { isDefault: false },
     });
     const updatedVehicle = await tx.vehicle.update({
-      where: { id: vehicleId },
+      where: { id: vehicleId, isDeleted: false },
       data: { isDefault: true },
     });
     return updatedVehicle;
@@ -202,7 +203,7 @@ const setDefaultVehicle = async (vehicleId, userId) => {
 
 const getVehicleByIdAdmin = async (vehicleId) => {
   const v = await prisma.vehicle.findUnique({
-    where: { id: vehicleId },
+    where: { id: vehicleId, isDeleted: false },
     include: {
       user: {
         select: {
@@ -232,13 +233,14 @@ const updateVehicleByAdmin = async (vehicleId, updateData) => {
           userId: targetUserId,
           isDefault: true,
           NOT: { id: vehicleId },
+          isDeleted: false,
         },
         data: { isDefault: false },
       });
     }
 
     const updated = await tx.vehicle.update({
-      where: { id: vehicleId },
+      where: { id: vehicleId, isDeleted: false },
       data: {
         ...updateData,
         userId: targetUserId,
@@ -251,7 +253,7 @@ const updateVehicleByAdmin = async (vehicleId, updateData) => {
 
 const deleteVehicleByAdmin = async (vehicleId) => {
   await getVehicleByIdAdmin(vehicleId);
-  await prisma.vehicle.delete({ where: { id: vehicleId } });
+  await prisma.vehicle.delete({ where: { id: vehicleId, isDeleted: false } });
   return { id: vehicleId };
 };
 
