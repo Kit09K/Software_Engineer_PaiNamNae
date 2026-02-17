@@ -9,7 +9,7 @@ const router = express.Router();
 
 // ทุกเส้นทางในไฟล์นี้ต้องผ่านการยืนยันตัวตน (auth) และต้องมีสิทธิ์เป็น Admin (ensureAdmin) เท่านั้น
 // เพื่อให้สอดคล้องกับข้อกำหนดเรื่องการจำกัดการเข้าถึงข้อมูลส่วนบุคคล (PDPA)
-router.use(auth(), ensureAdmin);
+router.use(auth.protect, ensureAdmin);
 
 // ดึงรายการ Logs ทั้งหมด (รองรับ Pagination, Filtering ตามวันที่และ Action)
 // validate(systemLogValidation.getLogs)

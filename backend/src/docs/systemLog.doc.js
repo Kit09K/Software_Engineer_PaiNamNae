@@ -72,7 +72,7 @@
  * type: integer
  * default: 50
  * responses:
- * 200:
+ * '200':
  * description: "ดึงข้อมูลสำเร็จ"
  * content:
  * application/json:
@@ -92,9 +92,9 @@
  * type: integer
  * totalPages:
  * type: integer
- * 401:
+ * '401':
  * $ref: '#/components/responses/Unauthorized'
- * 403:
+ * '403':
  * $ref: '#/components/responses/Forbidden'
  *
  * /system-logs/{id}:
@@ -110,7 +110,7 @@
  * schema:
  * type: string
  * responses:
- * 200:
+ * '200':
  * description: "ดึงข้อมูลสำเร็จ"
  * content:
  * application/json:
