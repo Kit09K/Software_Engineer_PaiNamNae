@@ -17,6 +17,7 @@ const buildVehicleWhere = (opts = {}) => {
   } = opts;
 
   return {
+    isDeleted: false,
     ...(userId && { userId }),
     ...(vehicleType && {
       vehicleType: { contains: vehicleType, mode: "insensitive" },

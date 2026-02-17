@@ -4,19 +4,19 @@ Library    SeleniumLibrary
 *** Variables ***
 ${homepage}    http://www.google.com
 ${browser}     Chrome
-${pnnUrl}      http://localhost:3001/
+${pnnUrl}      http://localhost:3000/
 
-${username}				   Somsak123
-${email}                   somsak@gmail.com
-${password}                Somsak987654321
+${username}				   tester
+${email}                   thesun1145@gmail.com
+${password}                tester555
 
-${firstname}               Somsak
-${lastname}                Deejai
-${phone}                   0912345678
-${gender}				   female
+${firstname}               John
+${lastname}                Doe
+${phone}                   0123456789
+${gender}				   male
 
 ${idCard}    			   ${CURDIR}/testdata/idcard.jpg
-${idnumber}				   1234567891013
+${idnumber}				   1234567891234
 ${expirydate}			   01012580
 
 *** Test Cases ***

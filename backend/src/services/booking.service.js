@@ -23,6 +23,7 @@ const searchBookingsAdmin = async (opts = {}) => {
   } = opts;
 
   const where = {
+    isAnonymized: false,
     ...(status && { status }),
     ...(routeId && { routeId }),
     ...(passengerId && { passengerId }),
@@ -76,7 +77,6 @@ const searchBookingsAdmin = async (opts = {}) => {
         }
       ]
     } : {}),
-    isAnonymized: false,
   };
 
   const skip = (page - 1) * limit;

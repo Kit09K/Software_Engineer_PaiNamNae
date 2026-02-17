@@ -50,7 +50,7 @@ class DeleteService {
     // set isDeleted to true for vehicles owned by user based on delete request
     static async markDeleteVehicles(userId, deleteRequest) {
         const markedVehicles = await prisma.vehicle.updateMany({
-            where: { ownerId: userId },
+            where: { userId: userId },
             data: { isDeleted: deleteRequest.deleteVehicles },
         });
         return markedVehicles;
@@ -66,7 +66,7 @@ class DeleteService {
     // set isDeleted to true for bookings made by user based on delete request
     static async markDeleteBookings(userId, deleteRequest) {
         const markedBookings = await prisma.booking.updateMany({
-            where: { userId },
+            where: { passengerID: userID },
             data: { isAnonymized: deleteRequest.deleteBookings },
         });
         return markedBookings;
