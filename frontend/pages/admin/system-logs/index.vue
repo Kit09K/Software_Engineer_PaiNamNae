@@ -176,15 +176,14 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
-// นำเข้า Components
+import { ref, computed, watch, onMounted } from 'vue'
+// นำเข้า Components (ตรวจสอบ Path ให้ถูกต้องตามโปรเจคจริง)
 import AdminHeader from '~/components/admin/AdminHeader.vue'
 import AdminSidebar from '~/components/admin/AdminSidebar.vue'
 
 // --- Config ---
 const config = useRuntimeConfig()
-// ถ้าไม่ได้ set public.apiBase ไว้ใน nuxt.config ให้ใช้ fallback
-const apiBase = config.public.apiBase || 'http://localhost:3000/api'
+const apiBase = config.public.apiBase || 'http://localhost:8000/api' // แก้ Port ให้ตรง Backend
 
 // --- State ---
 const page = ref(1)
@@ -196,31 +195,62 @@ const filter = ref({
 })
 
 // --- Data Fetching ---
-// ใช้ useFetch ยิงไปที่ API Backend ของเรา
-const { data: logResponse, pending, refresh } = await useFetch(`${apiBase}/admin/logs`, {
-    // ส่ง Token ไปด้วย (ถ้ามีการทำ Auth)
-    // headers: { Authorization: `Bearer ${token.value}` },
-    query: {
-        page: page,
-        limit: limit,
-        // ส่งค่า filter ไปทีละตัว
-        search: filter.value.search,
-        action: filter.value.action,
-        date: filter.value.date
-    },
-    // ให้ refresh อัตโนมัติเมื่อค่าเหล่านี้เปลี่ยน
-    watch: [page] 
+// สร้าง Computed Params เพื่อให้ Nuxt รู้ว่าต้องส่งค่าล่าสุดไป
+const queryParams = computed(() => ({
+    page: page.value,
+    limit: limit.value,
+    search: filter.value.search,
+    action: filter.value.action,
+    date: filter.value.date
+}))
+
+// ดึง Token จาก LocalStorage (ต้องเช็คว่ารันบน Browser ไหม)
+const getToken = () => {
+    if (import.meta.client) {
+        return localStorage.getItem('token')
+    }
+    return ''
+}
+
+const { data: logResponse, pending, refresh, error } = await useFetch(`${apiBase}/admin/logs`, {
+    // 1. สำคัญ: สั่งให้รันเฉพาะฝั่ง Client เพื่อให้เจอ LocalStorage
+    server: false,
+    
+    // 2. ผูก Query แบบ Reactive
+    query: queryParams,
+    
+    // 3. ใส่ Header Token
+    headers: computed(() => ({
+        Authorization: `Bearer ${getToken()}`
+    })),
+
+    // Debug Error ถ้ามี
+    onResponseError({ response }) {
+        console.error('API Error:', response._data)
+        if (response.status === 401) {
+            // Token หมดอายุ ให้เด้งไป Login
+            window.location.href = '/login'
+        }
+    }
 })
+
+// --- Watchers ---
+
+// เมื่อเปลี่ยน Filter ให้รีเซ็ตกลับหน้า 1 (Log จะได้ไม่ว่างถ้าหน้าปัจจุบันเกินจำนวนผลลัพธ์ใหม่)
+watch(() => [filter.value.action, filter.value.date, filter.value.search], () => {
+    page.value = 1
+    // หมายเหตุ: useFetch จะ refresh เองอัตโนมัติเพราะ queryParams เปลี่ยน
+})
+
 
 // --- Methods ---
 
-// ฟังก์ชันค้นหา (Reset กลับหน้า 1 เมื่อค้นหาใหม่)
 const handleSearch = () => {
     page.value = 1
+    // บังคับโหลดใหม่ (เผื่อ useFetch ไม่ detect การกด enter)
     refresh()
 }
 
-// Format วันที่ให้สวยงาม แยกวันที่กับเวลา
 const formatDate = (dateStr) => {
     if (!dateStr) return { date: '-', time: '' }
     const d = new Date(dateStr)
@@ -230,19 +260,17 @@ const formatDate = (dateStr) => {
     }
 }
 
-// จัดรูปแบบ JSON Details ให้แสดงผลได้ดีขึ้น
 const formatDetails = (details) => {
     if (!details) return '-'
     try {
-        // ถ้าเป็น Object ให้แปลงเป็น String, ถ้าเป็น String อยู่แล้วก็ใช้เลย
-        const str = typeof details === 'object' ? JSON.stringify(details, null, 2) : details
-        return str.replace(/[{}"]/g, '').replace(/,/g, ', ') // ลบวงเล็บปีกกาและ quote ให้ดูสะอาดตา
+        // เช็คก่อนว่าเป็น Object หรือ String
+        const content = typeof details === 'string' ? JSON.parse(details) : details
+        return JSON.stringify(content, null, 2).replace(/[{}"]/g, '').replace(/,/g, ', ')
     } catch (e) {
         return String(details)
     }
 }
 
-// เลือกสี Badge ตาม Action Enum
 const actionBadge = (action) => {
     const map = {
         'LOGIN': 'bg-purple-100 text-purple-700 border-purple-200',
@@ -258,7 +286,6 @@ const actionBadge = (action) => {
     return map[action] || 'bg-gray-100 text-gray-600 border-gray-200'
 }
 
-// เลือกไอคอนตาม Action
 const actionIcon = (action) => {
     const map = {
         'LOGIN': 'fas fa-sign-in-alt',
@@ -274,19 +301,24 @@ const actionIcon = (action) => {
     return map[action] || 'fas fa-circle'
 }
 
-// ฟังก์ชัน Export CSV
 const exportLogs = () => {
-    // สร้าง URL พร้อม Query Params
-    const queryParams = new URLSearchParams({
+    const token = getToken()
+    const params = new URLSearchParams({
         search: filter.value.search,
         action: filter.value.action,
-        date: filter.value.date
+        date: filter.value.date,
+        token: token // ส่ง Token ไปทาง Query Param ชั่วคราวเพื่อให้โหลดไฟล์ได้ (หรือใช้ blob method ก็ได้แต่นี่ยากกว่า)
     }).toString()
     
-    // เปิดหน้าต่างใหม่เพื่อดาวน์โหลดไฟล์
-    // (Backend ต้องมี Route /admin/logs/export รองรับ ตามที่เคยคุยกัน)
-    window.open(`${apiBase}/admin/logs/export?${queryParams}`, '_blank')
+    window.open(`${apiBase}/admin/logs/export?${params}`, '_blank')
 }
+
+useHead({
+    title: 'System Logs | Painamnae Admin',
+    link: [
+        { rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css' }
+    ]
+})
 </script>
 
 <style scoped>

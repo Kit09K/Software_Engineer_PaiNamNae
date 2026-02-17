@@ -20,26 +20,3 @@ const contextMiddleware = (req, res, next) => {
 };
 
 module.exports = contextMiddleware;
-
-// // backend/src/middlewares/contextMiddleware.js
-// const { contextStorage } = require('../utils/context');
-
-// const contextMiddleware = (req, res, next) => {
-//   const ipAddress = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '0.0.0.0';
-//   const userAgent = req.headers['user-agent'] || 'unknown';
-  
-//   const userId = req.user ? req.user.id : null;
-
-//   const store = {
-//     userId,
-//     ipAddress,
-//     userAgent,
-//   };
-
-//   contextStorage.run(store, () => {
-//     next();
-//   });
-// };
-
-
-// module.exports = contextMiddleware;

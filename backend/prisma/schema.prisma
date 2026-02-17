@@ -70,6 +70,7 @@ enum LogAction {
   APPROVE_VERIFICATION      // Admin อนุมัติเอกสาร
   REJECT_VERIFICATION       // Admin ปฏิเสธเอกสาร
   SOS_TRIGGERED             // การกดปุ่มฉุกเฉิน
+  CHANGE_PASSWORD
 }
 
 model User {
