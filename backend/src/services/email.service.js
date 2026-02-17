@@ -21,7 +21,7 @@ class EmailService {
                 subject: subject, 
                 text: text,
                 attachments: attachments
-      };
+            };
             await this.transporter.sendMail(mailOptions);
         }
         catch (error) {

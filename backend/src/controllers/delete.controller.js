@@ -28,9 +28,6 @@ class DeleteController {
             deleteBookings,
             sendEmailCopy
         );
-        res.status(201).json({
-            message: "Delete request created successfully",
-        });
 
         try {
             const backupData = {
@@ -45,19 +42,19 @@ class DeleteController {
             const deleteRequest = await DeleteService.getDeleteRequestByUserId(userId);
             if (deleteRequest.deleteAccount) {
                 backupData.userData = await UserService.getUserById(userId);
-                await DeleteService.markDeleteUserData(userId, deleteRequest);
+                await DeleteService.markDeleteUserData(userId);
             }
             if (deleteRequest.deleteVehicles) {
                 backupData.vehicles = await VehicleService.getAllVehicles(userId);
-                await DeleteService.markDeleteVehicles(userId, deleteRequest);
+                await DeleteService.markDeleteVehicles(userId);
             }
             if (deleteRequest.deleteRoutes && req.user.role === 'DRIVER') {
                 backupData.routes = await RouteService.getMyRoutes(userId);
-                await DeleteService.markDeleteRoutes(userId, deleteRequest);
+                await DeleteService.markDeleteRoutes(userId);
             }
             if (deleteRequest.deleteBookings) {
                 backupData.bookings = await BookingService.getMyBookings(userId);
-                await DeleteService.markDeleteBookings(userId, deleteRequest);
+                await DeleteService.markDeleteBookings(userId);
             }
 
             if (deleteRequest.sendEmailCopy) {
@@ -73,9 +70,14 @@ class DeleteController {
             }
     
         }
+
+        
         catch (error) {
             console.error("Error processing delete request:", error);
         }
+    res.status(201).json({
+            message: "Delete request created successfully",
+        });
 
     })    
 }
