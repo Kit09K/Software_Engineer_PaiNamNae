@@ -1,7 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const { signToken } = require("../utils/jwt");
 const userService = require("../services/user.service");
-const systemLogService = require("../services/systemLog.service");
 const ApiError = require('../utils/ApiError');
 
 const login = asyncHandler(async (req, res) => {
@@ -86,34 +85,6 @@ const changePassword = asyncHandler(async (req, res) => {
     const userAgent = req.get('User-Agent');
 
     const result = await userService.updatePassword(userId, currentPassword, newPassword);
-
-    if (!result.success) {
-        // บันทึกเมื่อเปลี่ยนรหัสผ่านไม่สำเร็จ
-        await systemLogService.createLog({
-            userId,
-            action: 'UPDATE_DATA',
-            targetTable: 'User',
-            targetId: userId,
-            ipAddress,
-            userAgent,
-            details: { field: 'password', status: 'FAILED', error: result.error }
-        });
-        if (result.error === 'INCORRECT_PASSWORD') {
-            throw new ApiError(401, 'Incorrect current password.');
-        }
-        throw new ApiError(500, 'Could not update password.');
-    }
-
-    // บันทึกเมื่อเปลี่ยนรหัสผ่านสำเร็จ
-    await systemLogService.createLog({
-        userId,
-        action: 'UPDATE_DATA',
-        targetTable: 'User',
-        targetId: userId,
-        ipAddress,
-        userAgent,
-        details: { field: 'password', status: 'SUCCESS' }
-    });
 
     res.status(200).json({
         success: true,
