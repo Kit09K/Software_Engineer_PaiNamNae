@@ -61,6 +61,7 @@ jobs:
           NUXT_PUBLIC_API_BASE: ${{ secrets.NUXT_PUBLIC_API_BASE }}
           NUXT_PUBLIC_GOOGLE_MAPS_KEY: ${{ secrets.NUXT_PUBLIC_GOOGLE_MAPS_KEY }}
         run: |
+          echo .env
           cd frontend
           npm run generate
           
