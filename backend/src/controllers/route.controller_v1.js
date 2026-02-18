@@ -113,7 +113,6 @@ const createRoute = asyncHandler(async (req, res) => {
       }))
     );
 
-    // เก็บ waypoints ที่ “ร้องขอ” และผลลำดับที่ Google จัดให้
     payload.waypoints = {
       requested: routeFields.waypoints || [],
       optimizedOrder: primary.waypoint_order || [],
@@ -144,7 +143,6 @@ const updateRoute = asyncHandler(async (req, res) => {
     throw new ApiError(400, "ไม่สามารถแก้ไขเส้นทางที่ถูกยกเลิกได้");
   }
 
-  // await vehicleService.getVehicleById(vehicleId, driverId);
   let newVehicleId = existing.vehicleId;
   if (vehicleId) {
     await vehicleService.getVehicleById(vehicleId, driverId);
@@ -158,7 +156,6 @@ const updateRoute = asyncHandler(async (req, res) => {
     }),
   };
 
-  // ===== รีเฟรชข้อมูล Directions เฉพาะเมื่อจุดสำคัญเปลี่ยน =====
   const startChanged = routeFields.startLocation !== undefined &&
     JSON.stringify(routeFields.startLocation) !== JSON.stringify(existing.startLocation);
   const endChanged = routeFields.endLocation !== undefined &&
@@ -246,7 +243,6 @@ const adminCreateRoute = asyncHandler(async (req, res) => {
     departureTime: new Date(routeFields.departureTime),
   };
 
-  // Enrich แบบเดียวกับ createRoute
   const directions = await getDirections({
     origin: payload.startLocation,
     destination: payload.endLocation,
@@ -319,7 +315,6 @@ const adminUpdateRoute = asyncHandler(async (req, res) => {
     }),
   };
 
-  // ===== รีคอมพิวต์ Directions ถ้า origin/destination/เวลาออกเดินทาง เปลี่ยน =====
   const startChanged = routeFields.startLocation !== undefined &&
     JSON.stringify(routeFields.startLocation) !== JSON.stringify(existing.startLocation);
   const endChanged = routeFields.endLocation !== undefined &&
@@ -344,18 +339,14 @@ const adminUpdateRoute = asyncHandler(async (req, res) => {
     if (primary && leg) {
       payload.routeSummary = primary.summary || (leg.start_address + ' → ' + leg.end_address);
 
-      // แสดงผลแบบข้อความ (คงไว้)
       payload.distance = leg.distance?.text || null;
       payload.duration = leg.duration?.text || null;
 
-      // หน่วยดิบใหม่
       payload.distanceMeters = typeof leg.distance?.value === 'number' ? leg.distance.value : null;
       payload.durationSeconds = typeof leg.duration?.value === 'number' ? leg.duration.value : null;
 
-      // polyline หลัก
       payload.routePolyline = primary.overview_polyline?.points || null;
 
-      // steps/waypoints
       payload.steps = leg.steps?.map(s => ({
         html_instructions: s.html_instructions,
         distance: s.distance?.text,

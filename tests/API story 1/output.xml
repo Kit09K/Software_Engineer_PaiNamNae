@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.4.1 (Python 3.14.0 on win32)" generated="2026-02-18T14:22:20.545099" rpa="false" schemaversion="5">
+<suite id="s1" name="testAPI" source="D:\Year 3 term 2\Software Engineering\Sandbox\TestProject\tests\API story 1\testAPI.robot">
+<test id="s1-t1" name="Get System Logs Successfully" line="12">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2026-02-18T14:22:20.636556" level="INFO">Creating Session using : alias=api, url=http://localhost:8080/api/admin, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>api</arg>
+<arg>${BASE_URL}</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2026-02-18T14:22:20.636401" elapsed="0.000303"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-18T14:22:20.637277" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxemdldzgwMDAwaDVrYzMwdGNkdjgyIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0aGVzdW4xMTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc3MTM5ODczOSwiZXhwI...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.636886" elapsed="0.000418"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-02-18T14:22:20.648468" level="INFO">GET Request : url=http://localhost:8080/api/admin/logs 
+ path_url=/api/admin/logs 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxemdldzgwMDAwaDVrYzMwdGNkdjgyIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0aGVzdW4xMTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc3MTM5ODczOSwiZXhwIjoxNzcxNDAyMzM5fQ.hA0kSOA8dfC7_j7BA3mrGAPqT2FfIhJON6oHFNQwNtw'} 
+ body=None 
+ </msg>
+<msg time="2026-02-18T14:22:20.648582" level="INFO">GET Response : url=http://localhost:8080/api/admin/logs 
+ status=200, reason=OK 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '8362', 'ETag': 'W/"20aa-AfcbwAl1VdiW322WeCcHFyZmeNU"', 'Date': 'Wed, 18 Feb 2026 07:22:20 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"status":"success","data":[{"id":"cmlrp2nba001lgefy7gm083qh","timestamp":"2026-02-18T07:12:19.846Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrp2i8a001jgefyedpejgoz","timestamp":"2026-02-18T07:12:13.258Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGOUT","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":"cmlqzgew80000h5kc30tcdv82","details":{"message":"User logged out successfully"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrp2f2c001hgefyphhq7bd7","timestamp":"2026-02-18T07:12:09.157Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrp2ajs001fgefyzjrraqig","timestamp":"2026-02-18T07:12:03.299Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGOUT","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":"cmlqzgew80000h5kc30tcdv82","details":{"message":"User logged out successfully"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrom47c001dgefy4s9fotqs","timestamp":"2026-02-18T06:59:28.584Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrolfh1001bgefytfwfmjrq","timestamp":"2026-02-18T06:58:56.533Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrokqyp0019gefyjz4dpvps","timestamp":"2026-02-18T06:58:24.769Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrok2f60017gefy7n7wjp17","timestamp":"2026-02-18T06:57:52.962Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlroh9ml0015gefymo1zuxaj","timestamp":"2026-02-18T06:55:42.334Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrogb9v0013gefy0qirr8ol","timestamp":"2026-02-18T06:54:57.811Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlroelyu0011gefy5ak4gdvh","timestamp":"2026-02-18T06:53:38.358Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrobrje000zgefy2az7vtrp","timestamp":"2026-02-18T06:51:25.610Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlro9yr6000xgefy9j0yafid","timestamp":"2026-02-18T06:50:01.651Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlro8m9n000vgefy674nb7z2","timestamp":"2026-02-18T06:48:58.811Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnzkky000tgefytce3lt1h","timestamp":"2026-02-18T06:41:56.723Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"UPDATE_DATA","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":"cmlqzgew80000h5kc30tcdv82","details":{"message":"User updated profile information","updatedFields":["email","firstName","lastName","phoneNumber"]},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnxx64000rgefyuxi35vj9","timestamp":"2026-02-18T06:40:39.724Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnwrdz000pgefy1t4r3h7m","timestamp":"2026-02-18T06:39:45.575Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnqmcq000ngefywgydjsmx","timestamp":"2026-02-18T06:34:59.115Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnpxmq000lgefyz785z84m","timestamp":"2026-02-18T06:34:27.074Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnmwlc000jgefyuy8s503r","timestamp":"2026-02-18T06:32:05.760Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}}],"pagination":{"total":29,"page":1,"limit":20,"totalPages":2}} 
+ </msg>
+<msg time="2026-02-18T14:22:20.648738" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>${LOG_ENDPOINT}</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.637438" elapsed="0.011321"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${response}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.648982" elapsed="0.000219"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${response.json()['status']}</arg>
+<arg>success</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.649338" elapsed="0.000531"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${response.json()}</arg>
+<arg>data</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.649996" elapsed="0.000360"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${response.json()}</arg>
+<arg>pagination</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.650473" elapsed="0.000312"/>
+</kw>
+<status status="PASS" start="2026-02-18T14:22:20.635808" elapsed="0.015101"/>
+</test>
+<test id="s1-t2" name="Get System Logs With Pagination" line="28">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2026-02-18T14:22:20.651722" level="INFO">Creating Session using : alias=api, url=http://localhost:8080/api/admin, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>api</arg>
+<arg>${BASE_URL}</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2026-02-18T14:22:20.651630" elapsed="0.000193"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-18T14:22:20.652211" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxemdldzgwMDAwaDVrYzMwdGNkdjgyIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0aGVzdW4xMTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc3MTM5ODczOSwiZXhwI...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.651951" elapsed="0.000295"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-18T14:22:20.652543" level="INFO">${params} = {'page': '1', 'limit': '5'}</msg>
+<var>${params}</var>
+<arg>page=1</arg>
+<arg>limit=5</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.652361" elapsed="0.000198"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-02-18T14:22:20.657966" level="INFO">GET Request : url=http://localhost:8080/api/admin/logs?page=1&amp;limit=5 
+ path_url=/api/admin/logs?page=1&amp;limit=5 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxemdldzgwMDAwaDVrYzMwdGNkdjgyIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0aGVzdW4xMTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc3MTM5ODczOSwiZXhwIjoxNzcxNDAyMzM5fQ.hA0kSOA8dfC7_j7BA3mrGAPqT2FfIhJON6oHFNQwNtw'} 
+ body=None 
+ </msg>
+<msg time="2026-02-18T14:22:20.658048" level="INFO">GET Response : url=http://localhost:8080/api/admin/logs?page=1&amp;limit=5 
+ status=200, reason=OK 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '2189', 'ETag': 'W/"88d-JIMJhC1BpoVKoHDvZx7CCTlOh6g"', 'Date': 'Wed, 18 Feb 2026 07:22:20 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"status":"success","data":[{"id":"cmlrp2nba001lgefy7gm083qh","timestamp":"2026-02-18T07:12:19.846Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrp2i8a001jgefyedpejgoz","timestamp":"2026-02-18T07:12:13.258Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGOUT","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":"cmlqzgew80000h5kc30tcdv82","details":{"message":"User logged out successfully"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrp2f2c001hgefyphhq7bd7","timestamp":"2026-02-18T07:12:09.157Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrp2ajs001fgefyzjrraqig","timestamp":"2026-02-18T07:12:03.299Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGOUT","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":"cmlqzgew80000h5kc30tcdv82","details":{"message":"User logged out successfully"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrom47c001dgefy4s9fotqs","timestamp":"2026-02-18T06:59:28.584Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}}],"pagination":{"total":29,"page":1,"limit":5,"totalPages":6}} 
+ </msg>
+<msg time="2026-02-18T14:22:20.658150" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>${LOG_ENDPOINT}</arg>
+<arg>headers=${headers}</arg>
+<arg>params=${params}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.652665" elapsed="0.005503"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${response}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.658356" elapsed="0.000157"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${response.json()['pagination']['limit']} == 5</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.658631" elapsed="0.000716"/>
+</kw>
+<status status="PASS" start="2026-02-18T14:22:20.651420" elapsed="0.008062"/>
+</test>
+<test id="s1-t3" name="Filter Logs By Action" line="45">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2026-02-18T14:22:20.660263" level="INFO">Creating Session using : alias=api, url=http://localhost:8080/api/admin, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>api</arg>
+<arg>${BASE_URL}</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2026-02-18T14:22:20.660173" elapsed="0.000198"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-18T14:22:20.660734" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxemdldzgwMDAwaDVrYzMwdGNkdjgyIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0aGVzdW4xMTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc3MTM5ODczOSwiZXhwI...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.660495" elapsed="0.000258"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-18T14:22:20.661039" level="INFO">${params} = {'action': 'LOGIN'}</msg>
+<var>${params}</var>
+<arg>action=LOGIN</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.660867" elapsed="0.000189"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-02-18T14:22:20.667930" level="INFO">GET Request : url=http://localhost:8080/api/admin/logs?action=LOGIN 
+ path_url=/api/admin/logs?action=LOGIN 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxemdldzgwMDAwaDVrYzMwdGNkdjgyIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0aGVzdW4xMTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc3MTM5ODczOSwiZXhwIjoxNzcxNDAyMzM5fQ.hA0kSOA8dfC7_j7BA3mrGAPqT2FfIhJON6oHFNQwNtw'} 
+ body=None 
+ </msg>
+<msg time="2026-02-18T14:22:20.668008" level="INFO">GET Response : url=http://localhost:8080/api/admin/logs?action=LOGIN 
+ status=200, reason=OK 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '8170', 'ETag': 'W/"1fea-oM2Xl7rWoT1Dd/4WZx/oUqoYd7I"', 'Date': 'Wed, 18 Feb 2026 07:22:20 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"status":"success","data":[{"id":"cmlrp2nba001lgefy7gm083qh","timestamp":"2026-02-18T07:12:19.846Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrp2f2c001hgefyphhq7bd7","timestamp":"2026-02-18T07:12:09.157Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrom47c001dgefy4s9fotqs","timestamp":"2026-02-18T06:59:28.584Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrolfh1001bgefytfwfmjrq","timestamp":"2026-02-18T06:58:56.533Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrokqyp0019gefyjz4dpvps","timestamp":"2026-02-18T06:58:24.769Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrok2f60017gefy7n7wjp17","timestamp":"2026-02-18T06:57:52.962Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlroh9ml0015gefymo1zuxaj","timestamp":"2026-02-18T06:55:42.334Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrogb9v0013gefy0qirr8ol","timestamp":"2026-02-18T06:54:57.811Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlroelyu0011gefy5ak4gdvh","timestamp":"2026-02-18T06:53:38.358Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrobrje000zgefy2az7vtrp","timestamp":"2026-02-18T06:51:25.610Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlro9yr6000xgefy9j0yafid","timestamp":"2026-02-18T06:50:01.651Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlro8m9n000vgefy674nb7z2","timestamp":"2026-02-18T06:48:58.811Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnxx64000rgefyuxi35vj9","timestamp":"2026-02-18T06:40:39.724Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnwrdz000pgefy1t4r3h7m","timestamp":"2026-02-18T06:39:45.575Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnqmcq000ngefywgydjsmx","timestamp":"2026-02-18T06:34:59.115Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnpxmq000lgefyz785z84m","timestamp":"2026-02-18T06:34:27.074Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnmwlc000jgefyuy8s503r","timestamp":"2026-02-18T06:32:05.760Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnk00b000hgefy3xg2j6h9","timestamp":"2026-02-18T06:29:50.219Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnhqka000fgefyirex14ss","timestamp":"2026-02-18T06:28:04.667Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnh7ub000dgefyz21vd9r0","timestamp":"2026-02-18T06:27:40.403Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}}],"pagination":{"total":23,"page":1,"limit":20,"totalPages":2}} 
+ </msg>
+<msg time="2026-02-18T14:22:20.668133" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>${LOG_ENDPOINT}</arg>
+<arg>headers=${headers}</arg>
+<arg>params=${params}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.661160" elapsed="0.006992"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${response}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.668336" elapsed="0.000148"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${response.json()['status']}</arg>
+<arg>success</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.668606" elapsed="0.000477"/>
+</kw>
+<status status="PASS" start="2026-02-18T14:22:20.659963" elapsed="0.009240"/>
+</test>
+<test id="s1-t4" name="Search Logs By Keyword" line="62">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2026-02-18T14:22:20.669963" level="INFO">Creating Session using : alias=api, url=http://localhost:8080/api/admin, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>api</arg>
+<arg>${BASE_URL}</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2026-02-18T14:22:20.669878" elapsed="0.000181"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-18T14:22:20.670425" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxemdldzgwMDAwaDVrYzMwdGNkdjgyIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0aGVzdW4xMTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc3MTM5ODczOSwiZXhwI...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.670182" elapsed="0.000262"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-18T14:22:20.670734" level="INFO">${params} = {'search': '127.0.0.1'}</msg>
+<var>${params}</var>
+<arg>search=127.0.0.1</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.670558" elapsed="0.000193"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-02-18T14:22:20.676517" level="INFO">GET Request : url=http://localhost:8080/api/admin/logs?search=127.0.0.1 
+ path_url=/api/admin/logs?search=127.0.0.1 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxemdldzgwMDAwaDVrYzMwdGNkdjgyIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0aGVzdW4xMTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc3MTM5ODczOSwiZXhwIjoxNzcxNDAyMzM5fQ.hA0kSOA8dfC7_j7BA3mrGAPqT2FfIhJON6oHFNQwNtw'} 
+ body=None 
+ </msg>
+<msg time="2026-02-18T14:22:20.676592" level="INFO">GET Response : url=http://localhost:8080/api/admin/logs?search=127.0.0.1 
+ status=200, reason=OK 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '90', 'ETag': 'W/"5a-wp/OtpiYgoXBSLUmL2jgrQrW3GU"', 'Date': 'Wed, 18 Feb 2026 07:22:20 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"status":"success","data":[],"pagination":{"total":0,"page":1,"limit":20,"totalPages":0}} 
+ </msg>
+<msg time="2026-02-18T14:22:20.676684" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>${LOG_ENDPOINT}</arg>
+<arg>headers=${headers}</arg>
+<arg>params=${params}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.670853" elapsed="0.005850"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${response}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.676924" elapsed="0.000160"/>
+</kw>
+<status status="PASS" start="2026-02-18T14:22:20.669681" elapsed="0.007530"/>
+</test>
+<test id="s1-t5" name="Filter Logs By Date" line="78">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2026-02-18T14:22:20.678017" level="INFO">Creating Session using : alias=api, url=http://localhost:8080/api/admin, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>api</arg>
+<arg>${BASE_URL}</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2026-02-18T14:22:20.677919" elapsed="0.000194"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-18T14:22:20.678497" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxemdldzgwMDAwaDVrYzMwdGNkdjgyIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0aGVzdW4xMTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc3MTM5ODczOSwiZXhwI...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.678235" elapsed="0.000281"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-18T14:22:20.678816" level="INFO">${params} = {'date': '2026-02-18'}</msg>
+<var>${params}</var>
+<arg>date=2026-02-18</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.678631" elapsed="0.000203"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-02-18T14:22:20.684516" level="INFO">GET Request : url=http://localhost:8080/api/admin/logs?date=2026-02-18 
+ path_url=/api/admin/logs?date=2026-02-18 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxemdldzgwMDAwaDVrYzMwdGNkdjgyIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0aGVzdW4xMTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc3MTM5ODczOSwiZXhwIjoxNzcxNDAyMzM5fQ.hA0kSOA8dfC7_j7BA3mrGAPqT2FfIhJON6oHFNQwNtw'} 
+ body=None 
+ </msg>
+<msg time="2026-02-18T14:22:20.684595" level="INFO">GET Response : url=http://localhost:8080/api/admin/logs?date=2026-02-18 
+ status=200, reason=OK 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '8362', 'ETag': 'W/"20aa-AfcbwAl1VdiW322WeCcHFyZmeNU"', 'Date': 'Wed, 18 Feb 2026 07:22:20 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"status":"success","data":[{"id":"cmlrp2nba001lgefy7gm083qh","timestamp":"2026-02-18T07:12:19.846Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrp2i8a001jgefyedpejgoz","timestamp":"2026-02-18T07:12:13.258Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGOUT","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":"cmlqzgew80000h5kc30tcdv82","details":{"message":"User logged out successfully"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrp2f2c001hgefyphhq7bd7","timestamp":"2026-02-18T07:12:09.157Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrp2ajs001fgefyzjrraqig","timestamp":"2026-02-18T07:12:03.299Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGOUT","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":"cmlqzgew80000h5kc30tcdv82","details":{"message":"User logged out successfully"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrom47c001dgefy4s9fotqs","timestamp":"2026-02-18T06:59:28.584Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrolfh1001bgefytfwfmjrq","timestamp":"2026-02-18T06:58:56.533Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrokqyp0019gefyjz4dpvps","timestamp":"2026-02-18T06:58:24.769Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrok2f60017gefy7n7wjp17","timestamp":"2026-02-18T06:57:52.962Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlroh9ml0015gefymo1zuxaj","timestamp":"2026-02-18T06:55:42.334Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrogb9v0013gefy0qirr8ol","timestamp":"2026-02-18T06:54:57.811Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlroelyu0011gefy5ak4gdvh","timestamp":"2026-02-18T06:53:38.358Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrobrje000zgefy2az7vtrp","timestamp":"2026-02-18T06:51:25.610Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlro9yr6000xgefy9j0yafid","timestamp":"2026-02-18T06:50:01.651Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlro8m9n000vgefy674nb7z2","timestamp":"2026-02-18T06:48:58.811Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnzkky000tgefytce3lt1h","timestamp":"2026-02-18T06:41:56.723Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"UPDATE_DATA","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":"cmlqzgew80000h5kc30tcdv82","details":{"message":"User updated profile information","updatedFields":["email","firstName","lastName","phoneNumber"]},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnxx64000rgefyuxi35vj9","timestamp":"2026-02-18T06:40:39.724Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnwrdz000pgefy1t4r3h7m","timestamp":"2026-02-18T06:39:45.575Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnqmcq000ngefywgydjsmx","timestamp":"2026-02-18T06:34:59.115Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnpxmq000lgefyz785z84m","timestamp":"2026-02-18T06:34:27.074Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}},{"id":"cmlrnmwlc000jgefyuy8s503r","timestamp":"2026-02-18T06:32:05.760Z","userId":"cmlqzgew80000h5kc30tcdv82","action":"LOGIN","ipAddress":"::ffff:172.18.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36","targetTable":"User","targetId":null,"details":{"loginMethod":"username"},"user":{"username":"tester","role":"ADMIN"}}],"pagination":{"total":29,"page":1,"limit":20,"totalPages":2}} 
+ </msg>
+<msg time="2026-02-18T14:22:20.684729" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>${LOG_ENDPOINT}</arg>
+<arg>headers=${headers}</arg>
+<arg>params=${params}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.678948" elapsed="0.005799"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${response}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.684961" elapsed="0.000166"/>
+</kw>
+<status status="PASS" start="2026-02-18T14:22:20.677698" elapsed="0.007558"/>
+</test>
+<test id="s1-t6" name="Export Logs CSV Successfully" line="94">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2026-02-18T14:22:20.686047" level="INFO">Creating Session using : alias=api, url=http://localhost:8080/api/admin, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>api</arg>
+<arg>${BASE_URL}</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2026-02-18T14:22:20.685950" elapsed="0.000193"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-18T14:22:20.686526" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxemdldzgwMDAwaDVrYzMwdGNkdjgyIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0aGVzdW4xMTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc3MTM5ODczOSwiZXhwI...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.686265" elapsed="0.000280"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-02-18T14:22:20.691761" level="INFO">GET Request : url=http://localhost:8080/api/admin/logs/export 
+ path_url=/api/admin/logs/export 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxemdldzgwMDAwaDVrYzMwdGNkdjgyIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0aGVzdW4xMTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc3MTM5ODczOSwiZXhwIjoxNzcxNDAyMzM5fQ.hA0kSOA8dfC7_j7BA3mrGAPqT2FfIhJON6oHFNQwNtw'} 
+ body=None 
+ </msg>
+<msg time="2026-02-18T14:22:20.691839" level="INFO">GET Response : url=http://localhost:8080/api/admin/logs/export 
+ status=200, reason=OK 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': 'attachment; filename="system_logs_2026-02-18T07:22:20.689Z.csv"', 'Content-Length': '3275', 'ETag': 'W/"ccb-j5+SMnsjc7Jz9zWnH9CrMwnf3kY"', 'Date': 'Wed, 18 Feb 2026 07:22:20 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body="timestamp","username","ipAddress","action","targetTable","details"
+"2026-02-18T07:12:19.846Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T07:12:13.258Z","tester","::ffff:172.18.0.1","LOGOUT","User","{""message"":""User logged out successfully""}"
+"2026-02-18T07:12:09.157Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T07:12:03.299Z","tester","::ffff:172.18.0.1","LOGOUT","User","{""message"":""User logged out successfully""}"
+"2026-02-18T06:59:28.584Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:58:56.533Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:58:24.769Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:57:52.962Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:55:42.334Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:54:57.811Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:53:38.358Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:51:25.610Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:50:01.651Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:48:58.811Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:41:56.723Z","tester","::ffff:172.18.0.1","UPDATE_DATA","User","{""message"":""User updated profile information"",""updatedFields"":[""email"",""firstName"",""lastName"",""phoneNumber""]}"
+"2026-02-18T06:40:39.724Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:39:45.575Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:34:59.115Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:34:27.074Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:32:05.760Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:29:50.219Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:28:04.667Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:27:40.403Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:27:06.269Z","tester","::ffff:172.18.0.1","LOGOUT","User","{""message"":""User logged out successfully""}"
+"2026-02-18T06:23:17.339Z","tester","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:21:31.557Z","admin123","::ffff:172.18.0.1","LOGOUT","User","{""message"":""User logged out successfully""}"
+"2026-02-18T06:20:57.897Z","admin123","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}"
+"2026-02-18T06:20:48.320Z","admin123","::ffff:172.18.0.1","LOGOUT","User","{""message"":""User logged out successfully""}"
+"2026-02-18T06:14:37.005Z","admin123","::ffff:172.18.0.1","LOGIN","User","{""loginMethod"":""username""}" 
+ </msg>
+<msg time="2026-02-18T14:22:20.691938" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>${LOG_ENDPOINT}/export</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.686662" elapsed="0.005294"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${response}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.692133" elapsed="0.000146"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${response.headers['Content-Type']}</arg>
+<arg>text/csv</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-02-18T14:22:20.692404" elapsed="0.000536"/>
+</kw>
+<status status="PASS" start="2026-02-18T14:22:20.685738" elapsed="0.007328"/>
+</test>
+<status status="PASS" start="2026-02-18T14:22:20.546020" elapsed="0.147654"/>
+</suite>
+<statistics>
+<total>
+<stat pass="6" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="testAPI" id="s1" pass="6" fail="0" skip="0">testAPI</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

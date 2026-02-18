@@ -13,6 +13,8 @@ const { errorHandler } = require('./src/middlewares/errorHandler');
 const ApiError = require('./src/utils/ApiError')
 const { metricsMiddleware } = require('./src/middlewares/metrics');
 const ensureAdmin = require('./src/bootstrap/ensureAdmin');
+const contextMiddleware = require('./src/middlewares/contextMiddleware');
+
 const app = express();
 promClient.collectDefaultMetrics();
 
@@ -51,6 +53,7 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions)); // เปิดรับ preflight สำหรับทุก route
 
 app.use(express.json());
+app.use(contextMiddleware);
 
 //Rate Limiting
 // const limiter = rateLimit({
@@ -68,7 +71,7 @@ app.use(metricsMiddleware);
 // Health Check Route
 app.get('/health', async (req, res) => {
     try {
-        const prisma = require('./src/utils/prisma');
+        const prisma = require('./src/lib/prisma');
         await prisma.$queryRaw`SELECT 1`;
         res.status(200).json({ status: 'ok' });
     } catch (err) {

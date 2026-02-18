@@ -233,26 +233,46 @@ async function handleProfileUpdate() {
     isLoading.value = true;
 
     try {
-        const formData = new FormData()
-        formData.append('firstName', form.firstName);
-        formData.append('lastName', form.lastName);
-        formData.append('email', form.email);
-        formData.append('phoneNumber', form.phoneNumber);
-
+        let updatedUser;
+        
+        // --- เช็คว่ามีการอัปโหลดรูปภาพไหม ---
         if (form.profilePictureFile) {
+            // กรณีที่ 1: มีรูปภาพ ต้องใช้ FormData
+            const formData = new FormData()
+            formData.append('firstName', form.firstName);
+            formData.append('lastName', form.lastName);
+            formData.append('email', form.email);
+            formData.append('phoneNumber', form.phoneNumber);
             formData.append('profilePicture', form.profilePictureFile);
+
+            // หมายเหตุ: Nuxt $fetch จะจัดการ Content-Type เป็น multipart/form-data ให้เองอัตโนมัติเมื่อ Body เป็น FormData
+            updatedUser = await $api('/users/me', {
+                method: 'PUT',
+                body: formData
+            });
+
+        } else {
+            // กรณีที่ 2: ไม่มีรูปภาพ ส่งเป็น JSON ธรรมดา (Backend จะอ่าน req.body ได้ชัวร์กว่า)
+            updatedUser = await $api('/users/me', {
+                method: 'PUT',
+                body: {
+                    firstName: form.firstName,
+                    lastName: form.lastName,
+                    email: form.email,
+                    phoneNumber: form.phoneNumber
+                }
+            });
         }
 
-        const updatedUser = await $api('/users/me', {
-            method: 'PUT',
-            body: formData
-        });
-
+        // อัปเดต Cookie และ State
         userCookie.value = updatedUser;
         originalUserData = { ...updatedUser };
 
+        // --- ส่วนของการเปลี่ยนรหัสผ่าน (เหมือนเดิม) ---
         let passwordChanged = false;
+        // เช็คว่ามีการกรอกช่องใดช่องหนึ่งหรือไม่
         if (form.currentPassword || form.newPassword || form.confirmNewPassword) {
+            // ถ้ากรอก ต้องกรอกให้ครบทุกช่อง
             if (!form.currentPassword || !form.newPassword || !form.confirmNewPassword) {
                 throw new Error("หากต้องการเปลี่ยนรหัสผ่าน กรุณากรอกข้อมูลรหัสผ่านให้ครบทุกช่อง");
             }
@@ -273,21 +293,25 @@ async function handleProfileUpdate() {
             });
 
             passwordChanged = true;
+            // เคลียร์ฟอร์มรหัสผ่าน
             form.currentPassword = '';
             form.newPassword = '';
             form.confirmNewPassword = '';
         }
 
+        // Toast แจ้งเตือน
         toast.success(
             'อัปเดตสำเร็จ!',
             passwordChanged ? 'โปรไฟล์และรหัสผ่านของคุณถูกบันทึกแล้ว' : 'ข้อมูลโปรไฟล์ของคุณถูกบันทึกแล้ว'
         );
 
     } catch (err) {
+        console.error('Update Profile Error:', err); // Log Error ออกมาดู
         const message = err.data?.message || err.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง';
         toast.error('เกิดข้อผิดพลาด', message);
     } finally {
         isLoading.value = false;
+        // Reset file input
         if (fileInput.value) {
             fileInput.value.value = '';
         }

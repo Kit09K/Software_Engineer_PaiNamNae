@@ -202,6 +202,8 @@ const updateUserProfile = async (id, data) => {
     return safeUser;
 };
 
+const updateUserById = updateUserProfile;
+
 const deleteUser = async (id) => {
     const deletedUser = await prisma.user.delete({ where: { id, isDeleted: false } });
 
@@ -241,4 +243,5 @@ module.exports = {
     deleteUser,
     updateUserProfile,
     getUserPublicById,
+    updateUserById,
 };

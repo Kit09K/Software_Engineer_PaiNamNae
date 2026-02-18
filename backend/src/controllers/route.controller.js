@@ -4,6 +4,7 @@ const vehicleService = require("../services/vehicle.service");
 const ApiError = require("../utils/ApiError");
 const verifService = require("../services/driverVerification.service");
 const { getDirections } = require("../utils/googleMaps");
+const prisma = require('../lib/prisma');
 
 const getAllRoutes = asyncHandler(async (req, res) => {
   const routes = await routeService.getAllRoutes();
@@ -77,7 +78,6 @@ const createRoute = asyncHandler(async (req, res) => {
     departureTime: new Date(routeFields.departureTime),
   };
 
-  // ===== Enrich จาก Google Directions =====
   const directions = await getDirections({
     origin: payload.startLocation,
     destination: payload.endLocation,
@@ -94,13 +94,12 @@ const createRoute = asyncHandler(async (req, res) => {
     const sumSeconds = legs.reduce((a, l) => a + (l.duration?.value || 0), 0);
 
     payload.routeSummary = primary.summary || `${legs[0]?.start_address} → ${legs.at(-1)?.end_address}`;
-    payload.distance = legs.length ? legs.map(l => l.distance?.text).filter(Boolean).join(' + ') : null; // หรือ format เอง
+    payload.distance = legs.length ? legs.map(l => l.distance?.text).filter(Boolean).join(' + ') : null;
     payload.duration = legs.length ? legs.map(l => l.duration?.text).filter(Boolean).join(' + ') : null;
     payload.distanceMeters = sumMeters;
     payload.durationSeconds = sumSeconds;
     payload.routePolyline = primary.overview_polyline?.points || null;
 
-    // รวม steps ทั้งหมด
     payload.steps = legs.flatMap(leg =>
       (leg.steps || []).map(s => ({
         html_instructions: s.html_instructions,
@@ -113,7 +112,6 @@ const createRoute = asyncHandler(async (req, res) => {
       }))
     );
 
-    // เก็บ waypoints ที่ “ร้องขอ” และผลลำดับที่ Google จัดให้
     payload.waypoints = {
       requested: routeFields.waypoints || [],
       optimizedOrder: primary.waypoint_order || [],
@@ -125,6 +123,25 @@ const createRoute = asyncHandler(async (req, res) => {
   }
 
   const newRoute = await routeService.createRoute(payload);
+
+  try {
+    await prisma.systemLog.create({
+      data: {
+        action: 'CREATE_DATA',
+        userId: driverId,
+        targetTable: 'Route',
+        targetId: newRoute.id,
+        ipAddress: req.ip || req.connection.remoteAddress || '0.0.0.0',
+        userAgent: req.headers['user-agent'],
+        details: { 
+            message: 'Driver created a new route', 
+            from: payload.startLocation?.name || 'unknown',
+            to: payload.endLocation?.name || 'unknown'
+        }
+      }
+    });
+  } catch (e) { console.error("Log error (createRoute):", e.message); }
+
   res.status(201).json({
     success: true,
     message: "Route created successfully",
@@ -151,7 +168,6 @@ const updateRoute = asyncHandler(async (req, res) => {
     if (hasConfirmed) {
       throw new ApiError(400, "ไม่สามารถแก้ไขเส้นทางได้ เนื่องจากมีคำจองที่ยืนยันแล้ว (CONFIRMED)");
     }
-    // อนุญาตกรณีสถานะรวมอยู่ใน {PENDING, REJECTED, CANCELLED} เท่านั้น
     const allowed = new Set(['PENDING', 'REJECTED', 'CANCELLED']);
     const allAllowed = existing.bookings.every(b => allowed.has(b.status));
     if (!allAllowed) {
@@ -159,7 +175,6 @@ const updateRoute = asyncHandler(async (req, res) => {
     }
   }
 
-  // await vehicleService.getVehicleById(vehicleId, driverId);
   let newVehicleId = existing.vehicleId;
   if (vehicleId) {
     await vehicleService.getVehicleById(vehicleId, driverId);
@@ -173,7 +188,6 @@ const updateRoute = asyncHandler(async (req, res) => {
     }),
   };
 
-  // ===== รีเฟรชข้อมูล Directions เฉพาะเมื่อจุดสำคัญเปลี่ยน =====
   const startChanged = routeFields.startLocation !== undefined &&
     JSON.stringify(routeFields.startLocation) !== JSON.stringify(existing.startLocation);
   const endChanged = routeFields.endLocation !== undefined &&
@@ -244,6 +258,21 @@ const updateRoute = asyncHandler(async (req, res) => {
   }
 
   const updated = await routeService.updateRoute(id, payload);
+
+  try {
+    await prisma.systemLog.create({
+      data: {
+        action: 'UPDATE_DATA',
+        userId: driverId,
+        targetTable: 'Route',
+        targetId: id,
+        ipAddress: req.ip || req.connection.remoteAddress || '0.0.0.0',
+        userAgent: req.headers['user-agent'],
+        details: { message: 'Driver updated route', changedFields: Object.keys(routeFields) }
+      }
+    });
+  } catch (e) { console.error("Log error (updateRoute):", e.message); }
+
   res.status(200).json({
     success: true,
     message: "Route updated successfully",
@@ -263,6 +292,21 @@ const deleteRoute = asyncHandler(async (req, res) => {
     throw new ApiError(400, "ไม่สามารถลบเส้นทางที่ถูกยกเลิกได้");
   }
   const result = await routeService.deleteRoute(id);
+
+  try {
+    await prisma.systemLog.create({
+      data: {
+        action: 'DELETE_DATA',
+        userId: driverId,
+        targetTable: 'Route',
+        targetId: id,
+        ipAddress: req.ip || req.connection.remoteAddress || '0.0.0.0',
+        userAgent: req.headers['user-agent'],
+        details: { message: 'Driver deleted route' }
+      }
+    });
+  } catch (e) { console.error("Log error (deleteRoute):", e.message); }
+
   res.status(200).json({
     success: true,
     message: "Route deleted successfully",
@@ -287,7 +331,6 @@ const adminCreateRoute = asyncHandler(async (req, res) => {
     departureTime: new Date(routeFields.departureTime),
   };
 
-  // Enrich แบบเดียวกับ createRoute (รองรับ waypoints/optimizeWaypoints)
   const directions = await getDirections({
     origin: payload.startLocation,
     destination: payload.endLocation,
@@ -309,7 +352,6 @@ const adminCreateRoute = asyncHandler(async (req, res) => {
     payload.durationSeconds = sumSeconds;
     payload.routePolyline = primary.overview_polyline?.points || null;
 
-    // รวม steps ทุก leg
     payload.steps = legs.flatMap(leg =>
       (leg.steps || []).map(s => ({
         html_instructions: s.html_instructions,
@@ -332,6 +374,21 @@ const adminCreateRoute = asyncHandler(async (req, res) => {
   }
 
   const newRoute = await routeService.createRoute(payload);
+
+  try {
+    await prisma.systemLog.create({
+      data: {
+        action: 'CREATE_DATA',
+        userId: req.user.sub,
+        targetTable: 'Route',
+        targetId: newRoute.id,
+        ipAddress: req.ip || req.connection.remoteAddress || '0.0.0.0',
+        userAgent: req.headers['user-agent'],
+        details: { message: 'Admin created route for driver', driverId: driverId }
+      }
+    });
+  } catch (e) { console.error("Log error (adminCreateRoute):", e.message); }
+
   res.status(201).json({
     success: true,
     message: "Route (by admin) created successfully",
@@ -372,7 +429,6 @@ const adminUpdateRoute = asyncHandler(async (req, res) => {
     }),
   };
 
-  // ===== รีคอมพิวต์ Directions ถ้า origin/destination/เวลาออกเดินทาง เปลี่ยน =====
   const startChanged = routeFields.startLocation !== undefined &&
     JSON.stringify(routeFields.startLocation) !== JSON.stringify(existing.startLocation);
   const endChanged = routeFields.endLocation !== undefined &&
@@ -442,6 +498,21 @@ const adminUpdateRoute = asyncHandler(async (req, res) => {
   }
 
   const updated = await routeService.updateRoute(id, payload);
+
+  try {
+    await prisma.systemLog.create({
+      data: {
+        action: 'UPDATE_DATA',
+        userId: req.user.sub,
+        targetTable: 'Route',
+        targetId: id,
+        ipAddress: req.ip || req.connection.remoteAddress || '0.0.0.0',
+        userAgent: req.headers['user-agent'],
+        details: { message: 'Admin updated route', changedFields: Object.keys(routeFields) }
+      }
+    });
+  } catch (e) { console.error("Log error (adminUpdateRoute):", e.message); }
+
   res.status(200).json({
     success: true,
     message: "Route (by admin) updated successfully",
@@ -456,6 +527,21 @@ const adminDeleteRoute = asyncHandler(async (req, res) => {
   if (!existing) throw new ApiError(404, "Route not found");
 
   const result = await routeService.deleteRoute(id);
+
+  try {
+    await prisma.systemLog.create({
+      data: {
+        action: 'DELETE_DATA',
+        userId: req.user.sub,
+        targetTable: 'Route',
+        targetId: id,
+        ipAddress: req.ip || req.connection.remoteAddress || '0.0.0.0',
+        userAgent: req.headers['user-agent'],
+        details: { message: 'Admin deleted route' }
+      }
+    });
+  } catch (e) { console.error("Log error (adminDeleteRoute):", e.message); }
+
   res.status(200).json({
     success: true,
     message: "Route (by admin) deleted successfully",
@@ -469,6 +555,25 @@ const cancelRoute = asyncHandler(async (req, res) => {
   const { reason } = req.body;
 
   const result = await routeService.cancelRoute(id, driverId, { reason });
+
+  try {
+    await prisma.systemLog.create({
+      data: {
+        action: 'UPDATE_DATA',
+        userId: driverId,
+        targetTable: 'Route',
+        targetId: id,
+        ipAddress: req.ip || req.connection.remoteAddress || '0.0.0.0',
+        userAgent: req.headers['user-agent'],
+        details: { 
+            message: 'Driver cancelled route', 
+            status: 'CANCELLED',
+            reason: reason 
+        }
+      }
+    });
+  } catch (e) { console.error("Log error (cancelRoute):", e.message); }
+
   res.status(200).json({
     success: true,
     message: "Route cancelled successfully",
@@ -491,3 +596,4 @@ module.exports = {
   adminGetRoutesByDriver,
   cancelRoute,
 };
+

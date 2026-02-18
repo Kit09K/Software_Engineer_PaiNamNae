@@ -3,6 +3,7 @@ const verifService = require("../services/driverVerification.service");
 const ApiError = require("../utils/ApiError");
 const { uploadToCloudinary } = require("../utils/cloudinary");
 const notifService = require('../services/notification.service');
+const prisma = require('../lib/prisma');
 
 const adminListVerifications = asyncHandler(async (req, res) => {
   const result = await verifService.searchVerifications(req.query);
@@ -25,16 +26,9 @@ const getMyVerification = asyncHandler(async (req, res) => {
 
 const createVerification = asyncHandler(async (req, res) => {
   const userId = req.user.sub;
-  // ไฟล์ต้องมีอยู่
   if (!req.files || !req.files.licensePhotoUrl || !req.files.selfiePhotoUrl) {
     throw new ApiError(400, "License photo and selfie photo are required");
   }
-
-  // อัปโหลดรูปไป Cloudinary
-  // const result = await uploadToCloudinary(
-  //   req.file.buffer,
-  //   "painamnae/licenses"
-  // );
 
   const [licenseResult, selfieResult] = await Promise.all([
     uploadToCloudinary(
@@ -57,6 +51,25 @@ const createVerification = asyncHandler(async (req, res) => {
   };
 
   const newRec = await verifService.createVerification(payload);
+
+  try {
+      await prisma.systemLog.create({
+          data: {
+              action: 'CREATE_DATA',
+              userId: userId,
+              targetTable: 'DriverVerification',
+              targetId: newRec.id,
+              ipAddress: req.ip || req.connection.remoteAddress || '0.0.0.0',
+              userAgent: req.headers['user-agent'],
+              details: { 
+                  message: 'User submitted driver verification request',
+                  type: 'DRIVER_VERIFICATION'
+              }
+          }
+      });
+  } catch (logError) {
+      console.error("Create verification logging failed:", logError.message);
+  }
 
   const notifPayload = {
     userId,
@@ -90,7 +103,6 @@ const updateVerification = asyncHandler(async (req, res) => {
   if (!existing) throw new ApiError(404, "Verification not found");
   if (existing.userId !== userId) throw new ApiError(403, "Forbidden");
 
-  // ถ้ามีไฟล์ใหม่ ให้อัปโหลดทับ
   let photoUrl = existing.licensePhotoUrl;
   if (req.file) {
     const result = await uploadToCloudinary(
@@ -274,7 +286,6 @@ const adminUpdateVerification = asyncHandler(async (req, res) => {
     payload.selfiePhotoUrl = r.url;
   }
 
-  // แปลงวันที่ (ถ้ามาเป็น string)
   if (payload.licenseIssueDate) payload.licenseIssueDate = new Date(payload.licenseIssueDate);
   if (payload.licenseExpiryDate) payload.licenseExpiryDate = new Date(payload.licenseExpiryDate);
 
@@ -299,3 +310,4 @@ module.exports = {
   adminUpdateVerification,
   adminDeleteVerification,
 };
+

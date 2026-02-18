@@ -1,0 +1,630 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.3.2 (Python 3.13.7 on win32)" generated="2026-02-18T13:57:38.888145" rpa="false" schemaversion="5">
+<suite id="s1" name="testUAT1" source="D:\Year 3 term 2\Software Engineering\Sandbox\TestProject\tests\UAT story 1\testUAT1.robot">
+<test id="s1-t1" name="Open System Logs" line="14">
+<kw name="Open website">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:57:39.103932" level="INFO">Opening browser 'Chrome' to base url 'http://www.google.com'.</msg>
+<msg time="2026-02-18T13:57:39.160806" level="WARN">The chromedriver version (143.0.7499.169) detected in PATH at D:\Year 3 term 2\Software Engineering\Lab 4\TestAutomationLab\StarterFiles\chromedriver-win64\chromedriver.exe might not be compatible with the detected chrome version (144.0.7559.133); currently, chromedriver 144.0.7559.133 is recommended for chrome 144.*, so it is advised to delete the driver in PATH and retry</msg>
+<arg>${homepage}</arg>
+<arg>${browser}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-02-18T13:57:39.103719" elapsed="1.639742"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-02-18T13:57:40.743665" elapsed="0.056236"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:57:40.800281" level="INFO">Opening url 'http://localhost:3000/'</msg>
+<arg>${Url}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-02-18T13:57:40.800094" elapsed="0.871170"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:57:39.103220" elapsed="2.568276"/>
+</kw>
+<kw name="Login">
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:57:44.674191" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:57:41.672691" elapsed="3.001912"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>เดินทางร่วมกัน อย่างมั่นใจ ด้วยความปลอดภัยเป็นอันดับหนึ่ง</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-18T13:57:44.675193" elapsed="0.024659"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:57:44.700265" level="INFO">Clicking element 'xpath=//a[normalize-space()="เข้าสู่ระบบ"]'.</msg>
+<arg>xpath=//a[normalize-space()="เข้าสู่ระบบ"]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:57:44.699999" elapsed="0.035899"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:57:47.736543" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:57:44.736053" elapsed="3.000856"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:57:47.738150" level="INFO">Typing text 'tester' into text field 'id=identifier'.</msg>
+<arg>id=identifier</arg>
+<arg>${username}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:57:47.737404" elapsed="0.059385"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:57:47.797133" level="INFO">Typing text 'tester555' into text field 'id=password'.</msg>
+<arg>id=password</arg>
+<arg>${password}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:57:47.796933" elapsed="0.039105"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:57:52.836437" level="INFO">Slept 5 seconds.</msg>
+<arg>5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:57:47.836183" elapsed="5.000351"/>
+</kw>
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:57:52.836830" level="INFO">Clicking button 'xpath=//button[normalize-space()="เข้าสู่ระบบ"]'.</msg>
+<arg>xpath=//button[normalize-space()="เข้าสู่ระบบ"]</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:57:52.836667" elapsed="0.049045"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:57:41.672192" elapsed="11.213668"/>
+</kw>
+<kw name="Go to Dashboard">
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:57:57.886798" level="INFO">Slept 5 seconds.</msg>
+<arg>5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:57:52.886507" elapsed="5.000432"/>
+</kw>
+<kw name="Mouse Over" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:57:57.887416" level="INFO">Simulating Mouse Over on element 'xpath=//*[@id="__nuxt"]/div/div[1]/header/div/div[1]/nav/div[4]/div[1]'.</msg>
+<arg>xpath=//*[@id="__nuxt"]/div/div[1]/header/div/div[1]/nav/div[4]/div[1]</arg>
+<doc>Simulates hovering the mouse over the element ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:57:57.887139" elapsed="0.281897"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:58:03.171058" level="INFO">Slept 5 seconds.</msg>
+<arg>5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:57:58.169524" elapsed="5.001861"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:58:03.172559" level="INFO">Clicking element 'xpath=//*[@id="__nuxt"]/div/div[1]/header/div/div[1]/nav/div[4]/div[2]/a[2]'.</msg>
+<arg>xpath=//*[@id="__nuxt"]/div/div[1]/header/div/div[1]/nav/div[4]/div[2]/a[2]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:58:03.171884" elapsed="0.052376"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>User Management</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-18T13:58:03.224473" elapsed="0.225813"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:57:52.886243" elapsed="10.564137"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:58:06.451584" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:58:03.450572" elapsed="3.001345"/>
+</kw>
+<kw name="Click System Logs Button">
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:58:06.454514" level="INFO">Clicking element 'xpath=//*[@id="sidebar"]/div/nav/a[6]'.</msg>
+<arg>xpath=//*[@id="sidebar"]/div/nav/a[6]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:58:06.453953" elapsed="0.040153"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>System Logs (บันทึกกิจกรรมระบบ)</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-18T13:58:06.494304" elapsed="0.239607"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:58:08.734410" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:58:06.734057" elapsed="2.000683"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:58:06.453108" elapsed="2.281944"/>
+</kw>
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-02-18T13:58:08.736129" elapsed="2.172680"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:57:39.102733" elapsed="31.807129"/>
+</test>
+<test id="s1-t2" name="Check for login logs" line="27">
+<kw name="Open website">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:58:10.915866" level="INFO">Opening browser 'Chrome' to base url 'http://www.google.com'.</msg>
+<msg time="2026-02-18T13:58:10.981024" level="WARN">The chromedriver version (143.0.7499.169) detected in PATH at D:\Year 3 term 2\Software Engineering\Lab 4\TestAutomationLab\StarterFiles\chromedriver-win64\chromedriver.exe might not be compatible with the detected chrome version (144.0.7559.133); currently, chromedriver 144.0.7559.133 is recommended for chrome 144.*, so it is advised to delete the driver in PATH and retry</msg>
+<arg>${homepage}</arg>
+<arg>${browser}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-02-18T13:58:10.915206" elapsed="1.607334"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-02-18T13:58:12.522691" elapsed="0.018518"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:58:12.541494" level="INFO">Opening url 'http://localhost:3000/'</msg>
+<arg>${Url}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-02-18T13:58:12.541350" elapsed="0.939843"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:58:10.913902" elapsed="2.567423"/>
+</kw>
+<kw name="Login">
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:58:16.482896" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:58:13.481853" elapsed="3.001266"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>เดินทางร่วมกัน อย่างมั่นใจ ด้วยความปลอดภัยเป็นอันดับหนึ่ง</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-18T13:58:16.483432" elapsed="0.014791"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:58:16.498533" level="INFO">Clicking element 'xpath=//a[normalize-space()="เข้าสู่ระบบ"]'.</msg>
+<arg>xpath=//a[normalize-space()="เข้าสู่ระบบ"]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:58:16.498371" elapsed="0.040506"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:58:19.540400" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:58:16.539191" elapsed="3.001522"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:58:19.541924" level="INFO">Typing text 'tester' into text field 'id=identifier'.</msg>
+<arg>id=identifier</arg>
+<arg>${username}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:58:19.541206" elapsed="0.058724"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:58:19.600455" level="INFO">Typing text 'tester555' into text field 'id=password'.</msg>
+<arg>id=password</arg>
+<arg>${password}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:58:19.600142" elapsed="0.043586"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:58:24.644956" level="INFO">Slept 5 seconds.</msg>
+<arg>5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:58:19.643993" elapsed="5.001059"/>
+</kw>
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:58:24.645348" level="INFO">Clicking button 'xpath=//button[normalize-space()="เข้าสู่ระบบ"]'.</msg>
+<arg>xpath=//button[normalize-space()="เข้าสู่ระบบ"]</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:58:24.645186" elapsed="0.051707"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:58:13.481619" elapsed="11.215388"/>
+</kw>
+<kw name="Go to Dashboard">
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:58:29.698909" level="INFO">Slept 5 seconds.</msg>
+<arg>5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:58:24.697613" elapsed="5.001618"/>
+</kw>
+<kw name="Mouse Over" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:58:29.700355" level="INFO">Simulating Mouse Over on element 'xpath=//*[@id="__nuxt"]/div/div[1]/header/div/div[1]/nav/div[4]/div[1]'.</msg>
+<arg>xpath=//*[@id="__nuxt"]/div/div[1]/header/div/div[1]/nav/div[4]/div[1]</arg>
+<doc>Simulates hovering the mouse over the element ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:58:29.699722" elapsed="0.280635"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:58:34.982055" level="INFO">Slept 5 seconds.</msg>
+<arg>5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:58:29.980644" elapsed="5.001726"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:58:34.983475" level="INFO">Clicking element 'xpath=//*[@id="__nuxt"]/div/div[1]/header/div/div[1]/nav/div[4]/div[2]/a[2]'.</msg>
+<arg>xpath=//*[@id="__nuxt"]/div/div[1]/header/div/div[1]/nav/div[4]/div[2]/a[2]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:58:34.982868" elapsed="0.053068"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>User Management</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-18T13:58:35.036246" elapsed="0.232088"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:58:24.697316" elapsed="10.571109"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:58:38.269026" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:58:35.268621" elapsed="3.000712"/>
+</kw>
+<kw name="Click System Logs Button">
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:58:38.271916" level="INFO">Clicking element 'xpath=//*[@id="sidebar"]/div/nav/a[6]'.</msg>
+<arg>xpath=//*[@id="sidebar"]/div/nav/a[6]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:58:38.271349" elapsed="0.039970"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>System Logs (บันทึกกิจกรรมระบบ)</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-18T13:58:38.311663" elapsed="0.243837"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:58:40.556153" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:58:38.555649" elapsed="2.000812"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:58:38.270516" elapsed="2.286243"/>
+</kw>
+<kw name="Page Should Contain" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:58:40.592341" level="INFO">Current page contains text 'loginMethod: username'.</msg>
+<arg>loginMethod: username</arg>
+<doc>Verifies that current page contains ``text``.</doc>
+<status status="PASS" start="2026-02-18T13:58:40.557526" elapsed="0.034891"/>
+</kw>
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-02-18T13:58:40.592707" elapsed="2.135557"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:58:10.912348" elapsed="31.816946"/>
+</test>
+<test id="s1-t3" name="Search for specific User" line="42">
+<kw name="Open website">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:58:42.735505" level="INFO">Opening browser 'Chrome' to base url 'http://www.google.com'.</msg>
+<msg time="2026-02-18T13:58:42.797713" level="WARN">The chromedriver version (143.0.7499.169) detected in PATH at D:\Year 3 term 2\Software Engineering\Lab 4\TestAutomationLab\StarterFiles\chromedriver-win64\chromedriver.exe might not be compatible with the detected chrome version (144.0.7559.133); currently, chromedriver 144.0.7559.133 is recommended for chrome 144.*, so it is advised to delete the driver in PATH and retry</msg>
+<arg>${homepage}</arg>
+<arg>${browser}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-02-18T13:58:42.734761" elapsed="1.585439"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-02-18T13:58:44.320347" elapsed="0.045040"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:58:44.365799" level="INFO">Opening url 'http://localhost:3000/'</msg>
+<arg>${Url}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-02-18T13:58:44.365601" elapsed="0.880247"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:58:42.734057" elapsed="2.512004"/>
+</kw>
+<kw name="Login">
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:58:48.248109" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:58:45.247276" elapsed="3.001157"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>เดินทางร่วมกัน อย่างมั่นใจ ด้วยความปลอดภัยเป็นอันดับหนึ่ง</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-18T13:58:48.248932" elapsed="0.020135"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:58:48.269367" level="INFO">Clicking element 'xpath=//a[normalize-space()="เข้าสู่ระบบ"]'.</msg>
+<arg>xpath=//a[normalize-space()="เข้าสู่ระบบ"]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:58:48.269208" elapsed="0.037959"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:58:51.308345" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:58:48.307386" elapsed="3.001275"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:58:51.309897" level="INFO">Typing text 'tester' into text field 'id=identifier'.</msg>
+<arg>id=identifier</arg>
+<arg>${username}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:58:51.309142" elapsed="0.063417"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:58:51.373130" level="INFO">Typing text 'tester555' into text field 'id=password'.</msg>
+<arg>id=password</arg>
+<arg>${password}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:58:51.372807" elapsed="0.037996"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:58:56.411456" level="INFO">Slept 5 seconds.</msg>
+<arg>5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:58:51.410945" elapsed="5.000604"/>
+</kw>
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:58:56.411839" level="INFO">Clicking button 'xpath=//button[normalize-space()="เข้าสู่ระบบ"]'.</msg>
+<arg>xpath=//button[normalize-space()="เข้าสู่ระบบ"]</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:58:56.411677" elapsed="0.050886"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:58:45.246705" elapsed="11.215995"/>
+</kw>
+<kw name="Go to Dashboard">
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:59:01.464289" level="INFO">Slept 5 seconds.</msg>
+<arg>5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:58:56.463246" elapsed="5.001384"/>
+</kw>
+<kw name="Mouse Over" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:59:01.466991" level="INFO">Simulating Mouse Over on element 'xpath=//*[@id="__nuxt"]/div/div[1]/header/div/div[1]/nav/div[4]/div[1]'.</msg>
+<arg>xpath=//*[@id="__nuxt"]/div/div[1]/header/div/div[1]/nav/div[4]/div[1]</arg>
+<doc>Simulates hovering the mouse over the element ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:59:01.465119" elapsed="0.292408"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:59:06.758446" level="INFO">Slept 5 seconds.</msg>
+<arg>5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:59:01.757865" elapsed="5.000831"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:59:06.759522" level="INFO">Clicking element 'xpath=//*[@id="__nuxt"]/div/div[1]/header/div/div[1]/nav/div[4]/div[2]/a[2]'.</msg>
+<arg>xpath=//*[@id="__nuxt"]/div/div[1]/header/div/div[1]/nav/div[4]/div[2]/a[2]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:59:06.759065" elapsed="0.041911"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>User Management</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-18T13:59:06.801133" elapsed="0.229931"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:58:56.462980" elapsed="10.568179"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:59:10.032472" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:59:07.031362" elapsed="3.001208"/>
+</kw>
+<kw name="Click System Logs Button">
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:59:10.033352" level="INFO">Clicking element 'xpath=//*[@id="sidebar"]/div/nav/a[6]'.</msg>
+<arg>xpath=//*[@id="sidebar"]/div/nav/a[6]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:59:10.033125" elapsed="0.036467"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>System Logs (บันทึกกิจกรรมระบบ)</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-18T13:59:10.069743" elapsed="0.249894"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:59:12.320151" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:59:10.319779" elapsed="2.000698"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:59:10.032913" elapsed="2.287868"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:59:12.322452" level="INFO">Typing text 'admin123' into text field 'xpath=//*[@id="main-content"]/div/div/div[1]/div[2]/div[1]/input'.</msg>
+<arg>xpath=//*[@id="main-content"]/div/div/div[1]/div[2]/div[1]/input</arg>
+<arg>admin123</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:59:12.321741" elapsed="0.075046"/>
+</kw>
+<kw name="Page Should Not Contain" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:59:12.420213" level="INFO">Current page does not contain text 'tester'.</msg>
+<arg>tester</arg>
+<doc>Verifies the current page does not contain ``text``.</doc>
+<status status="PASS" start="2026-02-18T13:59:12.397178" elapsed="0.023099"/>
+</kw>
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-02-18T13:59:12.420530" elapsed="2.131177"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:58:42.732673" elapsed="31.820058"/>
+</test>
+<test id="s1-t4" name="Filter for specific Logs" line="57">
+<kw name="Open website">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:59:14.559173" level="INFO">Opening browser 'Chrome' to base url 'http://www.google.com'.</msg>
+<msg time="2026-02-18T13:59:14.621801" level="WARN">The chromedriver version (143.0.7499.169) detected in PATH at D:\Year 3 term 2\Software Engineering\Lab 4\TestAutomationLab\StarterFiles\chromedriver-win64\chromedriver.exe might not be compatible with the detected chrome version (144.0.7559.133); currently, chromedriver 144.0.7559.133 is recommended for chrome 144.*, so it is advised to delete the driver in PATH and retry</msg>
+<arg>${homepage}</arg>
+<arg>${browser}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-02-18T13:59:14.558535" elapsed="1.808655"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-02-18T13:59:16.367380" elapsed="0.041051"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:59:16.408755" level="INFO">Opening url 'http://localhost:3000/'</msg>
+<arg>${Url}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-02-18T13:59:16.408601" elapsed="0.867358"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:59:14.557689" elapsed="2.718364"/>
+</kw>
+<kw name="Login">
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:59:20.277486" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:59:17.276521" elapsed="3.001286"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>เดินทางร่วมกัน อย่างมั่นใจ ด้วยความปลอดภัยเป็นอันดับหนึ่ง</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-18T13:59:20.278291" elapsed="0.032357"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:59:20.310937" level="INFO">Clicking element 'xpath=//a[normalize-space()="เข้าสู่ระบบ"]'.</msg>
+<arg>xpath=//a[normalize-space()="เข้าสู่ระบบ"]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:59:20.310782" elapsed="0.038901"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:59:23.350174" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:59:20.349862" elapsed="3.000622"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:59:23.351705" level="INFO">Typing text 'tester' into text field 'id=identifier'.</msg>
+<arg>id=identifier</arg>
+<arg>${username}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:59:23.350967" elapsed="0.066027"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:59:23.417445" level="INFO">Typing text 'tester555' into text field 'id=password'.</msg>
+<arg>id=password</arg>
+<arg>${password}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:59:23.417199" elapsed="0.040092"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:59:28.458469" level="INFO">Slept 5 seconds.</msg>
+<arg>5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:59:23.457435" elapsed="5.001134"/>
+</kw>
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:59:28.458859" level="INFO">Clicking button 'xpath=//button[normalize-space()="เข้าสู่ระบบ"]'.</msg>
+<arg>xpath=//button[normalize-space()="เข้าสู่ระบบ"]</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:59:28.458696" elapsed="0.051922"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:59:17.276321" elapsed="11.234443"/>
+</kw>
+<kw name="Go to Dashboard">
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:59:33.511988" level="INFO">Slept 5 seconds.</msg>
+<arg>5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:59:28.511405" elapsed="5.000697"/>
+</kw>
+<kw name="Mouse Over" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:59:33.512524" level="INFO">Simulating Mouse Over on element 'xpath=//*[@id="__nuxt"]/div/div[1]/header/div/div[1]/nav/div[4]/div[1]'.</msg>
+<arg>xpath=//*[@id="__nuxt"]/div/div[1]/header/div/div[1]/nav/div[4]/div[1]</arg>
+<doc>Simulates hovering the mouse over the element ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:59:33.512366" elapsed="0.265188"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:59:38.778491" level="INFO">Slept 5 seconds.</msg>
+<arg>5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:59:33.777822" elapsed="5.000941"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:59:38.779595" level="INFO">Clicking element 'xpath=//*[@id="__nuxt"]/div/div[1]/header/div/div[1]/nav/div[4]/div[2]/a[2]'.</msg>
+<arg>xpath=//*[@id="__nuxt"]/div/div[1]/header/div/div[1]/nav/div[4]/div[2]/a[2]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:59:38.779152" elapsed="0.050794"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>User Management</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-18T13:59:38.830199" elapsed="0.235765"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:59:28.511114" elapsed="10.555002"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:59:42.067096" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:59:39.066489" elapsed="3.000707"/>
+</kw>
+<kw name="Click System Logs Button">
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:59:42.067905" level="INFO">Clicking element 'xpath=//*[@id="sidebar"]/div/nav/a[6]'.</msg>
+<arg>xpath=//*[@id="sidebar"]/div/nav/a[6]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-18T13:59:42.067782" elapsed="0.033809"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>System Logs (บันทึกกิจกรรมระบบ)</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-18T13:59:42.101741" elapsed="0.234524"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:59:44.337125" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:59:42.336405" elapsed="2.001032"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:59:42.067579" elapsed="2.270161"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath=//select[contains(@class,"bg-white")]</arg>
+<arg>10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-18T13:59:44.338535" elapsed="0.020840"/>
+</kw>
+<kw name="Select From List By Value" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:59:44.359749" level="INFO">Selecting options from selection list 'xpath=//select[contains(@class,"bg-white")]' by value UPDATE_DATA.</msg>
+<arg>xpath=//select[contains(@class,"bg-white")]</arg>
+<arg>UPDATE_DATA</arg>
+<doc>Selects options from selection list ``locator`` by ``values``.</doc>
+<status status="PASS" start="2026-02-18T13:59:44.359585" elapsed="0.042686"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-18T13:59:46.403306" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-18T13:59:44.402744" elapsed="2.000888"/>
+</kw>
+<kw name="Page Should Contain" owner="SeleniumLibrary">
+<msg time="2026-02-18T13:59:46.440716" level="INFO">Current page contains text 'UPDATE_DATA'.</msg>
+<arg>UPDATE_DATA</arg>
+<doc>Verifies that current page contains ``text``.</doc>
+<status status="PASS" start="2026-02-18T13:59:46.404676" elapsed="0.036118"/>
+</kw>
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-02-18T13:59:46.441336" elapsed="2.126229"/>
+</kw>
+<status status="PASS" start="2026-02-18T13:59:14.556064" elapsed="34.011881"/>
+</test>
+<status status="PASS" start="2026-02-18T13:57:38.889145" elapsed="129.679617"/>
+</suite>
+<statistics>
+<total>
+<stat pass="4" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="testUAT1" id="s1" pass="4" fail="0" skip="0">testUAT1</stat>
+</suite>
+</statistics>
+<errors>
+<msg time="2026-02-18T13:57:39.160806" level="WARN">The chromedriver version (143.0.7499.169) detected in PATH at D:\Year 3 term 2\Software Engineering\Lab 4\TestAutomationLab\StarterFiles\chromedriver-win64\chromedriver.exe might not be compatible with the detected chrome version (144.0.7559.133); currently, chromedriver 144.0.7559.133 is recommended for chrome 144.*, so it is advised to delete the driver in PATH and retry</msg>
+<msg time="2026-02-18T13:58:10.981024" level="WARN">The chromedriver version (143.0.7499.169) detected in PATH at D:\Year 3 term 2\Software Engineering\Lab 4\TestAutomationLab\StarterFiles\chromedriver-win64\chromedriver.exe might not be compatible with the detected chrome version (144.0.7559.133); currently, chromedriver 144.0.7559.133 is recommended for chrome 144.*, so it is advised to delete the driver in PATH and retry</msg>
+<msg time="2026-02-18T13:58:42.797713" level="WARN">The chromedriver version (143.0.7499.169) detected in PATH at D:\Year 3 term 2\Software Engineering\Lab 4\TestAutomationLab\StarterFiles\chromedriver-win64\chromedriver.exe might not be compatible with the detected chrome version (144.0.7559.133); currently, chromedriver 144.0.7559.133 is recommended for chrome 144.*, so it is advised to delete the driver in PATH and retry</msg>
+<msg time="2026-02-18T13:59:14.621801" level="WARN">The chromedriver version (143.0.7499.169) detected in PATH at D:\Year 3 term 2\Software Engineering\Lab 4\TestAutomationLab\StarterFiles\chromedriver-win64\chromedriver.exe might not be compatible with the detected chrome version (144.0.7559.133); currently, chromedriver 144.0.7559.133 is recommended for chrome 144.*, so it is advised to delete the driver in PATH and retry</msg>
+</errors>
+</robot>

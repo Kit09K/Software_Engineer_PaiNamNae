@@ -37,37 +37,37 @@ class DeleteService {
         return deleteRequest;
     }
     // set isDeleted to true for user and related data based on delete request
-    static async markDeleteUserData(userId, deleteRequest) {
+    static async markDeleteUserData(userId) {
         const markedUser = await prisma.user.update({
             where: { id: userId },
             data: { 
-                isDeleted: deleteRequest.deleteAccount,
+                isDeleted: true,
                 deletedAt: new Date()
             },
         });
         return markedUser;
     }
     // set isDeleted to true for vehicles owned by user based on delete request
-    static async markDeleteVehicles(userId, deleteRequest) {
+    static async markDeleteVehicles(userId) {
         const markedVehicles = await prisma.vehicle.updateMany({
             where: { userId: userId },
-            data: { isDeleted: deleteRequest.deleteVehicles },
+            data: { isDeleted: true },
         });
         return markedVehicles;
     }
     // set isDeleted to true for routes driven by user based on delete request
-    static async markDeleteRoutes(userId, deleteRequest) {
+    static async markDeleteRoutes(userId) {
         const markedRoutes = await prisma.route.updateMany({
             where: { driverId: userId },
-            data: { isCancelled: deleteRequest.deleteRoutes },
+            data: { isCancelled: true },
         });
         return markedRoutes;
     }
     // set isDeleted to true for bookings made by user based on delete request
-    static async markDeleteBookings(userId, deleteRequest) {
+    static async markDeleteBookings(userId) {
         const markedBookings = await prisma.booking.updateMany({
-            where: { passengerID: userID },
-            data: { isAnonymized: deleteRequest.deleteBookings },
+            where: { passengerId: userId },
+            data: { isAnonymized: true },
         });
         return markedBookings;
     }

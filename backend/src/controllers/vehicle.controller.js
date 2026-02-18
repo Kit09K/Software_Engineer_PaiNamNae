@@ -3,6 +3,7 @@ const vehicleService = require("../services/vehicle.service");
 const ApiError = require("../utils/ApiError");
 const { uploadToCloudinary } = require('../utils/cloudinary');
 const userService = require("../services/user.service");
+const prisma = require('../lib/prisma');
 
 const listMyVehicles = asyncHandler(async (req, res) => {
   const ownerId = req.user.sub;
@@ -68,10 +69,28 @@ const createVehicle = asyncHandler(async (req, res) => {
       )
     );
 
-    payload.photos = uploads.map(u => u.url); // เก็บเป็น array ของ URL
+    payload.photos = uploads.map(u => u.url);
   }
 
   const newVehicle = await vehicleService.createVehicle(payload, ownerId);
+
+  try {
+    await prisma.systemLog.create({
+      data: {
+        action: 'CREATE_DATA',
+        userId: ownerId,
+        targetTable: 'Vehicle',
+        targetId: newVehicle.id,
+        ipAddress: req.ip || req.connection.remoteAddress || '0.0.0.0',
+        userAgent: req.headers['user-agent'],
+        details: { 
+            message: 'Driver added a new vehicle', 
+            licensePlate: payload.licensePlate 
+        }
+      }
+    });
+  } catch (e) { console.error("Log error (createVehicle):", e.message); }
+
   res.status(201).json({
     success: true,
     message: "Vehicle created successfully.",
@@ -95,6 +114,23 @@ const updateVehicle = asyncHandler(async (req, res) => {
 
   const updated = await vehicleService.updateVehicle(id, ownerId, payload)
 
+  try {
+    await prisma.systemLog.create({
+      data: {
+        action: 'UPDATE_DATA',
+        userId: ownerId,
+        targetTable: 'Vehicle',
+        targetId: id,
+        ipAddress: req.ip || req.connection.remoteAddress || '0.0.0.0',
+        userAgent: req.headers['user-agent'],
+        details: { 
+            message: 'Driver updated vehicle', 
+            changedFields: Object.keys(payload) 
+        }
+      }
+    });
+  } catch (e) { console.error("Log error (updateVehicle):", e.message); }
+
   res.status(200).json({
     success: true,
     message: "Vehicle updated successfully.",
@@ -106,6 +142,20 @@ const deleteVehicle = asyncHandler(async (req, res) => {
   const ownerId = req.user.sub;
   const { id } = req.params;
   const result = await vehicleService.deleteVehicle(id, ownerId);
+
+  try {
+    await prisma.systemLog.create({
+      data: {
+        action: 'DELETE_DATA',
+        userId: ownerId,
+        targetTable: 'Vehicle',
+        targetId: id,
+        ipAddress: req.ip || req.connection.remoteAddress || '0.0.0.0',
+        userAgent: req.headers['user-agent'],
+        details: { message: 'Driver deleted vehicle' }
+      }
+    });
+  } catch (e) { console.error("Log error (deleteVehicle):", e.message); }
 
   res.status(200).json({
     success: true,
@@ -157,10 +207,29 @@ const adminCreateVehicle = asyncHandler(async (req, res) => {
       )
     );
 
-    payload.photos = uploads.map(u => u.url); // เก็บเป็น array ของ URL
+    payload.photos = uploads.map(u => u.url);
   }
 
   const newVehicle = await vehicleService.createVehicle(payload, userId);
+
+  try {
+    await prisma.systemLog.create({
+      data: {
+        action: 'CREATE_DATA',
+        userId: req.user.sub,
+        targetTable: 'Vehicle',
+        targetId: newVehicle.id,
+        ipAddress: req.ip || req.connection.remoteAddress || '0.0.0.0',
+        userAgent: req.headers['user-agent'],
+        details: { 
+            message: 'Admin created vehicle for user', 
+            targetUserId: userId,
+            licensePlate: payload.licensePlate
+        }
+      }
+    });
+  } catch (e) { console.error("Log error (adminCreateVehicle):", e.message); }
+
   res.status(201).json({
     success: true,
     message: "Vehicle created successfully.",
@@ -184,6 +253,24 @@ const adminUpdateVehicle = asyncHandler(async (req, res) => {
   }
 
   const updated = await vehicleService.updateVehicleByAdmin(id, payload);
+
+  try {
+    await prisma.systemLog.create({
+      data: {
+        action: 'UPDATE_DATA',
+        userId: req.user.sub,
+        targetTable: 'Vehicle',
+        targetId: id,
+        ipAddress: req.ip || req.connection.remoteAddress || '0.0.0.0',
+        userAgent: req.headers['user-agent'],
+        details: { 
+            message: 'Admin updated vehicle', 
+            changedFields: Object.keys(payload) 
+        }
+      }
+    });
+  } catch (e) { console.error("Log error (adminUpdateVehicle):", e.message); }
+
   res.status(200).json({
     success: true,
     message: "Vehicle (by admin) updated successfully.",
@@ -194,6 +281,21 @@ const adminUpdateVehicle = asyncHandler(async (req, res) => {
 const adminDeleteVehicle = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const result = await vehicleService.deleteVehicleByAdmin(id);
+
+  try {
+    await prisma.systemLog.create({
+      data: {
+        action: 'DELETE_DATA',
+        userId: req.user.sub,
+        targetTable: 'Vehicle',
+        targetId: id,
+        ipAddress: req.ip || req.connection.remoteAddress || '0.0.0.0',
+        userAgent: req.headers['user-agent'],
+        details: { message: 'Admin deleted vehicle' }
+      }
+    });
+  } catch (e) { console.error("Log error (adminDeleteVehicle):", e.message); }
+
   res.status(200).json({
     success: true,
     message: "Vehicle (by admin) deleted successfully.",

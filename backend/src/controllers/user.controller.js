@@ -3,6 +3,7 @@ const userService = require("../services/user.service");
 const ApiError = require('../utils/ApiError');
 const { uploadToCloudinary } = require('../utils/cloudinary');
 const notifService = require('../services/notification.service');
+const prisma = require('../lib/prisma');
 
 const adminListUsers = asyncHandler(async (req, res) => {
     const result = await userService.searchUsers(req.query);
@@ -54,8 +55,8 @@ const getMyUser = asyncHandler(async (req, res) => {
         message: "User retrieved",
         data: data
     })
-
 })
+
 const createUser = asyncHandler(async (req, res) => {
     const userData = req.body;
 
@@ -63,13 +64,11 @@ const createUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "National ID photo and selfie photo are required.");
     }
 
-    // อัปโหลดรูปทั้งสองไปยัง Cloudinary
     const [nationalIdResult, selfieResult] = await Promise.all([
         uploadToCloudinary(req.files.nationalIdPhotoUrl[0].buffer, 'painamnae/national_ids'),
         uploadToCloudinary(req.files.selfiePhotoUrl[0].buffer, 'painamnae/selfies')
     ]);
 
-    // เพิ่ม URL ของรูปภาพเข้าไปในข้อมูลที่จะบันทึก
     userData.nationalIdPhotoUrl = nationalIdResult.url;
     userData.selfiePhotoUrl = selfieResult.url;
 
@@ -98,9 +97,7 @@ const createUser = asyncHandler(async (req, res) => {
 });
 
 const updateCurrentUserProfile = asyncHandler(async (req, res) => {
-    // เอาข้อมูล text fields ที่มากับ req.body
     const updateData = { ...req.body };
-
 
     if (req.files?.nationalIdPhotoUrl) {
         const buf = req.files.nationalIdPhotoUrl[0].buffer;
@@ -121,6 +118,26 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
     }
 
     const updatedUser = await userService.updateUserProfile(req.user.sub, updateData);
+
+    try {
+        await prisma.systemLog.create({
+            data: {
+                action: 'UPDATE_DATA', 
+                userId: req.user.sub,
+                targetTable: 'User',
+                targetId: req.user.sub,
+                ipAddress: req.ip || req.connection.remoteAddress || '0.0.0.0',
+                userAgent: req.headers['user-agent'],
+                details: { 
+                    message: 'User updated profile information',
+                    updatedFields: Object.keys(updateData) 
+                }
+            }
+        });
+    } catch (logError) {
+        console.error("Update profile logging failed:", logError.message);
+    }
+
     res.status(200).json({
         success: true,
         message: "Profile updated",
@@ -130,6 +147,8 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
 
 const adminUpdateUser = asyncHandler(async (req, res) => {
     const updatedUser = await userService.updateUserProfile(req.params.id, req.body);
+
+    
     res.status(200).json({
         success: true,
         message: "User updated by admin",
@@ -203,9 +222,9 @@ module.exports = {
     getMyUser,
     getUserPublicById,
     createUser,
-    updateCurrentUserProfile,
+    updateCurrentUserProfile, 
+    
     adminUpdateUser,
     adminDeleteUser,
     setUserStatus,
-
 };
