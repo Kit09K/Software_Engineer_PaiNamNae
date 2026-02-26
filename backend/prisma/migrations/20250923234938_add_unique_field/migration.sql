@@ -31,6 +31,8 @@ CREATE INDEX "Route_createdAt_idx" ON "Route"("createdAt");
 CREATE INDEX "Route_departureTime_idx" ON "Route"("departureTime");
 
 -- Create "SystemLog" Index
-CREATE INDEX "SystemLog_timestamp_idx" ON "SystemLog"("timestamp");
+CREATE INDEX "SystemLog_timestamp_idx" ON "SystemLog"("timestamp"); -- สำคัญมากสำหรับ del_morethan90_log()
 CREATE INDEX "SystemLog_userId_idx" ON "SystemLog"("userId");
 CREATE INDEX "SystemLog_action_idx" ON "SystemLog"("action");
+CREATE INDEX "SystemLog_level_idx" ON "SystemLog"("level"); -- เพิ่ม : เพื่อให้ Filter ตามระดับความรุนแรงได้เร็ว
+CREATE INDEX "SystemLog_resource_idx" ON "SystemLog"("resource"); -- เพิ่ม : เพื่อให้ Filter ตาม Module ได้เร็ว
