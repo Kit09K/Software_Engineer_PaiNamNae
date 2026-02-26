@@ -9,6 +9,7 @@ CREATE TYPE "LicenseType" AS ENUM ('PRIVATE_CAR_TEMPORARY', 'PRIVATE_CAR', 'PUBL
 CREATE TYPE "NotificationType" AS ENUM ('SYSTEM', 'VERIFICATION', ' BOOKING', 'ROUTE');
 CREATE TYPE "LogAction" AS ENUM ('LOGIN', 'LOGOUT', 'ACCESS_SENSITIVE_DATA', 'CREATE_DATA', 'UPDATE_DATA', 'DELETE_DATA',
         'APPROVE_VERIFICATION', 'REJECT_VERIFICATION', 'SOS_TRIGGERED');
+CREATE TYPE "LogLevel" AS ENUM ('INFO', 'WARNING', 'ERROR', 'CRITICAL');
 
 -- Create "User" Table
 CREATE TABLE "User" (
@@ -150,12 +151,15 @@ CREATE TABLE "SystemLog" (
     "id" TEXT NOT NULL,
     "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" TEXT,
-    "action" TEXT NOT NULL,
+    "action" "LogAction" NOT NULL,
+    "level" "LogLevel" NOT NULL DEFAULT 'INFO', -- เพิ่ม: เพื่อให้ Admin กรองดูเฉพาะ Error หรือ Critical ได้
     "ipAddress" TEXT NOT NULL,
     "userAgent" TEXT,
+    "resource" TEXT, -- เพิ่ม : เพื่อระบุว่าเกิดที่ Module ไหน (เช่น 'Booking', 'User', 'Payment')
     "targetTable" TEXT,
     "targetId" TEXT,
-    "details" JSON,
+    "details" JSON, -- ใช้เก็บ old_value, new_value สำหรับ Audit Log
+    "errorMessage" TEXT, -- เพิ่ม : กรณีเกิด Error ให้แยกออกมาเก็บต่างหาก เพื่อความง่ายในการอ่าน
 
     CONSTRAINT "SystemLog_pkey" PRIMARY KEY ("id")
 );
