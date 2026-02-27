@@ -1,14 +1,6 @@
 const prisma = require('../utils/prisma');
-
+const DeleteRequestService = require('./deleteRequest.service');
 class CleanupService {
-    // ปรับให้ฟังก์ชันรับ tx เข้ามาแทนการเรียก prisma โดยตรง
-    static async completeDeleteRequest(tx, deleteRequestId) {
-        await tx.deleteRequest.update({
-            where: { id: deleteRequestId },
-            data: { status: 'DELETED' }
-        });
-    }
-
     static async hardDeleteData(request) {
         // ใช้ Transaction ครอบทั้งการลบข้อมูล และการเปลี่ยนสถานะ
         return await prisma.$transaction(async (tx) => {
@@ -43,24 +35,13 @@ class CleanupService {
             }
 
             // 5.เรียกใช้ฟังก์ชันอัปเดตสถานะ โดยส่ง tx เข้าไปด้วย
-            await this.completeDeleteRequest(tx, request.id);
-        });
-    }
-
-    static async getDeleteRequestlteDeleteAt(currentDate) {
-        return await prisma.deleteRequest.findMany({
-            where: {
-                status: 'PENDING',
-                deleteAt: {
-                    lte: currentDate
-                }
-            }
+            await DeleteRequestService.completeDeleteRequest(tx, request.id);
         });
     }
 
     static async delete90DaysData() {
         const currentDate = new Date();
-        const deleteRequests = await this.getDeleteRequestlteDeleteAt(currentDate);
+        const deleteRequests = await DeleteRequestService.getDeleteRequestlteDeleteAt(currentDate);
 
         console.log(`[${currentDate.toISOString()}] Found ${deleteRequests.length} pending delete requests.`);
 
