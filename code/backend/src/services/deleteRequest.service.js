@@ -143,7 +143,7 @@ class DeleteRequestService {
         }
 
         
-        await this.emailService.sendDeleteRequestEmail({
+        await this.emailService.sendEmail({
             to: userInfo.email,
             subject: "คำขอลบข้อมูลของคุณได้รับการดำเนินการแล้ว",
             text: `เรียน คุณ${userInfo.name} ${userInfo.lastName},\n\nเราได้ดำเนินการตามคำขอลบข้อมูลของคุณเรียบร้อยแล้ว ข้อมูลที่ถูกลบมีดังนี้:\n\n` +
