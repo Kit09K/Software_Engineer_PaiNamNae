@@ -28,7 +28,7 @@ class DeleteRequestService {
                 deleteRouteRequest : deleteRouteRequest,
                 deleteBookingRequest : deleteBookingRequest,
                 requestAt : new Date(),
-                deleteAt : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // Set deleteAt to 30 days from now
+                deleteAt : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // Set deleteAt to 90 days from now
             }
         });
         return deleteRequest;

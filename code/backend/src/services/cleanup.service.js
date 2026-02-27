@@ -1,5 +1,6 @@
 const prisma = require('../utils/prisma');
 const DeleteRequestService = require('./deleteRequest.service');
+const { deleteFromCloudinary, extractPublicIdFromUrl } = require('../utils/cloudinary');
 class CleanupService {
     constructor(deleteRequestService) {
         this.deleteRequestService = deleteRequestService;
@@ -7,27 +8,31 @@ class CleanupService {
     async hardDeleteData(request) {
         const userId = request.userId;
         if (request.deleteVehicleRequest) {
+            
             const vehicles = await prisma.vehicle.findMany({
                 where: { userId: userId, isDeleted: true }
             });
 
             for (const vehicle of vehicles) {
+                // เช็คว่ามีข้อมูลในฟิลด์ photos ไหม
                 if (vehicle.photos) {
-                    let photoList = [];
-                    // แปลง JSON ให้เป็น Array
-                    try {
-                        photoList = typeof vehicle.photos === 'string' ? JSON.parse(vehicle.photos) : vehicle.photos;
-                    } catch (e) { console.error("JSON parse error:", e); }
+                    let photoList = vehicle.photos;
+                    
+                    // ป้องกันกรณี Prisma คืนค่ามาเป็น String (บางครั้งเกิดขึ้นกับ JSON field)
+                    if (typeof photoList === 'string') {
+                        try { photoList = JSON.parse(photoList); } catch (e) { photoList = []; }
+                    }
 
                     if (Array.isArray(photoList)) {
-                        for (const photo of photoList) {
-                            // รองรับทั้งแบบ ['url1', 'url2'] และ [{ url: '...' }]
-                            const url = typeof photo === 'string' ? photo : photo.url;
-                            const publicId = extractPublicIdFromUrl(url);
+                        for (const photoObj of photoList) {
+                            // สมมติว่าใน JSON ของคุณเก็บเป็น [ { "url": "...", "public_id": "..." }, ... ]
+                            // หรือเก็บเป็น Array ของ String ตรงๆ [ "url1", "url2" ]
+                            const imageUrl = typeof photoObj === 'string' ? photoObj : photoObj.url;
                             
+                            const publicId = extractPublicIdFromUrl(imageUrl);
                             if (publicId) {
-                                try { await deleteFromCloudinary(publicId); } 
-                                catch (err) { console.error(` ลบรูปรถไม่สำเร็จ: ${publicId}`); }
+                                await deleteFromCloudinary(publicId);
+                                console.log(` Deleted Vehicle Photo: ${publicId}`);
                             }
                         }
                     }
@@ -41,14 +46,29 @@ class CleanupService {
                 where: { id: userId, isDeleted: true }
             });
 
-            //  เปลี่ยน 'profileImage' เป็นชื่อฟิลด์จริงใน Database ของคุณนะครับ
-            if (user && user.profileImage) { 
-                const publicId = extractPublicIdFromUrl(user.profileImage);
-                if (publicId) {
-                    try { await deleteFromCloudinary(publicId); } 
-                    catch (err) { console.error(` ลบรูปโปรไฟล์ไม่สำเร็จ: ${publicId}`); }
+                if (user) {
+                    // รายชื่อฟิลด์ที่มีโอกาสเก็บ URL รูปภาพในตาราง User
+                    const userImageFields = [
+                        'profilePicture', 
+                        'nationalIdPhotoUrl', 
+                        'selfiePhotoUrl'
+                    ];
+
+                    for (const field of userImageFields) {
+                        const imageUrl = user[field];
+                        if (imageUrl) {
+                            const publicId = extractPublicIdFromUrl(imageUrl);
+                            if (publicId) {
+                                try {
+                                    const result = await deleteFromCloudinary(publicId);
+                                    console.log(`🗑️ Deleted User ${field}: ${publicId} | Result: ${result.result}`);
+                                } catch (error) {
+                                    console.error(`⚠️ Failed to delete ${field}: ${publicId}`, error.message);
+                                }
+                            }
+                        }
+                    }
                 }
-            }
         }
         // ใช้ Transaction ครอบทั้งการลบข้อมูล และการเปลี่ยนสถานะ
         return await prisma.$transaction(async (tx) => {
