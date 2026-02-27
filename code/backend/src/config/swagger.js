@@ -7,8 +7,15 @@ const options = {
         info: {
             title: 'Painamnae API',
             version: packageJson.version,
-            description: 'API for ride sharing (users, drivers, vehicles, routes, bookings).',
+            description: 'API for ride sharing (users, drivers, vehicles, routes, bookings) and Admin System Logs for compliance.',
         },
+        // เพิ่ม Tags เพื่อจัดหมวดหมู่ API ในหน้า Swagger UI ให้สวยงามและหาง่าย
+        tags: [
+            {
+                name: 'Admin Logs',
+                description: 'API endpoints for viewing, filtering, exporting, and managing system logs (Admin only)',
+            }
+        ],
         components: {
             securitySchemes: {
                 bearerAuth: {
