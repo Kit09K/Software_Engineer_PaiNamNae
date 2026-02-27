@@ -43,7 +43,24 @@ const deleteFromCloudinary = (publicId) => {
     });
 };
 
+const extractPublicIdFromUrl = (imageUrl) => {
+    try {
+        if (!imageUrl) return null;
+        const parts = imageUrl.split('/');
+        const uploadIndex = parts.findIndex(part => part === 'upload');
+        if (uploadIndex === -1) return null;
+        let startIndex = uploadIndex + 1;
+        if (parts[startIndex].match(/^v\d+$/)) startIndex++;
+        const publicIdWithExt = parts.slice(startIndex).join('/');
+        return publicIdWithExt.substring(0, publicIdWithExt.lastIndexOf('.'));
+    } catch (error) {
+        console.error(' Error extracting publicId:', error);
+        return null;
+    }
+};
+
 module.exports = {
     uploadToCloudinary,
     deleteFromCloudinary,
+    extractPublicIdFromUrl,
 };
