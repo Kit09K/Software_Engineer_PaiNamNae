@@ -6,120 +6,152 @@ function withSoftDelete(baseClient) {
         query : {
             user : {
                 async findMany({args, query}) {
-                    args.where = {
+                    if (args.where?.isDeleted === undefined) {
+                        args.where = {
                         ...args.where,
                         isDeleted: false
+                        }
                     }
                     return query(args);
                 },
                 async findFirst({args, query}) {
-                    args.where = {
+                    if (args.where?.isDeleted === undefined) {
+                        args.where = {
                         ...args.where,
                         isDeleted: false
+                        }
                     }
                     return query(args);
                 },
                 async findUnique({args, query}) {
-                    args.where = {
+                    if (args.where?.isDeleted === undefined) {
+                        args.where = {
                         ...args.where,
                         isDeleted: false
+                        }
                     }
                     return query(args);
                 },
                 async count ({args, query}) {
-                    args.where = {
+                    if (args.where?.isDeleted === undefined) {
+                        args.where = {
                         ...args.where,
                         isDeleted: false
-                    }
+                        }
+                    } 
                     return query(args);
                 }
             },
             vehicle : {
                 async findMany({args, query}) {
-                    args.where = {
+                    if (args.where?.isDeleted === undefined) {
+                        args.where = {
                         ...args.where,
                         isDeleted: false
+                        }
                     }
                     return query(args);
                 },
                 async findFirst({args, query}) {
-                    args.where = {
+                    if (args.where?.isDeleted === undefined) {
+                        args.where = {
                         ...args.where,
                         isDeleted: false
+                        }
                     }
                     return query(args);
                 },
                 async findUnique({args, query}) {
-                    args.where = {
+                    if (args.where?.isDeleted === undefined) {
+                        args.where = {
                         ...args.where,
                         isDeleted: false
+                        }
                     }
                     return query(args);
                 },
                 async count ({args, query}) {
-                    args.where = {
+                    if (args.where?.isDeleted === undefined) {
+                        args.where = {
                         ...args.where,
                         isDeleted: false
+                        }
                     }
                     return query(args);
                 }
             },
             route : {
                 async findMany({args, query}) {
-                    args.where = {
+                    if (args.where?.isDeleted === undefined) {
+                        args.where = {
                         ...args.where,
                         isDeleted: false
+                        }
                     }
                     return query(args);
                 },
                 async findFirst({args, query}) {
-                    args.where = {
+                    if (args.where?.isDeleted === undefined) {
+                        args.where = {
                         ...args.where,
                         isDeleted: false
+                        }
                     }
                     return query(args);
                 },
                 async findUnique({args, query}) {
-                    args.where = {
+                    if (args.where?.isDeleted === undefined) {
+                        args.where = {
                         ...args.where,
                         isDeleted: false
+                        }
                     }
                     return query(args);
                 },
                 async count ({args, query}) {
-                    args.where = {
+                    if (args.where?.isDeleted === undefined) {
+                        args.where = {
                         ...args.where,
                         isDeleted: false
+                        }
                     }
                     return query(args);
                 }
             },
             booking : {
                 async findMany({args, query}) {
-                    args.where = {
+                    if (args.where?.isDeleted === undefined) {
+                        args.where = {
                         ...args.where,
                         isDeleted: false
+                        }
                     }
                     return query(args);
                 },
                 async findFirst({args, query}) {
-                    args.where = {
+                    if (args.where?.isDeleted === undefined) {
+                        args.where = {
                         ...args.where,
                         isDeleted: false
+                        }
                     }
                     return query(args);
                 },
                 async findUnique({args, query}) {
-                    args.where = {
+                    if (args.where?.isDeleted === undefined) {
+                        args.where = {
                         ...args.where,
                         isDeleted: false
+                        }
                     }
                     return query(args);
                 },
                 async count ({args, query}) {
-                    args.where = {
+                    if (args.where?.isDeleted === undefined) {
+                        args.where = {
                         ...args.where,
                         isDeleted: false
+                        }
                     }
                     return query(args);
                 }

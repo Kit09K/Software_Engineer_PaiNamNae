@@ -119,6 +119,7 @@ class DeleteRequestService {
             routesData: null,
             bookingsData: null
         };
+        const infoList = await this.checkInfoBeforeDelete(userId);
 
         const userInfo = await UserService.getUserById(userId);
 
@@ -146,11 +147,12 @@ class DeleteRequestService {
         await this.emailService.sendEmail({
             to: userInfo.email,
             subject: "คำขอลบข้อมูลของคุณได้รับการดำเนินการแล้ว",
-            text: `เรียน คุณ${userInfo.name} ${userInfo.lastName},\n\nเราได้ดำเนินการตามคำขอลบข้อมูลของคุณเรียบร้อยแล้ว ข้อมูลที่ถูกลบมีดังนี้:\n\n` +
-                `${deleteUserRequest ? "- ข้อมูลบัญชีผู้ใช้\n" : ""}` +
-                `${deleteVehicleRequest ? "- ข้อมูลรถยนต์\n" : ""}` +
-                `${deleteRouteRequest ? "- ข้อมูลเส้นทาง\n" : ""}` +
-                `${deleteBookingRequest ? "- ข้อมูลการจอง\n" : ""}` +
+            text: `เรียน คุณ${userInfo.firstName} ${userInfo.lastName},\n\nเราได้ดำเนินการตามคำขอลบข้อมูลของคุณเรียบร้อยแล้ว ข้อมูลที่ถูกลบมีดังนี้:\n\n` +
+                `${infoList.user ? "- ข้อมูลบัญชีผู้ใช้\n" : ""}` +
+                `${infoList.vehicles ? "- ข้อมูลรถยนต์\n" : ""}` +
+                `${infoList.routes ? "- ข้อมูลเส้นทาง\n" : ""}` +
+                `${infoList.bookings ? "- ข้อมูลการจอง\n" : ""}` +
+                'โดยรูปภาพของคุณจะถูกลบออกจากระบบทั้งหมดภายใน 90 วัน กรุณาดาวน์โหลดข้อมูลที่คุณต้องการไว้ก่อนตาม link ที่อยู่ในไฟล์ JSON ที่ส่งมา และไม่สามารถกู้คืนได้อีกต่อไป\n\n' +
                 `\nหากคุณมีคำถามเพิ่มเติมหรือต้องการความช่วยเหลือ กรุณาติดต่อทีมสนับสนุนของเราได้ตลอดเวลา\n\nขอบคุณที่ใช้บริการของเรา\nทีมงาน painamnae`,
             attachments: [{
                         filename: 'delete-receipt.json',
