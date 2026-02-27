@@ -2,31 +2,38 @@ const prisma = require('../utils/prisma');
 
 // Service สำหรับจัดการ System Logs ตาม พ.ร.บ. คอมพิวเตอร์ และ PDPA
 
+// บันทึก log ลง database
 const createLog = async (logData) => {
-  const { userId, action, ipAddress, userAgent, targetTable, targetId, details } = logData;
+  const { userId, action, level, resource, ipAddress, userAgent, targetTable, targetId, details, errorMessage } = logData;
 
   return await prisma.systemLog.create({
     data: {
       userId,
       action,
+      level: level || 'INFO', 
+      resource: resource || targetTable || 'System', 
       ipAddress,
       userAgent,
       targetTable,
       targetId,
       details: details || {}, // เก็บรายละเอียดเพิ่มเติมในรูปแบบ JSON
+      errorMessage,
     },
   });
 };
 
-// ดึงข้อมูล Logs ทั้งหมดสำหรับ Admin (รองรับ Pagination และ Filtering)
+// SELECT ข้อมูลเพื่อมาแสดง และ Filter_logs()
 const queryLogs = async (filter, options) => {
-  const { action, startDate, endDate, userId } = filter;
+  const { action, startDate, endDate, userId, level, resource } = filter;
   const { limit = 50, page = 1 } = options;
   const skip = (page - 1) * limit;
 
+  // สร้างเงื่อนไขในการค้นหา (Filter)
   const where = {
     ...(action && { action }),
     ...(userId && { userId }),
+    ...(level && { level }),       // เพิ่มการกรองตาม Level
+    ...(resource && { resource }), // เพิ่มการกรองตาม Resource
     ...(startDate && endDate && {
       timestamp: {
         gte: new Date(startDate),
@@ -43,6 +50,7 @@ const queryLogs = async (filter, options) => {
         user: {
           select: {
             username: true,
+            email: true,
             firstName: true,
             lastName: true,
             role: true,
@@ -79,23 +87,56 @@ const getLogById = async (logId) => {
   });
 };
 
-// ฟังก์ชันสำหรับลบ Log ที่เก่าเกินกว่ากำหนด (เช่น 90 วัน) ใช้เพื่อรักษาขนาดฐานข้อมูลโดยที่ยังปฏิบัติตาม พ.ร.บ. คอมพิวเตอร์
-const cleanupOldLogs = async () => {
-  const ninetyDaysAgo = new Date();
-  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+// logs_export() (export log to JSON และสามารถ Filter ข้อมูลได้)
+const exportLogsToJSON = async (filter) => {
+  const { action, startDate, endDate, userId, level, resource } = filter;
 
-  return await prisma.systemLog.deleteMany({
+  const where = {
+    ...(action && { action }),
+    ...(userId && { userId }),
+    ...(level && { level }),
+    ...(resource && { resource }),
+    ...(startDate && endDate && {
+      timestamp: {
+        gte: new Date(startDate),
+        lte: new Date(endDate),
+      },
+    }),
+  };
+
+  const logs = await prisma.systemLog.findMany({
+    where,
+    include: {
+      user: {
+        select: { username: true, email: true, role: true }
+      }
+    },
+    orderBy: { timestamp: 'desc' },
+  });
+
+  return logs;
+};
+
+// static del_morethan90_log() (ลบ log หากเกิน 90 วัน)
+const deleteLogsOlderThan = async (days) => {
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - days);
+
+  const result = await prisma.systemLog.deleteMany({
     where: {
       timestamp: {
-        lt: ninetyDaysAgo, // ลบข้อมูลที่น้อยกว่า 90 วันที่แล้ว
+        lt: cutoffDate, 
       },
     },
   });
+
+  return { count: result.count };
 };
 
 module.exports = {
   createLog,
   queryLogs,
   getLogById,
-  cleanupOldLogs,
+  exportLogsToJSON,
+  deleteLogsOlderThan,
 };

@@ -1,5 +1,7 @@
 const cron = require('node-cron');
 const prisma = require('./prisma');
+const systemLogService = require('../services/systemLog.service');
+
 async function hardDeleteProcess() {
     console.log('Running hard delete task at', new Date());
 
@@ -39,16 +41,18 @@ async function hardDeleteProcess() {
                             where: { userId: request.userId, isDeleted: true },
                         });
                     }
+
                     // if the request is to delete the routes, delete all associated route records
                     if (request.deleteRoutes) {
                         await tx.route.deleteMany({
-                            where: { userId: request.userId, isCancelled: true },
+                            where: { driverId: request.userId, isCancelled: true },
                         });
                     }
+
                     // if the request is to delete the bookings, delete all associated booking records
                     if (request.deleteBookings) {
                         await tx.booking.deleteMany({
-                            where: { userId: request.userId, isAnonymized: true },
+                            where: { passengerId: request.userId, isAnonymized: true },
                         });
                     }
 
@@ -57,12 +61,33 @@ async function hardDeleteProcess() {
                         await tx.user.deleteMany({
                             where: { id: request.userId, isDeleted: true },
                         });
-                    }
-
-                    
+                    }    
                 });
-            }
-            catch (error) {
+
+                // บันทึก Log การ Hard Delete โดยระบบ
+                await systemLogService.createLog({
+                    action: 'DELETE_DATA',
+                    level: 'WARNING', // ตั้งเป็น Warning เพราะเป็นการลบถาวร
+                    resource: 'HardDelete_Cron',
+                    targetTable: 'User',
+                    targetId: request.userId,
+                    ipAddress: '127.0.0.1',
+                    userAgent: 'Node-Cron',
+                    details: { 
+                        message: 'System automatically hard-deleted user data', 
+                        requestId: request.id,
+                        options: { 
+                            account: request.deleteAccount, 
+                            vehicles: request.deleteVehicles, 
+                            routes: request.deleteRoutes, 
+                            bookings: request.deleteBookings 
+                        }
+                    }
+                });
+
+                console.log(`Successfully hard deleted data for userId: ${request.userId}`);
+
+            } catch (error) {
                 console.error(`Error processing deletion request for userId ${request.userId}:`, error);
             }
         }

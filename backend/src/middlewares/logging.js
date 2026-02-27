@@ -2,11 +2,12 @@ const systemLogService = require('../services/systemLog.service');
 
 /**
  * Middleware สำหรับดักจับและบันทึกกิจกรรมสำคัญ (Critical Actions)
- * @param {string} actionType 
- * @param {string} targetTable 
+ * @param {string} actionType       - ค่าต้องตรงกับ Enum LogAction (เช่น CREATE_DATA, UPDATE_DATA, DELETE_DATA)
+ * @param {string} targetTable      - ชื่อ Table หรือ Module ที่เกิดการกระทำ
+ * @param {string} level            - (Optional) ระดับความรุนแรง INFO, WARNING, ERROR, CRITICAL
  */
 
-const logActivity = (actionType, targetTable) => {
+const logActivity = (actionType, targetTable, level = 'INFO') => {
     return async (req, res, next) => {
         // เก็บข้อมูลเบื้องต้นจาก Request
         const userId = req.user ? req.user.sub : null;
@@ -18,17 +19,18 @@ const logActivity = (actionType, targetTable) => {
         // ดึง ID ของเป้าหมายจาก Params (ถ้ามี)
         const targetId = req.params.id || req.body.id || null;
 
-        // บันทึกเฉพาะเมื่อเป็น Method ที่มีการเปลี่ยนแปลงข้อมูล หรือตามที่ระบุ actionType มา
-        const criticalMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
-        
-        // รอให้ Controller ทำงานเสร็จก่อนเพื่อดูว่า Success หรือไม่ (Optional)
-        // แต่ในทางกฎหมาย การดักจับ "ความพยายาม" (Attempt) ก็มีความสำคัญ
+        // ป้องกันปัญหา Enum ผิดพลาด โดยผูก HTTP Method เข้ากับ LogAction พื้นฐาน
+        let defaultAction = 'UPDATE_DATA';
+        if (method === 'POST') defaultAction = 'CREATE_DATA';
+        if (method === 'DELETE') defaultAction = 'DELETE_DATA';
         
         try {
             // บันทึก Log ลงฐานข้อมูล
             await systemLogService.createLog({
                 userId,
-                action: actionType || `${method}_ACTIVITY`,
+                action: actionType || defaultAction,
+                level: method === 'DELETE' ? 'WARNING' : level, // ถ้ายกเลิก/ลบ ให้แจ้งเตือนเป็น WARNING เสมอ
+                resource: targetTable, // Filter_logs
                 targetTable,
                 targetId,
                 ipAddress,

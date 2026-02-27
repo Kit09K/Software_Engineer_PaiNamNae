@@ -1,22 +1,28 @@
 const express = require('express');
 const systemLogController = require('../controllers/systemLog.controller');
-const auth = require('../middlewares/auth');
-const ensureAdmin = require('../bootstrap/ensureAdmin'); // ตรวจสอบสิทธิ์ Admin
+const { protect, requireAdmin } = require('../middlewares/auth');
 const validate = require('../middlewares/validate'); // ถ้ามี middleware ตรวจสอบ query
 const systemLogValidation = require('../validations/systemLog.validation'); // ถ้ามีไฟล์ validation
 
 const router = express.Router();
 
-// ทุกเส้นทางในไฟล์นี้ต้องผ่านการยืนยันตัวตน (auth) และต้องมีสิทธิ์เป็น Admin (ensureAdmin) เท่านั้น
-// เพื่อให้สอดคล้องกับข้อกำหนดเรื่องการจำกัดการเข้าถึงข้อมูลส่วนบุคคล (PDPA)
-router.use(auth(), ensureAdmin);
+// ทุกเส้นทางในไฟล์นี้ต้องผ่านการยืนยันตัวตน และต้องเป็น Admin เท่านั้น
+router.use(protect, requireAdmin);
 
-// ดึงรายการ Logs ทั้งหมด (รองรับ Pagination, Filtering ตามวันที่และ Action)
-// validate(systemLogValidation.getLogs)
+// logs_export() (export log to JSON และสามารถ Filter ข้อมูลได้)
+// GET /api/system-logs/export
+router.get('/export', systemLogController.exportLogs);
+
+// static del_morethan90_log() (ลบ log หากเกิน 90 วัน)
+// DELETE /api/system-logs/old-logs
+router.delete('/old-logs', systemLogController.deleteOldLogs);
+
+// SELECT ข้อมูลเพื่อมาแสดง และ Filter_logs()
+// GET /api/system-logs
 router.get('/', systemLogController.getLogs); 
 
-// ดึงรายละเอียดเชิงลึกของ Log รายการเดียว (เพื่อดู JSON details)
-// validate(systemLogValidation.getLogById),
+// ดึงรายละเอียดเชิงลึกของ Log รายการเดียว
+// GET /api/system-logs/:id
 router.get('/:id', systemLogController.getLogById);
 
 module.exports = router;
