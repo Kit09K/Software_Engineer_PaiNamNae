@@ -1,12 +1,15 @@
 const cron = require('node-cron');
-const CleanupService = require('../services/cleanup.service.js');
+const DeleteRequestService = require('../services/deleteRequest.service');
+const CleanupService = require('../services/cleanup.service');
 
+const deleteRequestService = new DeleteRequestService();
+const cleanupService = new CleanupService(deleteRequestService);
 
 function scheduleHardDelete() {
     cron.schedule('0 0 * * *', async () => {
         console.log('Running hard delete cron job at', new Date());
         try{
-            await CleanupService.delete90DaysData();
+            await cleanupService.delete90DaysData();
             console.log('Hard delete cron job completed successfully at', new Date());
         }
         catch (error) {

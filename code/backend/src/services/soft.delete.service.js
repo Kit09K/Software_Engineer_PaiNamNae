@@ -2,8 +2,11 @@ const prisma = require('../utils/prisma');
 const ApiError = require('../utils/ApiError');
 
 class SoftDeleteService {
+    constructor() {
+
+    }
     // เปลี่ยนสถานะ isDeleted ของ User เป็น true
-    static async softDeleteUser(userId) {
+    async softDeleteUser(userId) {
         await prisma.user.update({
             where: { id : userId },
             data: { 
@@ -13,7 +16,7 @@ class SoftDeleteService {
     }
 
     // เปลี่ยนสถานะ isDeleted ของ Vehicle เป็น true
-    static async softDeleteVehicles(userId) {
+    async softDeleteVehicles(userId) {
         await prisma.vehicle.updateMany({
             where: { userId: userId },
             data: { isDeleted: true },
@@ -21,7 +24,7 @@ class SoftDeleteService {
     }
 
     // เปลี่ยนสถานะ isDeleted ของ Route เป็น true
-    static async softDeleteRoutes(userId) {
+    async softDeleteRoutes(userId) {
         await prisma.route.updateMany({
             where: { driverId: userId },
             data: { isDeleted: true },
@@ -29,7 +32,7 @@ class SoftDeleteService {
     }
 
     // เปลี่ยนสถานะ isDeleted ของ Booking เป็น true
-    static async softDeleteBookings(userId) {
+    async softDeleteBookings(userId) {
         await prisma.booking.updateMany({
             where: { passengerId: userId },
             data: { isDeleted: true },
