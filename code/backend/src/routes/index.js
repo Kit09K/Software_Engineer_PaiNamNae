@@ -7,6 +7,7 @@ const driverVerifRoutes = require('./driverVerification.routes');
 const bookingRoutes = require('./booking.routes');
 const notificationRoutes = require('./notification.routes')
 const deleteRequestRoutes = require('./deleteRequest.routes');
+const OtpRoutes = require('./otp.routes');
 const mapRoutes = require('./maps.routes')
 
 
@@ -20,6 +21,7 @@ router.use('/driver-verifications', driverVerifRoutes);
 router.use('/bookings', bookingRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/delete-request', deleteRequestRoutes);
+router.use('/otp', OtpRoutes);
 router.use('/api/maps', mapRoutes);
 
 module.exports = router;
