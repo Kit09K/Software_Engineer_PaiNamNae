@@ -95,3 +95,5 @@ class OtpService {
     }
 
 }
+
+module.exports = OtpService;
