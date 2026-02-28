@@ -1,6 +1,4 @@
 const asyncHandler = require("express-async-handler");
-const DeleteRequestService = require("../services/deleteRequest.service");
-const SoftDeleteService = require("../services/soft.delete.service");
 const ApiError = require("../utils/ApiError");
 
 class DeleteRequestController {
