@@ -25,6 +25,7 @@ router.post(
         protect, 
         deleteRequestController.sendDeleteRequest);
 
+// GET /api/delete-request/check-can-delete
 router.get(
         '/check-can-delete',
         protect, 
