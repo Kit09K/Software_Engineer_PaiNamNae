@@ -19,7 +19,7 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mt-6">
-                            <div class="md:col-span-4 relative">
+                            <div class="md:col-span-3 relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-search"></i>
                                 </span>
@@ -31,7 +31,7 @@
                                 >
                             </div>
 
-                            <div class="md:col-span-3">
+                            <div class="md:col-span-2">
                                 <select v-model="filter.action" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
                                     <option value="">ทุก Action (All)</option>
                                     <option value="LOGIN">LOGIN / LOGOUT</option>
@@ -60,19 +60,48 @@
                                 </select>
                             </div>
 
-                            <div class="md:col-span-3">
+                            <div class="md:col-span-2">
                                 <input 
                                     v-model="filter.date" 
                                     type="date" 
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                                 >
                             </div>
+                            
+                            <div class="md:col-span-3">
+                                <div class="flex items-center border border-gray-200 rounded-xl bg-gray-50/50 hover:bg-white transition-all focus-within:ring-2 focus-within:ring-blue-500 overflow-hidden h-[42px]">
+                                    <div class="pl-3 text-gray-400">
+                                        <i class="far fa-clock text-xs"></i>
+                                    </div>
+                                    
+                                    <input 
+                                        v-model="filter.startTime" 
+                                        type="text" 
+                                        maxlength="5"
+                                        @input="formatTimeInput($event, 'startTime')"
+                                        class="w-full px-2 py-2 bg-transparent outline-none text-sm border-none focus:ring-0 text-center placeholder:text-gray-300"
+                                        placeholder="00:00"
+                                    >
+                                    
+                                    <span class="text-gray-300 font-light px-1">-</span>
+                                    
+                                    <input 
+                                        v-model="filter.endTime" 
+                                        type="text" 
+                                        maxlength="5"
+                                        @input="formatTimeInput($event, 'endTime')"
+                                        class="w-full px-2 py-2 bg-transparent outline-none text-sm border-none focus:ring-0 text-center placeholder:text-gray-300"
+                                        placeholder="23:59"
+                                    >
+                                </div>
+                            </div>
 
+                            
                             <div class="md:col-span-2 flex gap-2">
                                 <button @click="handleSearch" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition shadow-sm">
                                     ค้นหา
                                 </button>
-                                <button @click="exportLogs" class="flex-none bg-green-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-green-700 transition shadow-sm" title="Export JSON">
+                                <button @click="exportLogs" class="flex-none bg-amber-500 text-white px-3 py-2 rounded-lg font-medium hover:bg-amber-600 transition shadow-sm" title="Export JSON">
                                     <i class="fas fa-file-code"></i>
                                 </button>
                             </div>
@@ -224,7 +253,9 @@ const totalItems = ref(0)
 const filter = ref({
     search: '',
     action: '',
-    date: ''
+    date: '' ,
+    startTime: '00:00', 
+    endTime: '23:59'    
 })
 
 const showExportModal = ref(false)
@@ -239,6 +270,21 @@ const exportFieldOptions = {
     plateNumber: 'หมายเลขทะเบียน',
     carType: 'ชนิดของรถ',
     carColor: 'สีรถ'
+}
+
+const formatTimeInput = (event, field) => {
+    let value = event.target.value.replace(/[^0-9]/g, ''); // เอาเฉพาะตัวเลข
+    
+    if (value.length >= 3) {
+        value = value.slice(0, 2) + ':' + value.slice(2, 4);
+    }
+    
+    // ตรวจสอบความถูกต้องเบื้องต้น 
+    const [hours, minutes] = value.split(':');
+    if (hours > 23) value = '23' + (minutes ? ':' + minutes : '');
+    if (minutes > 59) value = hours + ':59';
+    
+    filter.value[field] = value;
 }
 
 // ฟังก์ชันสำหรับเลือก/ไม่เลือก ทั้งหมด
