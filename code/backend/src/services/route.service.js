@@ -374,7 +374,7 @@ const cancelRoute = async (routeId, driverId, opts = {}) => {
 const completeRoute = async (routeId) => {
   await prisma.route.update({
     where: { id: routeId },
-    data: { status: RouteStatus.COMPLETED, completedAt: new Date() }
+    data: { status: RouteStatus.COMPLETED }
   });
 }
 

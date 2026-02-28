@@ -142,7 +142,7 @@ class DeleteRequestService {
     async sendDeleteRequest(deleteRequest,userId) {
 
         // ตรวจสอบว่าผู้ใช้สามารถลบบัญชีได้หรือไม่ (เช่น ไม่มีเส้นทางที่เปิดอยู่ หรือการจองที่ยังไม่เสร็จสมบูรณ์)
-        canDeleteResult = await this.checkCanDeleteAccount(userId);
+        const canDeleteResult = await this.checkCanDeleteAccount(userId);
         if (!canDeleteResult.canDelete) {
             throw new ApiError(400, canDeleteResult.message);
         }
