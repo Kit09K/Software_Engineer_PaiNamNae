@@ -25,4 +25,9 @@ router.post(
         protect, 
         deleteRequestController.sendDeleteRequest);
 
+router.get(
+        '/check-can-delete',
+        protect, 
+        deleteRequestController.checkCanDeleteAccount);
+
 module.exports = router;

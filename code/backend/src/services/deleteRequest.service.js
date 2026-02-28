@@ -72,7 +72,47 @@ class DeleteRequestService {
             data: { status: 'DELETED' }
         });
     }
+    
+    
+    async checkCanDeleteAccount(userId) {
+        const activeRoutes = await prisma.route.findFirst({
+            where : {
+                driverId : userId,
+                status : {
+                    in : ['AVAILABLE','FULL','IN_TRANSIT']
+                }
+            }
+        });
 
+        if (activeRoutes) {
+            return { 
+                canDelete: false, 
+                reason: "ACTIVE_ROUTE", 
+                message: "คุณมีเส้นทางที่เปิดรับผู้โดยสาร หรือกำลังเดินทางอยู่" 
+            };
+        }
+
+        const activeBooking = await prisma.booking.findFirst({
+            where: {
+                passengerId: userId,
+                status: { in: ['PENDING', 'CONFIRMED'] },
+                route: {
+                    status: { in: ['AVAILABLE', 'FULL', 'IN_TRANSIT'] },
+                }
+            }
+        });
+        if (activeBooking) {
+            return { 
+                canDelete: false, 
+                reason: "ACTIVE_BOOKING", 
+                message: "คุณมีการจองที่ยังไม่เสร็จสมบูรณ์" 
+            };
+        }
+
+        return { canDelete: true };
+    }
+
+    // ฟังก์ชันสำหรับตรวจสอบข้อมูลก่อนส่งคำขอลบ
     async checkInfoBeforeDelete(userId) {
         const user = await UserService.getUserById(userId);
         const vehicles = await VehicleService.getAllVehicles(userId);
@@ -100,6 +140,12 @@ class DeleteRequestService {
 
     // ฟังก์ชันหลักสำหรับส่งคำขอลบข้อมูล และทำการ Soft Delete ข้อมูลที่เกี่ยวข้อง
     async sendDeleteRequest(deleteRequest,userId) {
+
+        // ตรวจสอบว่าผู้ใช้สามารถลบบัญชีได้หรือไม่ (เช่น ไม่มีเส้นทางที่เปิดอยู่ หรือการจองที่ยังไม่เสร็จสมบูรณ์)
+        canDeleteResult = await this.checkCanDeleteAccount(userId);
+        if (!canDeleteResult.canDelete) {
+            throw new ApiError(400, canDeleteResult.message);
+        }
         const deleteUserRequest = deleteRequest.deleteUserRequest;
         const deleteVehicleRequest = deleteRequest.deleteVehicleRequest;
         const deleteRouteRequest = deleteRequest.deleteRouteRequest;

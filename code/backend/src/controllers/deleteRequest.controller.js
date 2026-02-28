@@ -38,6 +38,12 @@ class DeleteRequestController {
             message: "Delete request sent successfully",
         });
     });
-}
 
+    // ฟังก์ชันสำหรับตรวจสอบว่าผู้ใช้สามารถลบบัญชีได้หรือไม่ (เช่น ไม่มีเส้นทางที่เปิดอยู่ หรือการจองที่ยังไม่เสร็จสมบูรณ์)
+    checkCanDeleteAccount = asyncHandler(async (req, res) => {
+        const userId = req.user.sub;
+        const canDeleteResult = await this.deleteRequestService.checkCanDeleteAccount(userId);
+        return res.status(200).json(canDeleteResult);
+    });
+}
 module.exports = DeleteRequestController;
