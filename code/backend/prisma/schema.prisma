@@ -34,6 +34,12 @@ enum BookingStatus {
   CANCELLED
 }
 
+// สถานะสำหรับ DeleteRequest
+enum DeleteStatus {
+  PENDING
+  DELETED
+}
+
 enum CancelReason {
   CHANGE_OF_PLAN               // เปลี่ยนแผน/มีธุระกะทันหัน
   FOUND_ALTERNATIVE            // พบวิธีเดินทางอื่นแล้ว
@@ -88,6 +94,7 @@ model User {
   notification          Notification[]
   createdRoutes         Route[]             @relation("DriverRoutes")
   bookings              Booking[]           @relation("PassengerBookings")
+  isDeleted             Boolean  @default(false) // สำหรับ soft delete ข้อมูล user
 
   @@index([role])
   @@index([isActive])
@@ -153,6 +160,7 @@ model Vehicle {
   updatedAt     DateTime @updatedAt
 
   routes        Route[]
+  isDeleted      Boolean  @default(false) // สำหรับ soft delete ข้อมูล Vehicle
 
   @@index([userId])
   @@index([createdAt])
@@ -188,6 +196,7 @@ model Route {
   updatedAt     DateTime @updatedAt
 
   bookings        Booking[]
+  isDeleted        Boolean   @default(false) // สำหรับ soft delete ข้อมูล Route
 
   @@index([driverId])
   @@index([vehicleId])
@@ -210,4 +219,34 @@ model Booking {
   pickupLocation  Json          @db.Json
   dropoffLocation Json          @db.Json
   createdAt       DateTime      @default(now())
+  isDeleted        Boolean       @default(false) // สำหรับ soft delete ข้อมูล Booking
+}
+
+// สำหรับตรวจการขอลบและใช้เช็คตอน hard delete
+model DeleteRequest {
+  id              String        @id @default(cuid())
+  userId          String
+  deleteUserRequest     Boolean
+  deleteVehicleRequest  Boolean
+  deleteRouteRequest    Boolean
+  deleteBookingRequest  Boolean
+  status          DeleteStatus  @default(PENDING)
+  requestAt       DateTime      @default(now())
+  deleteAt        DateTime
+
+
+  @@index([userId])
+}
+
+// ตารางเก็บรหัส otp สำหรับยืนยันตัวลบ
+model otp {
+  id              String        @id @default(cuid())
+  email           String
+  otpCode         String
+  isUsed          Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  expireAt        DateTime
+
+
+  @@index([email])
 }
