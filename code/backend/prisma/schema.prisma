@@ -233,4 +233,20 @@ model DeleteRequest {
   status          DeleteStatus  @default(PENDING)
   requestAt       DateTime      @default(now())
   deleteAt        DateTime
+
+
+  @@index([userId])
+}
+
+// ตารางเก็บรหัส otp สำหรับยืนยันตัวลบ
+model otp {
+  id              String        @id @default(cuid())
+  email           String
+  otpCode         String
+  isUsed          Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  expireAt        DateTime
+
+
+  @@index([email])
 }

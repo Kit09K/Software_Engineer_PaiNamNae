@@ -6,7 +6,7 @@ const deleteRequestService = new DeleteRequestService();
 const cleanupService = new CleanupService(deleteRequestService);
 
 function scheduleHardDelete() {
-    cron.schedule('0 0 * * * ', async () => {
+    cron.schedule('0 0 * * *', async () => {
         console.log('Running hard delete cron job at', new Date());
         try{
             await cleanupService.delete90DaysData();

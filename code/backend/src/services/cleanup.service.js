@@ -2,11 +2,16 @@ const prisma = require('../utils/prisma');
 const DeleteRequestService = require('./deleteRequest.service');
 const { deleteFromCloudinary, extractPublicIdFromUrl } = require('../utils/cloudinary');
 class CleanupService {
-    constructor(deleteRequestService) {
+    constructor(deleteRequestService,otpService) {
         this.deleteRequestService = deleteRequestService;
+        this.otpService = otpService;
     }
     async hardDeleteData(request) {
         const userId = request.userId;
+
+        // ลบ OTP ที่หมดอายุทั้งหมด
+        await this.otpService.deleteExpiredOtps();
+
         if (request.deleteVehicleRequest) {
             
             const vehicles = await prisma.vehicle.findMany({
