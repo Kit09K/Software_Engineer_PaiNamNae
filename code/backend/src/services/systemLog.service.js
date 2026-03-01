@@ -122,6 +122,9 @@ const exportLogsToJSON = async (filter) => {
   const rawDataString = JSON.stringify(logs);
 
   // ใช้ระบบตรวจสอบความถูกต้องด้วย SHA-256 
+  // queryLogs: แอดมินเข้าหน้า Dashboard เพื่อดูว่ามีใครทำอะไรบ้าง ระบบจะเรียกฟังก์ชันนี้เพื่อดึงข้อมูลทั้งหมดไปแสดง และสามารถ Filter ดูเฉพาะคนได้
+  // getLogById: ดูรายละเอียดเจาะลึก
+  // exportLogsToJSON: แอดมินกดปุ่ม Export เพื่อเอาไฟล์ JSON ไปส่งให้เจ้าหน้าที่ตำรวจหรือใช้เป็นหลักฐาน (ฟังก์ชันนี้จะทำ SHA-256 แนบไปให้ด้วย)
   const hashSignature = crypto
     .createHash('sha256')
     .update(rawDataString)
