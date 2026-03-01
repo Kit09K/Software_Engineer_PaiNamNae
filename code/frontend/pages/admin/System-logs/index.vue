@@ -25,6 +25,7 @@
                                 </span>
                                 <input 
                                     v-model="filter.search" 
+                                    @input="filter.search = filter.search.trimStart()" 
                                     type="text" 
                                     placeholder="ค้นหา Username, IP หรือ ID..." 
                                     class="w-full pl-10 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
@@ -109,7 +110,7 @@
                     </div>
 
                     <div class="overflow-x-auto relative min-h-[400px]">
-                        <table class="w-full text-left border-collapse">
+                        <table class="w-full text-left border-collapse" v-if="!isLoading">
                             <thead class="bg-gray-50 sticky top-0">
                                 <tr class="text-gray-600 uppercase text-xs font-bold border-b border-gray-200">
                                     <th class="px-6 py-4 whitespace-nowrap">Timestamp</th>
@@ -166,6 +167,16 @@
                                 </tr>
                             </tbody>
                         </table>
+
+                        <!-- Loading State -->
+                        <div v-if="isLoading" class="flex flex-col items-center justify-center h-96">
+                            <div class="text-center">
+                                <div class="inline-block">
+                                    <div class="inline-block border-4 border-gray-200 border-t-blue-500 rounded-full w-12 h-12 animate-spin"></div>
+                                </div>
+                                <p class="mt-4 text-gray-600 font-medium">กำลังโหลดข้อมูล...</p>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -242,14 +253,18 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
 import AdminHeader from '~/components/admin/AdminHeader.vue'
 import AdminSidebar from '~/components/admin/AdminSidebar.vue'
+
+// API
+const { $api } = useNuxtApp()
 
 // --- UI State ---
 const page = ref(1)
 const totalPages = ref(1)
 const totalItems = ref(0)
+const isLoading = ref(false)
 const filter = ref({
     search: '',
     action: '',
@@ -296,38 +311,77 @@ const toggleSelectAll = () => {
     }
 }
 
-// --- Mock Data (ตัวอย่างข้อมูลเพื่อดู UI) ---
-const logs = ref([
-    {
-        id: 1,
-        timestamp: new Date().toISOString(),
-        ipAddress: '192.168.1.1',
-        action: 'LOGIN',
-        user: { username: 'admin_test' },
-        details: { method: 'web_browser', status: 'success' }
-    },
-    {
-        id: 2,
-        timestamp: new Date().toISOString(),
-        ipAddress: '::1',
-        action: 'UPDATE_DATA',
-        user: { username: 'kittayot' },
-        details: { field: 'status', old: 'pending', new: 'active' }
-    },
-    { id: 3, timestamp: '2026-02-27T10:00:00', ipAddress: '1.2.3.4', action: 'REGISTER', user: { username: 'NewUser01' }, details: 'Registered via Email: user01@email.com' },
-    { id: 4, timestamp: '2026-02-27T10:15:00', ipAddress: '172.20.0.1', action: 'PROFILE_UPDATE', user: { username: 'Kittayot' }, details: 'Updated phone: 081-xxx-xxxx, Changed Password' },
-    { id: 5, timestamp: '2026-02-27T11:00:00', ipAddress: '192.168.1.5', action: 'ROUTE_CREATE', user: { username: 'Driver_A' }, details: 'Created Route: BKK -> Korat (Seats: 4)' },
-    { id: 6, timestamp: '2026-02-27T11:30:00', ipAddress: '10.0.0.50', action: 'BOOKING_REQUEST', user: { username: 'Passenger_B' }, details: 'Booked 2 seats on Route #RD99' },
-    { id: 7, timestamp: '2026-02-27T12:00:00', ipAddress: '192.168.1.5', action: 'BOOKING_CONFIRM', user: { username: 'Driver_A' }, details: 'Confirmed booking for Passenger_B (BookingID: #B102)' },
-    { id: 8, timestamp: '2026-02-27T13:00:00', ipAddress: '::ffff:127.0.0.1', action: 'VERIFY_APPROVE', user: { username: 'Admin_Master' }, details: 'Approved Driving License for user: Driver_A' },
-    { id: 9, timestamp: '2026-02-27T14:20:00', ipAddress: '172.20.0.1', action: 'ROUTE_CANCEL', user: { username: 'Driver_A' }, details: 'Cancelled Route #RD99 (Reason: Vehicle broken)' }
-])
+const logs = ref([])
 
 // --- Methods ---
 
+// ฟังก์ชันดึงข้อมูล logs จาก API
+const fetchLogs = async () => {
+    isLoading.value = true
+    try {
+        const queryParams = new URLSearchParams({
+            page: page.value,
+            limit: 50,
+            ...(filter.value.search && { search: filter.value.search }),
+            ...(filter.value.action && { action: filter.value.action }),
+            ...(filter.value.date && { startDate: filter.value.date, endDate: filter.value.date }),
+            ...(filter.value.startTime && { startTime: filter.value.startTime }),
+            ...(filter.value.endTime && { endTime: filter.value.endTime }),
+            
+        })
+
+        const response = await $api('/system-logs?' + queryParams)
+        
+        console.log('API Response:', response)
+        
+        let data = []
+        let pagination = {}
+        
+        // Handle response structure from our API
+        if (response && typeof response === 'object') {
+            if (response.pagination) {
+                // Response has data and pagination properties
+                data = response.data || []
+                pagination = response.pagination
+            } else if (Array.isArray(response)) {
+                // Direct array response
+                data = response
+            } else if (response.results) {
+                // Results-based response
+                data = response.results
+                pagination = response
+            } else {
+                // Try data property
+                data = response.data || []
+                pagination = response
+            }
+        }
+        
+        logs.value = data
+        
+        if (pagination && pagination.totalResults !== undefined) {
+            totalItems.value = pagination.totalResults
+            totalPages.value = pagination.totalPages || Math.ceil(pagination.totalResults / 50)
+        } else if (pagination && pagination.total !== undefined) {
+            totalItems.value = pagination.total
+            totalPages.value = Math.ceil(pagination.total / 50)
+        }
+        
+    } catch (error) {
+        console.error('Error fetching logs:', error)
+        logs.value = []
+    } finally {
+        isLoading.value = false
+    }
+}
+
 const handleSearch = () => {
-    console.log('Filtering with:', filter.value)
-    // เขียนใหม่
+    page.value = 1 // Reset to first page when searching
+    // ensure search term is trimmed to avoid accidental whitespace-only queries
+    if (filter.value.search) {
+        filter.value.search = filter.value.search.trim();
+    }
+    fetchLogs()
 }
 
 const exportLogs = () => {
@@ -336,9 +390,57 @@ const exportLogs = () => {
 }
 
 // เพิ่มฟังก์ชันยืนยันการ Export
-const confirmExport = () => {
-    console.log('JSON Fields to export:', selectedExportFields.value)
-    showExportModal.value = false 
+const confirmExport = async () => {
+    try {
+        isLoading.value = true
+        const config = useRuntimeConfig()
+        const queryParams = new URLSearchParams({
+            ...(filter.value.search && { search: filter.value.search }),
+            ...(filter.value.action && { action: filter.value.action }),
+            ...(filter.value.date && { startDate: filter.value.date, endDate: filter.value.date }),
+            ...(filter.value.startTime && { startTime: filter.value.startTime }),
+            ...(filter.value.endTime && { endTime: filter.value.endTime })
+        })
+
+        const token = useCookie('token').value
+        // Ensure baseURL ends with / to avoid URL concatenation issues
+        const baseURL = config.public.apiBase.endsWith('/') ? config.public.apiBase : config.public.apiBase + '/'
+        const url = `${baseURL}system-logs/export?${queryParams}`
+
+        // Use native fetch to bypass Nuxt $fetch onResponse middleware
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': token ? `Bearer ${token}` : '',
+            },
+            credentials: 'include'
+        })
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}))
+            throw new Error(errorData.message || `Export failed with status ${response.status}`)
+        }
+
+        const blob = await response.blob()
+
+        // Create download link
+        const blobUrl = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = blobUrl
+        link.setAttribute('download', `painamnae_logs_${Date.now()}.json`)
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(blobUrl)
+        
+        showExportModal.value = false
+        alert('ไฟล์ได้รับการ export เรียบร้อยแล้ว')
+    } catch (error) {
+        console.error('Error exporting logs:', error)
+        alert('ไม่สามารถ export ข้อมูลได้: ' + (error.message || 'Unknown error'))
+    } finally {
+        isLoading.value = false
+    }
 }
 
 const formatDate = (dateStr) => {
@@ -410,6 +512,18 @@ useHead({
     link: [
         { rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css' }
     ]
+})
+
+// --- Watchers and Lifecycle ---
+
+// Watch page changes and fetch new data
+watch(page, () => {
+    fetchLogs()
+})
+
+// Load initial data on component mount
+onMounted(() => {
+    fetchLogs()
 })
 </script>
 

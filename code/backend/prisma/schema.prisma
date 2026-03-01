@@ -74,6 +74,14 @@ enum LogAction {
   EXPORT_LOGS           // เพิ่ม : เก็บประวัติเวลาแอดมินโหลดไฟล์
   SYSTEM_ERROR
   SOS_TRIGGERED // การกดปุ่มฉุกเฉิน
+  REGISTER              // User สมัครบัญชีใหม่
+  PROFILE_UPDATE        // User แก้ไขข้อมูลส่วนตัว
+  ROUTE_CREATE          // Driver สร้างเส้นทาง
+  BOOKING_REQUEST       // Passenger จองที่นั่ง
+  BOOKING_CONFIRM       // Driver ยืนยันการจอง
+  BOOKING_REJECT        // Driver ปฏิเสธการจอง
+  VERIFY_APPROVE        // Admin อนุมัติเอกสารยืนยันตัวตน
+  VERIFY_REJECT         // Admin ปฏิเสธเอกสารยืนยันตัวตน
 }
 
 enum LogLevel {

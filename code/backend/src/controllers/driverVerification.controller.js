@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const verifService = require("../services/driverVerification.service");
+const systemLogService = require("../services/systemLog.service");
 const ApiError = require("../utils/ApiError");
 const { uploadToCloudinary } = require("../utils/cloudinary");
 const notifService = require('../services/notification.service');
@@ -161,6 +162,43 @@ const updateVerificationStatus = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   const updated = await verifService.updateVerificationStatus(id, status);
+
+  // Log VERIFY_APPROVE or VERIFY_REJECT action
+  try {
+    if (status === 'APPROVED') {
+      await systemLogService.createLog({
+        userId: req.user.sub,
+        action: 'VERIFY_APPROVE',
+        level: 'INFO',
+        resource: 'DriverVerification',
+        ipAddress: req.ip || req.socket.remoteAddress,
+        userAgent: req.get('User-Agent'),
+        status: 'SUCCESS',
+        details: {
+          verificationId: updated.id,
+          verifiedUserId: updated.userId,
+          licenseNumber: updated.licenseNumber
+        }
+      });
+    } else if (status === 'REJECTED') {
+      await systemLogService.createLog({
+        userId: req.user.sub,
+        action: 'VERIFY_REJECT',
+        level: 'WARNING',
+        resource: 'DriverVerification',
+        ipAddress: req.ip || req.socket.remoteAddress,
+        userAgent: req.get('User-Agent'),
+        status: 'SUCCESS',
+        details: {
+          verificationId: updated.id,
+          rejectedUserId: updated.userId,
+          licenseNumber: updated.licenseNumber
+        }
+      });
+    }
+  } catch (logErr) {
+    console.error('Failed to create verification status log', logErr.message);
+  }
 
   try {
     if (status === 'APPROVED') {

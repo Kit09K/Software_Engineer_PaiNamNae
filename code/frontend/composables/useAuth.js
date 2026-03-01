@@ -50,9 +50,14 @@ export function useAuth() {
   }
 
   const logout = () => {
-    token.value = null
-    user.value = null
-    return router.push('/')
+    // Notify backend (record logout) then clear local cookies
+    try {
+      $api('/auth/logout', { method: 'POST' }).catch(() => {})
+    } finally {
+      token.value = null
+      user.value = null
+      return router.push('/')
+    }
   }
 
   return { token, user, login, logout, register }

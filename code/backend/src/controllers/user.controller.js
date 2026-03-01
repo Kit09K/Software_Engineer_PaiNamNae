@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const userService = require("../services/user.service");
+const systemLogService = require('../services/systemLog.service');
 const ApiError = require('../utils/ApiError');
 const { uploadToCloudinary } = require('../utils/cloudinary');
 const notifService = require('../services/notification.service');
@@ -90,6 +91,22 @@ const createUser = asyncHandler(async (req, res) => {
 
     await notifService.createNotificationByAdmin(notifPayload)
 
+    // Log REGISTER action
+    try {
+        await systemLogService.createLog({
+            userId: newUser.id,
+            action: 'REGISTER',
+            level: 'INFO',
+            resource: 'User',
+            ipAddress: req.ip || req.socket.remoteAddress,
+            userAgent: req.get('User-Agent'),
+            status: 'SUCCESS',
+            details: { email: newUser.email, username: newUser.username }
+        });
+    } catch (e) {
+        console.error('Failed to create REGISTER log', e.message);
+    }
+
     res.status(201).json({
         success: true,
         message: "User created successfully. Please wait for verification.",
@@ -121,6 +138,23 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
     }
 
     const updatedUser = await userService.updateUserProfile(req.user.sub, updateData);
+
+    // Log PROFILE_UPDATE action
+    try {
+        await systemLogService.createLog({
+            userId: req.user.sub,
+            action: 'PROFILE_UPDATE',
+            level: 'INFO',
+            resource: 'User',
+            ipAddress: req.ip || req.socket.remoteAddress,
+            userAgent: req.get('User-Agent'),
+            status: 'SUCCESS',
+            details: { updatedFields: Object.keys(updateData) }
+        });
+    } catch (e) {
+        console.error('Failed to create PROFILE_UPDATE log', e.message);
+    }
+
     res.status(200).json({
         success: true,
         message: "Profile updated",
