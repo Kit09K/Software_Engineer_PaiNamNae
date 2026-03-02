@@ -116,7 +116,8 @@
                                     <th class="px-6 py-4 whitespace-nowrap">Timestamp</th>
                                     <th class="px-6 py-4">User / IP</th>
                                     <th class="px-6 py-4">Action</th>
-                                    <th class="px-6 py-4 w-1/2">Details</th>
+                                    <th class="px-6 py-4">Log / Query</th> 
+                                    <th class="px-6 py-4 w-1/3">Details</th>
                                 </tr>
                             </thead>
                             
@@ -145,7 +146,7 @@
                                                 <div class="text-sm font-bold text-gray-900">
                                                     {{ log.user?.username || 'System (Auto)' }}
                                                 </div>
-                                                <div class="text-xs text-gray-500 font-mono">
+                                                <div class="text-[10px] text-gray-500 font-mono whitespace-nowrap ">
                                                     IP: {{ log.ipAddress }}
                                                 </div>
                                             </div>
@@ -157,6 +158,12 @@
                                             <i :class="actionIcon(log.action)"></i>
                                             {{ log.action }}
                                         </span>
+                                    </td>
+
+                                    <td class="px-6 py-4">
+                                        <div class="text-[10px] text-gray-500 font-mono bg-slate-50 p-2 rounded border border-slate-100 break-all leading-relaxed">
+                                            {{ log.backend_query_log || '-' }}
+                                        </div>
                                     </td>
 
                                     <td class="px-6 py-4">

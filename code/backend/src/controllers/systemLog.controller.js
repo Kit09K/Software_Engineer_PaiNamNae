@@ -5,7 +5,6 @@ const ApiError = require('../utils/ApiError');
 // ดึงรายการ Logs ทั้งหมดสำหรับหน้า Admin Panel
 const getLogs = asyncHandler(async (req, res) => {
     // รับค่าจาก Query Params เพื่อใช้ในการกรองข้อมูล (filter)
-    // trim the search string to avoid problems with leading/trailing whitespace
     const rawSearch = req.query.search;
     const trimmedSearch = rawSearch ? rawSearch.trim() : '';
     const filter = {
@@ -27,10 +26,20 @@ const getLogs = asyncHandler(async (req, res) => {
 
     const result = await systemLogService.queryLogs(filter, options);
 
+    const enhancedData = result.results.map(log => {
+        const queryTrace = `${req.method} ${req.baseUrl}${req.path}?${new URLSearchParams(req.query).toString()}`;
+        const whereClause = `queryLogs where= ${JSON.stringify(filter)}`;
+
+        return {
+            ...log,
+            backend_query_log: `${queryTrace} | ${whereClause}`
+        };
+    });
+
     res.status(200).json({
         success: true,
         message: "System logs retrieved successfully",
-        data: result.results,
+        data: enhancedData,
         pagination: {
             page: result.page,
             limit: result.limit,
