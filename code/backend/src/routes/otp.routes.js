@@ -22,4 +22,10 @@ router.post(
         protect, 
         otpController.verifyOtp);
 
+// GET /api/otp/get-for-testing (สำหรับ testing เท่านั้น)
+router.get(
+        '/get-for-testing',
+        protect, 
+        otpController.getOtpForTesting);
+
 module.exports = router;
