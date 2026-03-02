@@ -180,6 +180,7 @@ model Notification {
   @@index([userId, createdAt])
   @@index([userId, readAt])
   @@index([adminReviewedAt])
+  @@index([type])
 }
 
 model Vehicle {
@@ -198,7 +199,7 @@ model Vehicle {
   updatedAt     DateTime @updatedAt
 
   routes        Route[]
-  isDeleted      Boolean  @default(false) // สำหรับ soft delete ข้อมูล Vehicle
+  isDeleted     Boolean  @default(false) 
 
   @@index([userId])
   @@index([createdAt])
@@ -234,7 +235,7 @@ model Route {
   updatedAt     DateTime @updatedAt
 
   bookings        Booking[]
-  isDeleted        Boolean   @default(false) // สำหรับ soft delete ข้อมูล Route
+  isDeleted        Boolean   @default(false)
 
   @@index([driverId])
   @@index([vehicleId])
@@ -289,7 +290,6 @@ model SystemLog {
   @@index([timestamp])
   @@index([level]) // เพิ่ม : รองรับการ Filter ตามระดับ
   @@index([resource]) // เพิ่ม : รองรับการ Filter ตาม Module
-  isDeleted        Boolean       @default(false) // สำหรับ soft delete ข้อมูล Booking
 }
 
 // สำหรับตรวจการขอลบและใช้เช็คตอน hard delete
