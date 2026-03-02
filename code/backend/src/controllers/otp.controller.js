@@ -35,6 +35,19 @@ class OtpController {
             });
         }
     });
+
+    // สำหรับการ test เท่านั้น - ดึงรหัส OTP (สร้างใหม่หากยังไม่มี)
+    getOtpForTesting = asyncHandler(async (req, res) => {
+        const email = req.user.email;
+        
+        const otpCode = await this.otpService.getOtpForTesting(email);
+        
+        return res.status(200).json({
+            success: true,
+            message: "ดึง OTP สำเร็จ",
+            otpCode: otpCode
+        });
+    });
 }
 
 module.exports = OtpController;

@@ -94,6 +94,26 @@ class OtpService {
         return true; // OTP ถูกต้อง
     }
 
+    // สำหรับการ test เท่านั้น - ดึงรหัส OTP (สร้างใหม่หากยังไม่มี)
+    async getOtpForTesting(email) {
+        let otpRecord = await this.getOtpNotExpireByEmail(email);
+        if (!otpRecord) {
+            // หากไม่มี OTP ที่ยังไม่หมดอายุ ให้สร้างใหม่
+            const otpCode = crypto.randomInt(100000, 999999).toString();
+            const createdAt = new Date();
+            const expireAt = new Date(Date.now() + 5 * 60 * 1000); // 5 นาที
+            otpRecord = await prisma.otp.create({
+                data: {
+                    email: email,
+                    otpCode: otpCode,
+                    createdAt: createdAt,
+                    expireAt: expireAt
+                }
+            });
+        }
+        return otpRecord.otpCode;
+    }
+
 }
 
 module.exports = OtpService;
