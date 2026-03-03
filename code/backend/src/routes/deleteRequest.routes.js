@@ -1,5 +1,9 @@
 const express = require('express');
 const router = express.Router();
+<<<<<<< HEAD
+=======
+const { logActivity } = require('../middlewares/logging');
+>>>>>>> origin/StoryLog
 
 const DeleteRequestController = require('../controllers/deleteRequest.controller');
 const DeleteRequestService = require('../services/deleteRequest.service');
@@ -19,10 +23,18 @@ router.get(
         protect,
         deleteRequestController.checkInfoBeforeDelete);
 
+<<<<<<< HEAD
 // POST /api/delete-request
 router.post(
         '/',
         protect, 
+=======
+// POST /api/delete-request (สำหรับให้ User ยื่นคำขอลบข้อมูล Soft Delete)
+router.post(
+        '/',
+        protect, 
+        logActivity('DELETE_DATA', 'User', 'WARNING'), // ดักจับว่า User มากดยื่นขอลบ 
+>>>>>>> origin/StoryLog
         deleteRequestController.sendDeleteRequest);
 
 // GET /api/delete-request/check-can-delete

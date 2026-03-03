@@ -1,7 +1,8 @@
 const { Prisma } = require('@prisma/client');
 const ApiError = require('../utils/ApiError');
+const systemLogService = require('../services/systemLog.service');
 
-const errorHandler = (err, req, res, next) => {
+const errorHandler = async(err, req, res, next) => { // เปลี่ยนเป็น async เพื่อใช้ await
     if (process.env.NODE_ENV !== 'production') {
         console.error('💥 AN ERROR OCCURRED 💥:', err);
     }
@@ -15,6 +16,7 @@ const errorHandler = (err, req, res, next) => {
         statusCode = 400;
         message = 'ข้อมูลส่งมาไม่ครบหรือไม่ถูกต้อง';
     }
+
     //Prisma Known Request Error (P2002, P2025 ฯลฯ)
     else if (err instanceof Prisma.PrismaClientKnownRequestError) {
         switch (err.code) {
@@ -31,15 +33,40 @@ const errorHandler = (err, req, res, next) => {
                 message = 'เกิดข้อผิดพลาดด้านฐานข้อมูล';
         }
     }
-    //Zod Validation Error
+
+    // Zod Validation Error
     else if (err.name === 'ZodError') {
         statusCode = 400;
         message = err.errors.map(e => e.message).join(', ');
     }
-    //ApiError ที่โยนเอง
+
+    // ApiError ที่โยนเอง
     else if (err instanceof ApiError) {
         statusCode = err.statusCode;
         message = err.message;
+    }
+
+    // บันทึกเฉพาะ Error ที่มีนัยสำคัญลง Database 
+    if (statusCode >= 500 || statusCode === 409) {
+        try {
+            await systemLogService.createLog({
+                userId: req.user ? req.user.sub : null, // บันทึก ID ผู้ใช้ (ถ้ามี)
+                action: 'UPDATE_DATA', // หรือเพิ่ม enum 'SYSTEM_ERROR' ใน schema
+                level: statusCode >= 500 ? 'CRITICAL' : 'ERROR', // กำหนดระดับความรุนแรงตาม HTTP Status
+                resource: 'System_Error', // ระบุว่ามาจาก Error Handler เพื่อให้ Filter หาง่าย
+                ipAddress: req.ip || req.connection.remoteAddress, // เก็บ IP ตาม พ.ร.บ. คอมฯ
+                userAgent: req.get('User-Agent'),
+                errorMessage: err.message, // แยกเก็บ message เพื่อความชัดเจนใน Database
+                details: { 
+                    statusCode, 
+                    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+                    path: req.originalUrl,
+                    method: req.method
+                }
+            });
+        } catch (logError) {
+            console.error('Failed to save system log:', logError);
+        }
     }
 
     //สำหรับ Error 500 ทุกกรณี ให้ใช้ข้อความง่ายๆ เสมอ

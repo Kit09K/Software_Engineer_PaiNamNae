@@ -13,6 +13,7 @@ const { idParamSchema,
 const { protect, requireAdmin } = require('../middlewares/auth');
 const upload = require('../middlewares/upload.middleware');
 const parseVehicleBody = require('../middlewares/parseVehicleBody');
+const { logActivity } = require('../middlewares/logging');
 
 const router = express.Router();
 
@@ -102,6 +103,7 @@ router.get(
 router.post(
   '/',
   protect,
+  logActivity('CREATE_DATA', 'Vehicle', 'INFO'), // ดักจับการสร้าง Vehicle
   upload.fields([{ name: 'photos', maxCount: 5 }]), // รับ photos สูงสุด 5 ไฟล์
   parseVehicleBody,
   validate({ body: createVehicleSchema }),
