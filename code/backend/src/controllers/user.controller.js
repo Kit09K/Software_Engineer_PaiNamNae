@@ -214,6 +214,20 @@ const setUserStatus = asyncHandler(async (req, res) => {
     res.status(200).json({ success: true, message: "User status updated", data: updatedUser });
 });
 
+const deleteMyUser = asyncHandler(async (req, res) => {
+    // ดึง ID ของผู้ใช้ที่กำลังล็อกอินอยู่จาก Token
+    const userId = req.user.sub;
+
+    // เรียกใช้ Service เพื่อทำการลบข้อมูลในฐานข้อมูล
+    const deletedUser = await userService.deleteUser(userId);
+
+    res.status(200).json({
+        success: true,
+        message: "Your account has been deleted successfully.",
+        data: { deletedUserId: deletedUser.id }
+    });
+});
+
 module.exports = {
     adminListUsers,
     getAllUsers,
@@ -225,5 +239,5 @@ module.exports = {
     adminUpdateUser,
     adminDeleteUser,
     setUserStatus,
-
+    deleteMyUser,
 };
