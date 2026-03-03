@@ -130,4 +130,15 @@ router.delete(
   routeController.deleteRoute
 );
 
+// PATCH /routes/:id/complete
+router.patch(
+  "/:id/complete",
+  protect,
+  requireDriverVerified,
+  validate({ params: idParamSchema }),
+  routeController.completeRoute
+);
+
+
+
 module.exports = router;

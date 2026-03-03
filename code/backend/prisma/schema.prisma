@@ -34,6 +34,12 @@ enum BookingStatus {
   CANCELLED
 }
 
+// สถานะสำหรับ DeleteRequest
+enum DeleteStatus {
+  PENDING
+  DELETED
+}
+
 enum CancelReason {
   CHANGE_OF_PLAN               // เปลี่ยนแผน/มีธุระกะทันหัน
   FOUND_ALTERNATIVE            // พบวิธีเดินทางอื่นแล้ว
@@ -48,9 +54,9 @@ enum CancelReason {
 
 enum LicenseType {
   PRIVATE_CAR_TEMPORARY // รถยนต์ส่วนบุคคลชั่วคราว (2 ปี)
-  PRIVATE_CAR          // รถยนต์ส่วนบุคคล (5 ปี)
-  PUBLIC_CAR           // รถยนต์สาธารณะ
-  LIFETIME             // ตลอดชีพ
+  PRIVATE_CAR // รถยนต์ส่วนบุคคล (5 ปี)
+  PUBLIC_CAR // รถยนต์สาธารณะ
+  LIFETIME // ตลอดชีพ
 }
 
 enum NotificationType {
@@ -58,36 +64,72 @@ enum NotificationType {
   VERIFICATION
   BOOKING
   ROUTE
+  SECURITY_ALERT // แจ้งเตือนความปลอดภัยสำหรับ Admin
+}
+
+enum LogAction {
+  LOGIN
+  LOGOUT
+  VIEW_DATA             // เพิ่ม : สำหรับการดูข้อมูล (ไฟล์/แอป)
+  ACCESS_SENSITIVE_DATA // เช่น การดูรูปบัตรประชาชน
+  CREATE_DATA // เช่น สร้างเส้นทางใหม่
+  UPDATE_DATA // เช่น แก้ไขข้อมูลส่วนตัว
+  DELETE_DATA // เช่น การทำ Soft Delete
+  APPROVE_VERIFICATION // Admin อนุมัติเอกสาร
+  REJECT_VERIFICATION // Admin ปฏิเสธเอกสาร
+  EXPORT_LOGS           // เพิ่ม : เก็บประวัติเวลาแอดมินโหลดไฟล์
+  SYSTEM_ERROR
+  SOS_TRIGGERED // การกดปุ่มฉุกเฉิน
+  REGISTER              // User สมัครบัญชีใหม่
+  PROFILE_UPDATE        // User แก้ไขข้อมูลส่วนตัว
+  ROUTE_CREATE          // Driver สร้างเส้นทาง
+  BOOKING_REQUEST       // Passenger จองที่นั่ง
+  BOOKING_CONFIRM       // Driver ยืนยันการจอง
+  BOOKING_REJECT        // Driver ปฏิเสธการจอง
+  VERIFY_APPROVE        // Admin อนุมัติเอกสารยืนยันตัวตน
+  VERIFY_REJECT         // Admin ปฏิเสธเอกสารยืนยันตัวตน
+}
+
+enum LogLevel {
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
 }
 
 model User {
-  id                    String   @id @default(cuid())
-  username              String   @unique
-  email                 String   @unique
-  password              String
-  firstName             String?
-  lastName              String?
-  gender                String?
-  phoneNumber           String?
-  profilePicture        String?
-  nationalIdNumber      String?  @unique
-  nationalIdPhotoUrl    String?  @unique
-  nationalIdExpiryDate  DateTime?
-  selfiePhotoUrl        String?
-  role                  Role     @default(PASSENGER)
-  isVerified            Boolean  @default(false)
-  isActive              Boolean  @default(true)
-  otpCode               String?
-  lastLogin             DateTime?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                      String              @id @default(cuid())
+  username                String              @unique
+  email                   String              @unique
+  password                String
+  firstName               String?
+  lastName                String?
+  gender                  String?
+  phoneNumber             String?
+  profilePicture          String?
+  nationalIdNumber        String?             @unique
+  nationalIdPhotoUrl      String?             @unique
+  nationalIdExpiryDate    DateTime?
+  selfiePhotoUrl          String?
+  role                    Role                @default(PASSENGER)
+  isVerified              Boolean             @default(false)
+  isActive                Boolean             @default(true)
+  otpCode                 String?
+  lastLogin               DateTime?
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
   passengerSuspendedUntil DateTime?
   driverSuspendedUntil    DateTime?
-  driverVerification    DriverVerification?
-  vehicles              Vehicle[]
-  notification          Notification[]
-  createdRoutes         Route[]             @relation("DriverRoutes")
-  bookings              Booking[]           @relation("PassengerBookings")
+  driverVerification      DriverVerification?
+  vehicles                Vehicle[]
+  notification            Notification[]
+  createdRoutes           Route[]             @relation("DriverRoutes")
+  bookings                Booking[]           @relation("PassengerBookings")
+
+  // เพิ่ม
+  isDeleted Boolean   @default(false)
+
+  systemLogs SystemLog[] // เพิ่ม : อ้างอิงกลับไปยัง SystemLog
 
   @@index([role])
   @@index([isActive])
@@ -96,20 +138,23 @@ model User {
 }
 
 model DriverVerification {
-  id                  String             @id @default(cuid())
-  userId              String             @unique
-  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  licenseNumber       String             @unique
-  firstNameOnLicense  String
-  lastNameOnLicense   String
-  licenseIssueDate    DateTime
-  licenseExpiryDate   DateTime
-  licensePhotoUrl     String
-  selfiePhotoUrl      String
-  typeOnLicense       LicenseType
-  status              VerificationStatus @default(PENDING)
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @updatedAt
+  id                 String             @id @default(cuid())
+  userId             String             @unique
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  licenseNumber      String             @unique
+  firstNameOnLicense String
+  lastNameOnLicense  String
+  licenseIssueDate   DateTime
+  licenseExpiryDate  DateTime
+  licensePhotoUrl    String
+  selfiePhotoUrl     String
+  typeOnLicense      LicenseType
+  status             VerificationStatus @default(PENDING)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  // เพิ่ม
+  isDeleted Boolean @default(false)
 
   @@index([status])
   @@index([createdAt])
@@ -135,6 +180,7 @@ model Notification {
   @@index([userId, createdAt])
   @@index([userId, readAt])
   @@index([adminReviewedAt])
+  @@index([type])
 }
 
 model Vehicle {
@@ -153,6 +199,7 @@ model Vehicle {
   updatedAt     DateTime @updatedAt
 
   routes        Route[]
+  isDeleted     Boolean  @default(false) 
 
   @@index([userId])
   @@index([createdAt])
@@ -188,6 +235,7 @@ model Route {
   updatedAt     DateTime @updatedAt
 
   bookings        Booking[]
+  isDeleted        Boolean   @default(false)
 
   @@index([driverId])
   @@index([vehicleId])
@@ -210,4 +258,65 @@ model Booking {
   pickupLocation  Json          @db.Json
   dropoffLocation Json          @db.Json
   createdAt       DateTime      @default(now())
+
+  //เพิ่ม
+  isDeleted  Boolean @default(false)
+  passengerName String?
+}
+
+
+
+//Add SystemLog
+model SystemLog {
+  id           String    @id @default(cuid())
+  timestamp    DateTime  @default(now())
+  userId       String?
+  user         User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action       LogAction
+  level        LogLevel  @default(INFO) // เพิ่ม : ระดับความรุนแรง
+  status       String    @default("SUCCESS") // "SUCCESS" หรือ "FAILED"
+  protocol     String?   // เช่น "HTTP/1.1"
+  macAddress   String?   // MAC Address (ถ้าสามารถดึงผ่าน Network infrastructure ได้)
+  ipAddress    String
+  userAgent    String?
+  resource     String?   // เพิ่ม : ระบบหรือ Module ที่เกิด Log (เช่น 'User', 'Booking')
+  targetTable  String?
+  targetId     String?
+  details      Json?     @db.JsonB
+  errorMessage String? // เพิ่ม : เก็บข้อความ Error กรณีเกิดข้อผิดพลาด
+
+  @@index([userId])
+  @@index([action])
+  @@index([timestamp])
+  @@index([level]) // เพิ่ม : รองรับการ Filter ตามระดับ
+  @@index([resource]) // เพิ่ม : รองรับการ Filter ตาม Module
+}
+
+// สำหรับตรวจการขอลบและใช้เช็คตอน hard delete
+model DeleteRequest {
+  id              String        @id @default(cuid())
+  userId          String
+  deleteUserRequest     Boolean
+  deleteVehicleRequest  Boolean
+  deleteRouteRequest    Boolean
+  deleteBookingRequest  Boolean
+  status          DeleteStatus  @default(PENDING)
+  requestAt       DateTime      @default(now())
+  deleteAt        DateTime
+
+
+  @@index([userId])
+}
+
+// ตารางเก็บรหัส otp สำหรับยืนยันตัวลบ
+model otp {
+  id              String        @id @default(cuid())
+  email           String
+  otpCode         String
+  isUsed          Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  expireAt        DateTime
+
+
+  @@index([email])
 }

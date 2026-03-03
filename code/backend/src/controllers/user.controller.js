@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const userService = require("../services/user.service");
+const systemLogService = require('../services/systemLog.service');
 const ApiError = require('../utils/ApiError');
 const { uploadToCloudinary } = require('../utils/cloudinary');
 const notifService = require('../services/notification.service');
@@ -90,6 +91,22 @@ const createUser = asyncHandler(async (req, res) => {
 
     await notifService.createNotificationByAdmin(notifPayload)
 
+    // Log REGISTER action
+    try {
+        await systemLogService.createLog({
+            userId: newUser.id,
+            action: 'REGISTER',
+            level: 'INFO',
+            resource: 'User',
+            ipAddress: req.ip || req.socket.remoteAddress,
+            userAgent: req.get('User-Agent'),
+            status: 'SUCCESS',
+            details: { email: newUser.email, username: newUser.username }
+        });
+    } catch (e) {
+        console.error('Failed to create REGISTER log', e.message);
+    }
+
     res.status(201).json({
         success: true,
         message: "User created successfully. Please wait for verification.",
@@ -121,6 +138,23 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
     }
 
     const updatedUser = await userService.updateUserProfile(req.user.sub, updateData);
+
+    // Log PROFILE_UPDATE action
+    try {
+        await systemLogService.createLog({
+            userId: req.user.sub,
+            action: 'PROFILE_UPDATE',
+            level: 'INFO',
+            resource: 'User',
+            ipAddress: req.ip || req.socket.remoteAddress,
+            userAgent: req.get('User-Agent'),
+            status: 'SUCCESS',
+            details: { updatedFields: Object.keys(updateData) }
+        });
+    } catch (e) {
+        console.error('Failed to create PROFILE_UPDATE log', e.message);
+    }
+
     res.status(200).json({
         success: true,
         message: "Profile updated",
@@ -139,6 +173,23 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
 
 const adminDeleteUser = asyncHandler(async (req, res) => {
     const deletedUser = await userService.deleteUser(req.params.id);
+    // เพิ่ม : บันทึก System Log ว่ามีการลบข้อมูลเกิดขึ้น
+    await systemLogService.createLog({
+        userId: req.user.sub, // บันทึก ID ของ Admin ที่เป็นคนกดลบ
+        action: 'DELETE_DATA',
+        level: 'WARNING',     // ให้ระดับความรุนแรงเป็น WARNING เพราะเป็นการลบข้อมูล
+        resource: 'User',     // ระบุว่าทำกับโมดูล User
+        targetTable: 'User',
+        targetId: req.params.id, // บันทึก ID ของ User ที่โดนลบ
+        ipAddress: req.ip || req.socket.remoteAddress,
+        userAgent: req.get('User-Agent'),
+        protocol: `${req.protocol.toUpperCase()}/${req.httpVersion}`,
+        status: 'SUCCESS',
+        details: {
+            message: 'Admin deleted a user account',
+            deletedUserId: deletedUser.id
+        }
+    });
     res.status(200).json({
         success: true,
         message: "User deleted successfully.",
@@ -196,6 +247,20 @@ const setUserStatus = asyncHandler(async (req, res) => {
     res.status(200).json({ success: true, message: "User status updated", data: updatedUser });
 });
 
+const deleteMyUser = asyncHandler(async (req, res) => {
+    // ดึง ID ของผู้ใช้ที่กำลังล็อกอินอยู่จาก Token
+    const userId = req.user.sub;
+
+    // เรียกใช้ Service เพื่อทำการลบข้อมูลในฐานข้อมูล
+    const deletedUser = await userService.deleteUser(userId);
+
+    res.status(200).json({
+        success: true,
+        message: "Your account has been deleted successfully.",
+        data: { deletedUserId: deletedUser.id }
+    });
+});
+
 module.exports = {
     adminListUsers,
     getAllUsers,
@@ -207,5 +272,5 @@ module.exports = {
     adminUpdateUser,
     adminDeleteUser,
     setUserStatus,
-
+    deleteMyUser,
 };

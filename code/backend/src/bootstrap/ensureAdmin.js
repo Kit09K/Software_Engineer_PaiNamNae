@@ -1,5 +1,5 @@
 const prisma = require('../utils/prisma');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const SALT_ROUNDS = 10;
 
@@ -16,6 +16,7 @@ module.exports = async function ensureAdmin() {
         console.warn('⚠️  Skipping auto-admin bootstrap: ADMIN_EMAIL/ADMIN_USERNAME/ADMIN_PASSWORD not fully set.');
         return;
     }
+
     const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } });
     if (adminCount > 0) {
         console.log('✔ Admin already exists. Skipping admin bootstrap.');
@@ -43,6 +44,24 @@ module.exports = async function ensureAdmin() {
                 ...(ADMIN_LAST_NAME ? { lastName: ADMIN_LAST_NAME } : {}),
             },
         });
+
+        // บันทึก log การอัปเกรดสิทธิ์ผู้ใช้เป็น Admin
+        await prisma.systemLog.create({
+            data: {
+                action: 'UPDATE_DATA',
+                level: 'WARNING', // ระบุเป็น WARNING เพราะการเปลี่ยนสิทธิ์เป็น Admin เป็นเรื่องสำคัญที่ควรสังเกตเห็นได้ชัดตอน Filter
+                ipAddress: 'SYSTEM_BOOTSTRAP', // ใช้ชื่อระบบแทน IP เพราะรันจาก Script หลังบ้าน
+                resource: 'User',
+                targetTable: 'User',
+                targetId: updatedUser.id,
+                details: {
+                    message: 'Elevated existing user to ADMIN via bootstrap script',
+                    oldRole: existing.role,
+                    newRole: 'ADMIN'
+                }
+            }
+        });
+
         console.log(`🔐 Elevated existing user (${existing.email || existing.username}) to ADMIN.`);
     } else {
         await prisma.user.create({
@@ -57,6 +76,23 @@ module.exports = async function ensureAdmin() {
                 isActive: true,
             },
         });
+
+        // บันทึก log การสร้างบัญชี Admin ใหม่
+        await prisma.systemLog.create({
+            data: {
+                action: 'CREATE_DATA',
+                level: 'INFO',
+                ipAddress: 'SYSTEM_BOOTSTRAP',
+                resource: 'User',
+                targetTable: 'User',
+                targetId: newAdmin.id,
+                details: {
+                    message: 'Created initial ADMIN account via bootstrap script',
+                    email: ADMIN_EMAIL
+                }
+            }
+        });
+
         console.log(`🔐 Created initial ADMIN account (${ADMIN_EMAIL}).`);
     }
 };

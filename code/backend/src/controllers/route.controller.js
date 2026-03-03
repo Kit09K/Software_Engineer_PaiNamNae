@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const routeService = require("../services/route.service");
 const vehicleService = require("../services/vehicle.service");
+const systemLogService = require("../services/systemLog.service");
 const ApiError = require("../utils/ApiError");
 const verifService = require("../services/driverVerification.service");
 const { getDirections } = require("../utils/googleMaps");
@@ -125,6 +126,28 @@ const createRoute = asyncHandler(async (req, res) => {
   }
 
   const newRoute = await routeService.createRoute(payload);
+
+  // Log ROUTE_CREATE action
+  try {
+    await systemLogService.createLog({
+      userId: driverId,
+      action: 'ROUTE_CREATE',
+      level: 'INFO',
+      resource: 'Route',
+      ipAddress: req.ip || req.socket.remoteAddress,
+      userAgent: req.get('User-Agent'),
+      status: 'SUCCESS',
+      details: {
+        routeId: newRoute.id,
+        startLocation: newRoute.routeSummary,
+        availableSeats: newRoute.availableSeats,
+        vehicleId: newRoute.vehicleId
+      }
+    });
+  } catch (e) {
+    console.error('Failed to create ROUTE_CREATE log', e.message);
+  }
+
   res.status(201).json({
     success: true,
     message: "Route created successfully",
@@ -476,6 +499,18 @@ const cancelRoute = asyncHandler(async (req, res) => {
   });
 });
 
+const completeRoute = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const result = await routeService.completeRoute(id);
+  res.status(200).json({
+    success: true,
+    message: "Route completed successfully",
+    data: result
+  });
+
+});
+
 module.exports = {
   getAllRoutes,
   listRoutes,
@@ -490,4 +525,5 @@ module.exports = {
   adminDeleteRoute,
   adminGetRoutesByDriver,
   cancelRoute,
+  completeRoute,
 };
