@@ -5,6 +5,9 @@ const ApiError = require('../utils/ApiError');
 // ดึงรายการ Logs ทั้งหมดสำหรับหน้า Admin Panel
 const getLogs = asyncHandler(async (req, res) => {
     // รับค่าจาก Query Params เพื่อใช้ในการกรองข้อมูล (filter)
+    // trim the search string to avoid problems with leading/trailing whitespace
+    const rawSearch = req.query.search;
+    const trimmedSearch = rawSearch ? rawSearch.trim() : '';
     const filter = {
         action: req.query.action,
         userId: req.query.userId,
@@ -12,6 +15,9 @@ const getLogs = asyncHandler(async (req, res) => {
         resource: req.query.resource, // เพิ่ม : กรองตามโมดูล (User, Booking, Route)
         startDate: req.query.startDate,
         endDate: req.query.endDate,
+        startTime: req.query.startTime,
+        endTime: req.query.endTime,
+        search: trimmedSearch // คำค้นหาแบบ text (username, ip, action, email)
     };
 
     const options = {
@@ -50,6 +56,9 @@ const getLogById = asyncHandler(async (req, res) => {
 
 // logs_export() (export log to JSON และสามารถ Filter ข้อมูลได้)
 const exportLogs = asyncHandler(async (req, res) => {
+    // when exporting we also honour search term
+    const rawSearch = req.query.search;
+    const trimmedSearch = rawSearch ? rawSearch.trim() : '';
     const filter = {
         action: req.query.action,
         userId: req.query.userId,
@@ -57,6 +66,9 @@ const exportLogs = asyncHandler(async (req, res) => {
         resource: req.query.resource,
         startDate: req.query.startDate,
         endDate: req.query.endDate,
+        startTime: req.query.startTime,
+        endTime: req.query.endTime,
+        search: trimmedSearch
     };
 
     // ได้ไฟล์ JSON ที่หุ้มด้วยลายเซ็น SHA-256 จาก Service
@@ -83,7 +95,7 @@ const exportLogs = asyncHandler(async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Content-Disposition', `attachment; filename=painamnae_logs_${Date.now()}.json`);
     
-    res.status(200).send(JSON.stringify(logs, null, 2)); // ส่งข้อมูลกลับเป็น JSON String
+    res.status(200).send(JSON.stringify(exportPayload, null, 2)); // ส่งข้อมูล exportPayload ที่มี metadata และ data
 });
 
 // static del_morethan90_log() (ลบ log หากเกิน 90 วัน)

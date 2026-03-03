@@ -27,7 +27,12 @@ const createLog = async (logData) => {
 
 // SELECT ข้อมูลเพื่อมาแสดง และ Filter_logs()
 const queryLogs = async (filter, options) => {
-  const { action, startDate, endDate, userId, level, resource } = filter;
+  let { action, startDate, endDate, startTime, endTime, userId, level, resource, search } = filter;
+  // normalize search string
+  if (search && typeof search === 'string') {
+    search = search.trim();
+    if (search === '') search = undefined;
+  }
   const { limit = 50, page = 1 } = options;
   const skip = (page - 1) * limit;
 
@@ -37,14 +42,35 @@ const queryLogs = async (filter, options) => {
     ...(userId && { userId }),
     ...(level && { level }),       // เพิ่มการกรองตาม Level
     ...(resource && { resource }), // เพิ่มการกรองตาม Resource
-    ...(startDate && endDate && {
-      timestamp: {
-        gte: new Date(startDate),
-        lte: new Date(endDate),
-      },
-    }),
   };
 
+  // Date/time handling: build precise timestamp range
+  if (startDate) {
+    // if startTime provided use it, else default midnight
+    const t = startTime && startTime.length === 5 ? startTime : '00:00';
+    // เติม +07:00 ให้เป็นเวลาไทย
+    const gte = new Date(`${startDate}T${t}:00+07:00`);
+    where.timestamp = { ...where.timestamp, gte };
+  }
+  if (endDate) {
+    const t = endTime && endTime.length === 5 ? endTime : '23:59';
+    const lte = new Date(`${endDate}T${t}:59+07:00`);
+    where.timestamp = { ...where.timestamp, lte };
+  }
+
+  // Search across multiple fields: IP, user name, email
+  if (search) {
+    const orConditions = [
+      { ipAddress: { contains: search, mode: 'insensitive' } },
+      { user: { username: { contains: search, mode: 'insensitive' } } },
+      { user: { email: { contains: search, mode: 'insensitive' } } }
+    ];
+
+      where.OR = orConditions;
+  }
+
+  // DEBUG: print constructed filter to server log (remove in production if noisy)
+  console.log('queryLogs where=', JSON.stringify(where));
   const [totalResults, results] = await Promise.all([
     prisma.systemLog.count({ where }),
     prisma.systemLog.findMany({
@@ -92,7 +118,12 @@ const getLogById = async (logId) => {
 
 // logs_export() (export log to JSON และสามารถ Filter ข้อมูลได้)
 const exportLogsToJSON = async (filter) => {
-  const { action, startDate, endDate, userId, level, resource } = filter;
+  let { action, startDate, endDate, userId, level, resource, search } = filter;
+  // trim search as well
+  if (search && typeof search === 'string') {
+    search = search.trim();
+    if (search === '') search = undefined;
+  }
 
   const where = {
     ...(action && { action }),
@@ -106,6 +137,14 @@ const exportLogsToJSON = async (filter) => {
       },
     }),
   };
+
+  if (search) {
+  where.OR = [
+    { ipAddress: { contains: search, mode: "insensitive" } },
+    { user: { username: { contains: search, mode: "insensitive" } } },
+    { user: { email: { contains: search, mode: "insensitive" } } }
+  ]
+}
 
   // ดึงข้อมูลทั้งหมด
   const logs = await prisma.systemLog.findMany({

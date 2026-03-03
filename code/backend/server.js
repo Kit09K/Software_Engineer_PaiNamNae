@@ -12,6 +12,7 @@ const { errorHandler } = require('./src/middlewares/errorHandler');
 const ApiError = require('./src/utils/ApiError')
 const { metricsMiddleware } = require('./src/middlewares/metrics');
 const ensureAdmin = require('./src/bootstrap/ensureAdmin');
+const scheduleHardDelete = require('./src/cron/hard.delete.cron');
 
 const app = express();
 promClient.collectDefaultMetrics();
@@ -94,6 +95,9 @@ app.use((req, res, next) => {
 
 // --- Error Handling Middleware ---
 app.use(errorHandler);
+
+// --- Start Cron Jobs ---
+scheduleHardDelete();
 
 // --- Start Server ---
 const PORT = process.env.PORT || 3000;

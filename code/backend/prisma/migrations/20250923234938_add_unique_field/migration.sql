@@ -4,6 +4,7 @@
   - A unique constraint covering the columns `[nationalIdNumber]` on the table `User` will be added. If there are existing duplicate values, this will fail.
 
 */
+<<<<<<< HEAD
 
 -- Create "User" Index
 CREATE INDEX "User_role_idx" ON "User"("role");
@@ -36,3 +37,34 @@ CREATE INDEX "SystemLog_userId_idx" ON "SystemLog"("userId");
 CREATE INDEX "SystemLog_action_idx" ON "SystemLog"("action");
 CREATE INDEX "SystemLog_level_idx" ON "SystemLog"("level"); -- เพิ่ม : เพื่อให้ Filter ตามระดับความรุนแรงได้เร็ว
 CREATE INDEX "SystemLog_resource_idx" ON "SystemLog"("resource"); -- เพิ่ม : เพื่อให้ Filter ตาม Module ได้เร็ว
+=======
+-- CreateIndex
+CREATE INDEX "Route_driverId_idx" ON "Route"("driverId");
+
+-- CreateIndex
+CREATE INDEX "Route_vehicleId_idx" ON "Route"("vehicleId");
+
+-- CreateIndex
+CREATE INDEX "Route_status_idx" ON "Route"("status");
+
+-- CreateIndex
+CREATE INDEX "Route_createdAt_idx" ON "Route"("createdAt");
+
+-- CreateIndex
+CREATE INDEX "Route_departureTime_idx" ON "Route"("departureTime");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_nationalIdNumber_key" ON "User"("nationalIdNumber");
+
+-- CreateIndex
+CREATE INDEX "Vehicle_userId_idx" ON "Vehicle"("userId");
+
+-- CreateIndex
+CREATE INDEX "Vehicle_createdAt_idx" ON "Vehicle"("createdAt");
+
+-- CreateIndex
+CREATE INDEX "Vehicle_vehicleType_idx" ON "Vehicle"("vehicleType");
+
+-- CreateIndex
+CREATE INDEX "Vehicle_seatCapacity_idx" ON "Vehicle"("seatCapacity");
+>>>>>>> origin/sittiphat

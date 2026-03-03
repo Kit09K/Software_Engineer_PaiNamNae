@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const bookingService = require("../services/booking.service");
+const systemLogService = require("../services/systemLog.service");
 const ApiError = require("../utils/ApiError");
 
 const adminListBookings = asyncHandler(async (req, res) => {
@@ -28,6 +29,27 @@ const createBooking = asyncHandler(async (req, res) => {
   };
 
   const booking = await bookingService.createBooking(payload, passengerId);
+
+  // Log BOOKING_REQUEST action
+  try {
+    await systemLogService.createLog({
+      userId: passengerId,
+      action: 'BOOKING_REQUEST',
+      level: 'INFO',
+      resource: 'Booking',
+      ipAddress: req.ip || req.socket.remoteAddress,
+      userAgent: req.get('User-Agent'),
+      status: 'SUCCESS',
+      details: {
+        bookingId: booking.id,
+        routeId: booking.routeId,
+        numberOfSeats: booking.numberOfSeats
+      }
+    });
+  } catch (e) {
+    console.error('Failed to create BOOKING_REQUEST log', e.message);
+  }
+
   res.status(201).json({ success: true, data: booking });
 });
 
@@ -72,6 +94,31 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
     status,
     driverId
   );
+
+  // Log BOOKING_CONFIRM or BOOKING_REJECT action
+  try {
+    let action = status === 'CONFIRMED' ? 'BOOKING_CONFIRM' : status === 'REJECTED' ? 'BOOKING_REJECT' : null;
+    if (action) {
+      await systemLogService.createLog({
+        userId: driverId,
+        action,
+        level: 'INFO',
+        resource: 'Booking',
+        ipAddress: req.ip || req.socket.remoteAddress,
+        userAgent: req.get('User-Agent'),
+        status: 'SUCCESS',
+        details: {
+          bookingId: updated.id,
+          routeId: updated.routeId,
+          passengerId: updated.passengerId,
+          newStatus: updated.status
+        }
+      });
+    }
+  } catch (e) {
+    console.error('Failed to create booking status log', e.message);
+  }
+
   res.status(200).json({ success: true, data: updated });
 });
 

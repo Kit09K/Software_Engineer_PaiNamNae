@@ -21,4 +21,7 @@ router.put(
     authController.changePassword
 );
 
+// POST /api/auth/logout
+router.post('/logout', protect, authController.logout);
+
 module.exports = router;
