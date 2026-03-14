@@ -1,6 +1,6 @@
-class pushNotificationController {
-    constructor() {
-        this.pushNotificationService = new PushNotificationService();
+class PushNotificationController {
+    constructor(pushNotificationService) {
+        this.pushNotificationService = pushNotificationService;
     }
 
     async subscribe(req, res) {
@@ -62,4 +62,4 @@ class pushNotificationController {
     }
 }
 
-module.exports = pushNotificationController();
+module.exports = PushNotificationController;
