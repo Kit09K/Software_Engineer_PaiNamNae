@@ -18,8 +18,9 @@ class DeleteRequestController {
     // POST /api/delete-request
     sendDeleteRequest = asyncHandler(async (req, res) => {
         const userId = req.user.sub;
-        const { deleteUserRequest, deleteVehicleRequest, deleteRouteRequest, deleteBookingRequest } = req.body;
-        const { dataUserRequest, dataVehicleRequest, dataRouteRequest, dataBookingRequest } = req.body;
+        const { deleteRequest, dataRequest } = req.body
+        const { deleteUserRequest, deleteVehicleRequest, deleteRouteRequest, deleteBookingRequest } = deleteRequest;
+        const { dataUserRequest, dataVehicleRequest, dataRouteRequest, dataBookingRequest } = dataRequest;
 
         // ตรวจสอบว่ามีการส่งคำขอลบอย่างน้อยหนึ่งรายการหรือไม่
         if (!deleteUserRequest && !deleteVehicleRequest && !deleteRouteRequest && !deleteBookingRequest) {
