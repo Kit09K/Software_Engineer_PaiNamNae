@@ -1,0 +1,112 @@
+const prisma = require('../utils/prisma');
+const webpush = require('web-push');
+
+class PushNotificationService {
+    constructor() {
+        webpush.setVapidDetails(
+            process.env.MAILTO,
+            process.env.VAPID_PUBLIC_KEY,
+            process.env.VAPID_PRIVATE_KEY
+        );
+    }
+
+    async saveSubscription(userId, subscription) {
+        try {
+            const savedSubscription = await prisma.pushSubscription.upsert({
+                where: { endpoint: subscription.endpoint },
+                update: {
+                    p256dh: subscription.keys.p256dh,
+                    auth: subscription.keys.auth,
+                    userId: userId
+                },
+                create: {
+                    endpoint: subscription.endpoint,
+                    p256dh: subscription.keys.p256dh,
+                    auth: subscription.keys.auth,
+                    userId: userId
+                }
+                });
+            return savedSubscription;
+        } catch (error) {
+            console.error('Database Error:', error);
+            throw new Error('Could not save subscription');
+        }
+    }
+
+    async sendPushToUser(userId, payload) {
+        try {
+        // หาอุปกรณ์ทั้งหมดของ User คนนี้
+        const subscriptions = await prisma.pushSubscription.findMany({
+            where: { userId: userId }
+        });
+
+        if (subscriptions.length === 0) {
+            return { success: false, message: 'No subscriptions found for this user' };
+        }
+
+        const message = JSON.stringify(payload);
+
+        // ทยอยส่งไปทุกอุปกรณ์
+        const sendPromises = subscriptions.map(async (sub) => {
+            const pushConfig = {
+            endpoint: sub.endpoint,
+            keys: { p256dh: sub.p256dh, auth: sub.auth }
+            };
+
+            try {
+            await webpush.sendNotification(pushConfig, message);
+            } catch (err) {
+            // หากส่งไม่สำเร็จเพราะ endpoint หมดอายุ (404/410) ให้ลบทิ้ง
+            if (err.statusCode === 404 || err.statusCode === 410) {
+                await prisma.pushSubscription.delete({ where: { id: sub.id } });
+                console.log(`Deleted expired subscription ID: ${sub.id}`);
+            } else {
+                console.error('Push Service Error:', err);
+            }
+            }
+        });
+
+        await Promise.all(sendPromises);
+        return { success: true, message: 'Push sent to all active devices' };
+
+        } catch (error) {
+        console.error('Service Error:', error);
+        throw new Error('Could not send push notification');
+        }
+    }
+
+    // เพิ่ม: ฟังก์ชันสำหรับบันทึกลง Database และส่ง Push Notification ไปพร้อมกัน
+    async sendAndSaveNotification({ userId, type, title, body, link, metadata }) {
+        try {
+            // 1. บันทึกข้อมูลลงตาราง Notification
+            const notification = await prisma.notification.create({
+                data: {
+                    userId,
+                    type: type || 'SYSTEM', 
+                    title,
+                    body,
+                    link,
+                    metadata: metadata ? metadata : undefined
+                }
+            });
+
+            // 2. จัดรูปแบบ Payload สำหรับ Push Notification
+            const payload = {
+                title: notification.title,
+                body: notification.body,
+                url: notification.link || '/',
+                notificationId: notification.id // ส่ง ID ไปให้ Frontend 
+            };
+
+            // 3. ส่ง Push Notification ไปยัง User
+            await this.sendPushToUser(userId, payload);
+
+            return notification;
+        } catch (error) {
+            console.error('Service Error (sendAndSaveNotification):', error);
+            throw new Error('Could not save and send notification');
+        }
+    }
+}
+
+module.exports = PushNotificationService;
