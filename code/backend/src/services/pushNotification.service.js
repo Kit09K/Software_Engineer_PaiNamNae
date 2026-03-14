@@ -12,7 +12,7 @@ class PushNotificationService {
 
     async saveSubscription(userId, subscription) {
         try {
-            const savedSubscription = await this.prisma.pushSubscription.upsert({
+            const savedSubscription = await prisma.pushSubscription.upsert({
                 where: { endpoint: subscription.endpoint },
                 update: {
                     p256dh: subscription.keys.p256dh,
@@ -36,7 +36,7 @@ class PushNotificationService {
     async sendPushToUser(userId, payload) {
         try {
         // หาอุปกรณ์ทั้งหมดของ User คนนี้
-        const subscriptions = await this.prisma.pushSubscription.findMany({
+        const subscriptions = await prisma.pushSubscription.findMany({
             where: { userId: userId }
         });
 
@@ -58,7 +58,7 @@ class PushNotificationService {
             } catch (err) {
             // หากส่งไม่สำเร็จเพราะ endpoint หมดอายุ (404/410) ให้ลบทิ้ง
             if (err.statusCode === 404 || err.statusCode === 410) {
-                await this.prisma.pushSubscription.delete({ where: { id: sub.id } });
+                await prisma.pushSubscription.delete({ where: { id: sub.id } });
                 console.log(`Deleted expired subscription ID: ${sub.id}`);
             } else {
                 console.error('Push Service Error:', err);
