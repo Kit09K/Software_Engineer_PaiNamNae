@@ -6,7 +6,7 @@ class PushNotificationController {
     async subscribe(req, res) {
         try {
         const { subscription } = req.body;
-        const userId = req.user.id;
+        const userId = req.user.sub;
 
         if (!subscription || !subscription.endpoint) {
             return res.status(400).json({ error: 'Invalid subscription data' });
