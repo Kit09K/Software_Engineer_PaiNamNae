@@ -3,7 +3,7 @@ class PushNotificationController {
         this.pushNotificationService = pushNotificationService;
     }
 
-    async subscribe(req, res) {
+    subscribe = async (req, res) => {
         try {
         const { subscription } = req.body;
         const userId = req.user.sub;
@@ -26,7 +26,7 @@ class PushNotificationController {
         }
     }
 
-    async sendPush(req, res) {
+    sendPush = async (req, res) => {
         try {
         // รับ targetUserId (คนที่ต้องการส่งหา) และ payload (เนื้อหา) จาก Frontend / Postman
         const { targetUserId, title, body, url } = req.body;
