@@ -5,7 +5,7 @@
 
         <main id="main-content" class="main-content mt-16 ml-0 lg:ml-[280px] p-6 transition-all duration-300">
             <div class="p-6 bg-gray-50 min-h-screen">
-                <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="max-w-[98%] mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
 
                     <div class="p-6 border-b border-gray-200 bg-white">
                         <div class="flex justify-between items-start">
