@@ -139,7 +139,7 @@ class DeleteRequestService {
     }
 
     // ฟังก์ชันหลักสำหรับส่งคำขอลบข้อมูล และทำการ Soft Delete ข้อมูลที่เกี่ยวข้อง
-    async sendDeleteRequest(deleteRequest,userId) {
+    async sendDeleteRequest(deleteRequest,dataRequest,userId) {
 
         // ตรวจสอบว่าผู้ใช้สามารถลบบัญชีได้หรือไม่ (เช่น ไม่มีเส้นทางที่เปิดอยู่ หรือการจองที่ยังไม่เสร็จสมบูรณ์)
         const canDeleteResult = await this.checkCanDeleteAccount(userId);
@@ -165,27 +165,47 @@ class DeleteRequestService {
             routesData: null,
             bookingsData: null
         };
-        const infoList = await this.checkInfoBeforeDelete(userId);
+        const sendData = {
+            deleteUserRequest : dataRequest.deleteUserRequest,
+            deleteVehicleRequest : dataRequest.deleteVehicleRequest,
+            deleteRouteRequest : dataRequest.deleteRouteRequest,
+            deleteBookingRequest : dataRequest.deleteBookingRequest
+        };
 
         const userInfo = await UserService.getUserById(userId);
 
-        if (deleteUserRequest) {
+        // เตรียมข้อมูลส่งในไฟล์ JSON แนบไปกับอีเมลตามคำขอลบที่ผู้ใช้เลือกไว้
+        if (sendData.deleteUserRequest) {
             backupData.userData = userInfo;
+        }
+
+        if (sendData.deleteVehicleRequest) {
+            backupData.vehiclesData = await VehicleService.getAllVehicles(userId);
+        }
+
+        if (sendData.deleteRouteRequest) {
+            backupData.routesData = await RouteService.getMyRoutes(userId);
+        }
+
+        if (sendData.deleteBookingRequest) {
+            backupData.bookingsData = await BookingService.getMyBookings(userId);
+        }
+
+
+        // ทำการ Soft Delete ข้อมูลที่เกี่ยวข้องตามคำขอลบ
+        if (deleteUserRequest) {
             await this.softDeleteService.softDeleteUser(userId);
         }
 
         if (deleteVehicleRequest) {
-            backupData.vehiclesData = await VehicleService.getAllVehicles(userId);
             await this.softDeleteService.softDeleteVehicles(userId);
         }
 
         if (deleteRouteRequest) {
-            backupData.routesData = await RouteService.getMyRoutes(userId);
             await this.softDeleteService.softDeleteRoutes(userId);
         }
 
         if (deleteBookingRequest) {
-            backupData.bookingsData = await BookingService.getMyBookings(userId);
             await this.softDeleteService.softDeleteBookings(userId);
         }
 
