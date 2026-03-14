@@ -63,9 +63,7 @@ const getLogById = asyncHandler(async (req, res) => {
     });
 });
 
-// logs_export() (export log to JSON และสามารถ Filter ข้อมูลได้)
 const exportLogs = asyncHandler(async (req, res) => {
-    // when exporting we also honour search term
     const rawSearch = req.query.search;
     const trimmedSearch = rawSearch ? rawSearch.trim() : '';
     const filter = {
@@ -80,10 +78,8 @@ const exportLogs = asyncHandler(async (req, res) => {
         search: trimmedSearch
     };
 
-    // ได้ไฟล์ JSON ที่หุ้มด้วยลายเซ็น SHA-256 จาก Service
-    const exportPayload = await systemLogService.exportLogsToJSON(filter);
+    const { fileContent, fileHash } = await systemLogService.exportLogsToJSON(filter);
 
-    // บันทึก Log การ Export
     await systemLogService.createLog({
         userId: req.user.sub,
         action: 'EXPORT_LOGS',
@@ -96,24 +92,21 @@ const exportLogs = asyncHandler(async (req, res) => {
         details: { 
             message: 'Admin exported system logs securely', 
             filterUsed: filter,
-            generatedHash: exportPayload.metadata.sha256_signature // บันทึก Hash ที่ออกไปไว้ในระบบ
+            generatedHash: fileHash
         }
     });
 
-    // ตั้งค่า Header บังคับให้เบราว์เซอร์ดาวน์โหลดเป็นไฟล์ .json
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Content-Disposition', `attachment; filename=painamnae_logs_${Date.now()}.json`);
     
-    res.status(200).send(JSON.stringify(exportPayload, null, 2)); // ส่งข้อมูล exportPayload ที่มี metadata และ data
+    res.setHeader('X-File-SHA256', fileHash);
+    
+    res.status(200).send(fileContent); 
 });
-
-// static del_morethan90_log() (ลบ log หากเกิน 90 วัน)
 const deleteOldLogs = asyncHandler(async (req, res) => {
-    // กำหนดให้ลบข้อมูลที่เก่ากว่า 90 วัน
     const daysToKeep = 90;
     const result = await systemLogService.deleteLogsOlderThan(daysToKeep);
 
-    // บันทึก Log การลบข้อมูล (ให้รู้ว่าระบบทำความสะอาดตัวเองไปกี่รายการ)
     await systemLogService.createLog({
         userId: req.user ? req.user.sub : null, 
         action: 'DELETE_DATA',

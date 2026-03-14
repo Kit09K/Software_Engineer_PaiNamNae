@@ -1,9 +1,7 @@
 const prisma = require('../utils/prisma'); 
-const crypto = require('crypto'); // นำเข้าไลบรารีเข้ารหัสของ Node.js
+const crypto = require('crypto');
 
-// Service สำหรับจัดการ System Logs ตาม พ.ร.บ. คอมพิวเตอร์ และ PDPA
 
-// บันทึก log ลง database
 const createLog = async (logData) => {
   const { userId, action, level, resource, ipAddress, userAgent, targetTable, targetId, details, errorMessage, status, protocol } = logData;
 
@@ -17,18 +15,16 @@ const createLog = async (logData) => {
       userAgent,
       targetTable,
       targetId,
-      details: details || {}, // เก็บรายละเอียดเพิ่มเติมในรูปแบบ JSON
+      details: details || {}, 
       errorMessage,
-      status: status || 'SUCCESS', // รับค่า
-      protocol: protocol || 'HTTP/1.1', // รับค่า
+      status: status || 'SUCCESS',
+      protocol: protocol || 'HTTP/1.1',
     },
   });
 };
 
-// SELECT ข้อมูลเพื่อมาแสดง และ Filter_logs()
 const queryLogs = async (filter, options) => {
   let { action, startDate, endDate, startTime, endTime, userId, level, resource, search } = filter;
-  // normalize search string
   if (search && typeof search === 'string') {
     search = search.trim();
     if (search === '') search = undefined;
@@ -36,19 +32,15 @@ const queryLogs = async (filter, options) => {
   const { limit = 50, page = 1 } = options;
   const skip = (page - 1) * limit;
 
-  // สร้างเงื่อนไขในการค้นหา (Filter)
   const where = {
     ...(action && { action }),
     ...(userId && { userId }),
-    ...(level && { level }),       // เพิ่มการกรองตาม Level
-    ...(resource && { resource }), // เพิ่มการกรองตาม Resource
+    ...(level && { level }),       
+    ...(resource && { resource }),
   };
 
-  // Date/time handling: build precise timestamp range
   if (startDate) {
-    // if startTime provided use it, else default midnight
     const t = startTime && startTime.length === 5 ? startTime : '00:00';
-    // เติม +07:00 ให้เป็นเวลาไทย
     const gte = new Date(`${startDate}T${t}:00+07:00`);
     where.timestamp = { ...where.timestamp, gte };
   }
@@ -58,7 +50,6 @@ const queryLogs = async (filter, options) => {
     where.timestamp = { ...where.timestamp, lte };
   }
 
-  // Search across multiple fields: IP, user name, email
   if (search) {
     const orConditions = [
       { ipAddress: { contains: search, mode: 'insensitive' } },
@@ -69,7 +60,6 @@ const queryLogs = async (filter, options) => {
       where.OR = orConditions;
   }
 
-  // DEBUG: print constructed filter to server log (remove in production if noisy)
   console.log('queryLogs where=', JSON.stringify(where));
   const [totalResults, results] = await Promise.all([
     prisma.systemLog.count({ where }),
@@ -101,7 +91,6 @@ const queryLogs = async (filter, options) => {
   };
 };
 
-// ดึงข้อมูล Log รายรายการตาม ID
 const getLogById = async (logId) => {
   return await prisma.systemLog.findUnique({
     where: { id: logId },
@@ -116,10 +105,68 @@ const getLogById = async (logId) => {
   });
 };
 
-// logs_export() (export log to JSON และสามารถ Filter ข้อมูลได้)
+// const exportLogsToJSON = async (filter) => {
+//   let { action, startDate, endDate, userId, level, resource, search } = filter;
+//   if (search && typeof search === 'string') {
+//     search = search.trim();
+//     if (search === '') search = undefined;
+//   }
+
+//   const where = {
+//     ...(action && { action }),
+//     ...(userId && { userId }),
+//     ...(level && { level }),
+//     ...(resource && { resource }),
+//     ...(startDate && endDate && {
+//       timestamp: {
+//         gte: new Date(startDate),
+//         lte: new Date(endDate),
+//       },
+//     }),
+//   };
+
+//   if (search) {
+//   where.OR = [
+//     { ipAddress: { contains: search, mode: "insensitive" } },
+//     { user: { username: { contains: search, mode: "insensitive" } } },
+//     { user: { email: { contains: search, mode: "insensitive" } } }
+//   ]
+// }
+
+//   // ดึงข้อมูลทั้งหมด
+//   const logs = await prisma.systemLog.findMany({
+//     where,
+//     include: {
+//       user: {
+//         select: { username: true, email: true, role: true }
+//       }
+//     },
+//     orderBy: { timestamp: 'asc' },
+//   });
+
+//   const rawDataString = JSON.stringify(logs);
+
+//   const hashSignature = crypto
+//     .createHash('sha256')
+//     .update(rawDataString)
+//     .digest('hex');
+
+//   const exportPayload = {
+//     metadata: {
+//       exportedAt: new Date().toISOString(),
+//       recordCount: logs.length,
+//       filtersApplied: filter,
+//       sha256_signature: hashSignature, 
+//       warning: "Do not modify the 'data' array. Any changes will invalidate the sha256_signature."
+//     },
+//     data: logs 
+//   };
+
+//   return exportPayload;
+// };
+
 const exportLogsToJSON = async (filter) => {
   let { action, startDate, endDate, userId, level, resource, search } = filter;
-  // trim search as well
   if (search && typeof search === 'string') {
     search = search.trim();
     if (search === '') search = undefined;
@@ -139,14 +186,14 @@ const exportLogsToJSON = async (filter) => {
   };
 
   if (search) {
-  where.OR = [
-    { ipAddress: { contains: search, mode: "insensitive" } },
-    { user: { username: { contains: search, mode: "insensitive" } } },
-    { user: { email: { contains: search, mode: "insensitive" } } }
-  ]
-}
+    where.OR = [
+      { ipAddress: { contains: search, mode: "insensitive" } },
+      { user: { username: { contains: search, mode: "insensitive" } } },
+      { user: { email: { contains: search, mode: "insensitive" } } }
+    ];
+  }
 
-  // ดึงข้อมูลทั้งหมด
+  // 1. ดึงข้อมูลทั้งหมด
   const logs = await prisma.systemLog.findMany({
     where,
     include: {
@@ -157,31 +204,37 @@ const exportLogsToJSON = async (filter) => {
     orderBy: { timestamp: 'asc' },
   });
 
-  // สร้าง Payload ข้อมูลดิบเพื่อนำไป Hash
-  const rawDataString = JSON.stringify(logs);
-
-  // ใช้ระบบตรวจสอบความถูกต้องด้วย SHA-256 
-  const hashSignature = crypto
-    .createHash('sha256')
-    .update(rawDataString)
-    .digest('hex');
-
-    // จัดรูปแบบไฟล์ Export ให้มีลายเซ็นกำกับ
+  // 2. สร้าง Payload ทั้งหมด (โดยไม่ต้องมี field sha256_signature อยู่ข้างใน)
   const exportPayload = {
     metadata: {
       exportedAt: new Date().toISOString(),
       recordCount: logs.length,
       filtersApplied: filter,
-      sha256_signature: hashSignature,  // ใส่ค่า Hash ลงไปในไฟล์ เพื่อให้คนรับตรวจสอบได้
-      warning: "Do not modify the 'data' array. Any changes will invalidate the sha256_signature."
+      // นำคำเตือนเรื่องการแก้ไขไฟล์ออก หรือเปลี่ยนบริบทได้เลย
+      info: "To verify integrity, compare the file's SHA256 hash with the one provided by the system."
     },
     data: logs 
   };
 
-  return exportPayload;
+  // 3. แปลงเป็น JSON String ที่พร้อมจะเป็นเนื้อหาไฟล์
+  // ใช้ null, 2 เพื่อจัด format ให้อ่านง่าย (หรือจะเว้นว่างไว้ก็ได้ แต่ตอน User ตรวจ ต้องเป๊ะตามนี้)
+  const fileContentString = JSON.stringify(exportPayload, null, 2);
+
+  // 4. ทำ SHA256 จากเนื้อหาของไฟล์ "ทั้งไฟล์"
+  const fileHash = crypto
+    .createHash('sha256')
+    .update(fileContentString)
+    .digest('hex');
+
+  // 5. Return แยกกันระหว่างเนื้อหาไฟล์ และ ค่า Hash
+  return {
+    fileContent: fileContentString,
+    fileHash: fileHash
+  };
 };
 
-// static del_morethan90_log() (ลบ log หากเกิน 90 วัน)
+
+
 const deleteLogsOlderThan = async (days) => {
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - days);
