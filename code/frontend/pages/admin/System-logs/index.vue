@@ -108,8 +108,7 @@
                                     <th class="px-6 py-4 whitespace-nowrap">Timestamp</th>
                                     <th class="px-6 py-4">User / IP</th>
                                     <th class="px-6 py-4">Action</th>
-                                    <th class="px-6 py-4">Log / Query</th> 
-                                    <th class="px-6 py-4 w-1/3">Details</th>
+                                    <th class="px-6 py-4 w-1/2">Details</th>
                                 </tr>
                             </thead>
 
@@ -139,7 +138,7 @@
                                                 <div class="text-sm font-bold text-gray-900">
                                                     {{ log.user?.username || 'System (Auto)' }}
                                                 </div>
-                                                <div class="text-[10px] text-gray-500 font-mono whitespace-nowrap ">
+                                                <div class="text-xs text-gray-500 font-mono">
                                                     IP: {{ log.ipAddress }}
                                                 </div>
                                             </div>

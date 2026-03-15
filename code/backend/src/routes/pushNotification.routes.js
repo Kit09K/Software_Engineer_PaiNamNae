@@ -18,4 +18,7 @@ router.post('/send', protect, pushNotificationController.sendPush);
 // [เพิ่มใหม่] Route สำหรับคนขับกดแจ้งเตือนใกล้ถึงจุดรับ
 router.post('/notify-pickup', protect, pushNotificationController.notifyPassengerPickup);
 
+// [เพิ่มใหม่] Route สำหรับส่งข้อความระหว่าง Driver และ Passenger
+router.post('/send-message', protect, pushNotificationController.sendMessage);
+
 module.exports = router;

@@ -10,6 +10,7 @@ const deleteRequestRoutes = require('./deleteRequest.routes');
 const OtpRoutes = require('./otp.routes');
 const mapRoutes = require('./maps.routes')
 const systemLogRoutes = require('./systemLog.routes')
+const pushNotificationRoutes = require('./pushNotification.routes')
 
 
 
@@ -26,5 +27,6 @@ router.use('/delete-request', deleteRequestRoutes);
 router.use('/otp', OtpRoutes);
 router.use('/api/maps', mapRoutes);
 router.use('/system-logs', systemLogRoutes);
+router.use('/push-notifications', pushNotificationRoutes);
 
 module.exports = router;

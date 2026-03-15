@@ -35,12 +35,18 @@ class PushNotificationService {
 
     async sendPushToUser(userId, payload) {
         try {
+        
+        if (!prisma.pushSubscription || typeof prisma.pushSubscription.findMany !== 'function') {
+            console.warn('PushSubscription model not found in Prisma. Skipping push send.');
+            return { success: false, message: 'PushSubscription model not available' };
+        }
+
         // หาอุปกรณ์ทั้งหมดของ User คนนี้
         const subscriptions = await prisma.pushSubscription.findMany({
             where: { userId: userId }
         });
 
-        if (subscriptions.length === 0) {
+        if (!subscriptions || subscriptions.length === 0) {
             return { success: false, message: 'No subscriptions found for this user' };
         }
 
@@ -98,8 +104,12 @@ class PushNotificationService {
                 notificationId: notification.id // ส่ง ID ไปให้ Frontend 
             };
 
-            // 3. ส่ง Push Notification ไปยัง User
-            await this.sendPushToUser(userId, payload);
+            // 3. ส่ง Push Notification ไปยัง User (ถ้ามี subscription)
+            try {
+                await this.sendPushToUser(userId, payload);
+            } catch (pushError) {
+                console.warn('Push send failed (non-blocking):', pushError.message || pushError);
+            }
 
             return notification;
         } catch (error) {

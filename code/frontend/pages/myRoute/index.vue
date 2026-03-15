@@ -348,10 +348,20 @@
                                         </button>
                                     </template>
 
-                                    <button v-else-if="trip.status === 'confirmed'"
-                                        class="px-4 py-2 text-sm text-white transition duration-200 bg-blue-600 rounded-md hover:bg-blue-700">
-                                        แชทกับผู้โดยสาร
-                                    </button>
+                                    <div v-else-if="trip.status === 'confirmed'" class="flex gap-2">
+                                        <button
+                                            class="px-4 py-2 text-sm text-white transition duration-200 bg-blue-600 rounded-md hover:bg-blue-700"
+                                            
+                                        >
+                                            แชทกับผู้โดยสาร
+                                        </button>
+                                        <button
+                                            class="px-4 py-2 text-sm text-white transition duration-200 bg-green-600 rounded-md hover:bg-green-700"
+                                            @click.stop ="notifyPassenger(trip)"
+                                        > 
+                                            แจ้งเตือนผู้โดยสาร
+                                        </button>
+                                    </div>
 
                                     <button v-else-if="['rejected', 'cancelled'].includes(trip.status)"
                                         @click.stop="openConfirmModal(trip, 'delete')"
@@ -382,6 +392,15 @@
         <ConfirmModal :show="isModalVisible" :title="modalContent.title" :message="modalContent.message"
             :confirmText="modalContent.confirmText" :variant="modalContent.variant" @confirm="handleConfirmAction"
             @cancel="closeConfirmModal" />
+
+        <MessageModal
+            :show="isMessageModalVisible"
+            :title="messageModalTitle"
+            :subtitle="messageModalSubtitle"
+            :quickTags="['กำลังจะถึงจุดนัดรับใน 5 นาที', 'ถึงจุดนัดรับแล้ว', 'รถติดนิดหน่อย กรุณารอสักครู่', 'กำลังหาที่จอดรถครับ']"
+            @send="handleSendMessage"
+            @close="closeMessageModal"
+        />
     </div>
 </template>
 
@@ -391,6 +410,7 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/th'
 import buddhistEra from 'dayjs/plugin/buddhistEra'
 import ConfirmModal from '~/components/ConfirmModal.vue'
+import MessageModal from '~/components/MessageModal.vue'
 import { useToast } from '~/composables/useToast'
 
 dayjs.locale('th')
@@ -406,6 +426,12 @@ const isLoading = ref(false)
 const mapContainer = ref(null)
 const allTrips = ref([])
 const myRoutes = ref([])
+
+// Message Modal states
+const isMessageModalVisible = ref(false)
+const messageModalTitle = ref('แจ้งเตือนผู้โดยสาร')
+const messageModalSubtitle = ref('ส่งข้อความแจ้งเตือนถึงผู้โดยสาร')
+const currentTripForMessage = ref(null)
 
 // ---------- Google Maps states ----------
 let gmap = null
@@ -813,6 +839,40 @@ const handleConfirmAction = async () => {
         toast.error('เกิดข้อผิดพลาด', error?.data?.message || 'ไม่สามารถดำเนินการได้')
         closeConfirmModal()
     }
+}
+
+const notifyPassenger = async (trip) => {
+    // แสดง modal ให้พิมข้อความ
+    currentTripForMessage.value = trip
+    isMessageModalVisible.value = true
+}
+
+const handleSendMessage = async (message) => {
+    const trip = currentTripForMessage.value
+    if (!trip?.id) return
+
+    try {
+        await $api('/push-notifications/send-message', {
+            method: 'POST',
+            body: {
+                bookingId: trip.id,
+                message: message,
+                messageType: 'driver_to_passenger'
+            },
+        })
+        toast.success('ส่งข้อความสำเร็จ', `ส่งถึง ${trip.passenger.name} แล้ว`)
+        window.dispatchEvent(new Event('notifications:refresh'))
+        isMessageModalVisible.value = false
+        currentTripForMessage.value = null
+    } catch (err) {
+        console.error('Failed to send message:', err)
+        toast.error('ส่งข้อความไม่สำเร็จ', err?.data?.message || 'ลองใหม่อีกครั้ง')
+    }
+}
+
+const closeMessageModal = () => {
+    isMessageModalVisible.value = false
+    currentTripForMessage.value = null
 }
 
 const copyEmail = async (email) => {
