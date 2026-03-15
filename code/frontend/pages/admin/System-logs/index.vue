@@ -40,6 +40,10 @@
                                     <option value="DELETE_DATA">DELETE DATA</option>
                                     <option value="VIEW_DATA">VIEW_DATA</option>
                                     <option value="EXPORT_LOGS">EXPORT_LOGS</option>
+                                    <option value="BOOKING_CONFIRM">BOOKING_CONFIRM</option>
+                                    <option value="BOOKING_REQUEST">BOOKING_REQUEST</option>
+                                    <option value="ROUTE_CREATE">ROUTE_CREATE</option>
+                                    <option value="VERIFY_APPROVE">VERIFY_APPROVE</option>
                                 </select>
                             </div>
 
@@ -108,13 +112,14 @@
                                     <th class="px-6 py-4 whitespace-nowrap">Timestamp</th>
                                     <th class="px-6 py-4">User / IP</th>
                                     <th class="px-6 py-4">Action</th>
+                                    <th class="px-6 py-4">API Path</th>
                                     <th class="px-6 py-4 w-1/2">Details</th>
                                 </tr>
                             </thead>
 
                             <tbody class="divide-y divide-gray-100">
                                 <tr v-if="logs.length === 0">
-                                    <td colspan="4" class="px-6 py-12 text-center text-gray-500">
+                                    <td colspan="5" class="px-6 py-12 text-center text-gray-500">
                                         <div class="flex flex-col items-center justify-center">
                                             <i class="fas fa-search text-3xl mb-3 text-gray-300"></i>
                                             <p>ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</p>
@@ -151,6 +156,15 @@
                                             <i :class="actionIcon(log.action)"></i>
                                             {{ log.action }}
                                         </span>
+                                    </td>
+
+                                    <td class="px-6 py-4">
+                                        <span v-if="log.apiPath"
+                                            class="inline-block text-xs font-mono text-slate-600 bg-slate-50 border border-slate-200 px-2 py-1 rounded max-w-[220px] truncate"
+                                            :title="log.apiPath">
+                                            {{ log.apiPath }}
+                                        </span>
+                                        <span v-else class="text-xs text-gray-300">—</span>
                                     </td>
 
                                     <td class="px-6 py-4">

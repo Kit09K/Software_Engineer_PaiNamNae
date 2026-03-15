@@ -1,21 +1,22 @@
-const prisma = require('../utils/prisma'); 
+const prisma = require('../utils/prisma');
 const crypto = require('crypto');
 
 
 const createLog = async (logData) => {
-  const { userId, action, level, resource, ipAddress, userAgent, targetTable, targetId, details, errorMessage, status, protocol } = logData;
+  const { userId, action, apiPath, level, resource, ipAddress, userAgent, targetTable, targetId, details, errorMessage, status, protocol } = logData;
 
   return await prisma.systemLog.create({
     data: {
       userId,
       action,
-      level: level || 'INFO', 
-      resource: resource || targetTable || 'System', 
+      apiPath,           // เพิ่ม API Path
+      level: level || 'INFO',
+      resource: resource || targetTable || 'System',
       ipAddress,
       userAgent,
       targetTable,
       targetId,
-      details: details || {}, 
+      details: details || {},
       errorMessage,
       status: status || 'SUCCESS',
       protocol: protocol || 'HTTP/1.1',
@@ -24,7 +25,7 @@ const createLog = async (logData) => {
 };
 
 const queryLogs = async (filter, options) => {
-  let { action, startDate, endDate, startTime, endTime, userId, level, resource, search } = filter;
+  let { action, apiPath, startDate, endDate, startTime, endTime, userId, level, resource, search } = filter;
   if (search && typeof search === 'string') {
     search = search.trim();
     if (search === '') search = undefined;
@@ -34,8 +35,9 @@ const queryLogs = async (filter, options) => {
 
   const where = {
     ...(action && { action }),
+    ...(apiPath && { apiPath }),
     ...(userId && { userId }),
-    ...(level && { level }),       
+    ...(level && { level }),
     ...(resource && { resource }),
   };
 
@@ -57,7 +59,7 @@ const queryLogs = async (filter, options) => {
       { user: { email: { contains: search, mode: 'insensitive' } } }
     ];
 
-      where.OR = orConditions;
+    where.OR = orConditions;
   }
 
   console.log('queryLogs where=', JSON.stringify(where));
@@ -76,7 +78,7 @@ const queryLogs = async (filter, options) => {
           },
         },
       },
-      orderBy: { timestamp: 'desc' }, 
+      orderBy: { timestamp: 'desc' },
       take: limit,
       skip,
     }),
@@ -213,7 +215,7 @@ const exportLogsToJSON = async (filter) => {
       // นำคำเตือนเรื่องการแก้ไขไฟล์ออก หรือเปลี่ยนบริบทได้เลย
       info: "To verify integrity, compare the file's SHA256 hash with the one provided by the system."
     },
-    data: logs 
+    data: logs
   };
 
   // 3. แปลงเป็น JSON String ที่พร้อมจะเป็นเนื้อหาไฟล์
@@ -242,7 +244,7 @@ const deleteLogsOlderThan = async (days) => {
   const result = await prisma.systemLog.deleteMany({
     where: {
       timestamp: {
-        lt: cutoffDate, 
+        lt: cutoffDate,
       },
     },
   });
