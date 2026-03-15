@@ -32,6 +32,51 @@
                                     </ul>
                                 </div>
 
+                                <div class="mb-8 p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                                    <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                                        <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                        </svg>
+                                        เลือกข้อมูลที่คุณต้องการรับสำเนารายงานทาง Email
+                                    </h2>
+                                    
+                                    <!-- แก้จาก grid-cols-2 เป็น grid-cols-1 เพื่อให้เรียงยาวลงมา -->
+                                    <div class="grid grid-cols-1 gap-3">
+                                        <!-- ข้อมูล User -->
+                                        <label :class="['flex items-center p-4 border rounded-md transition-all', hasInfos.user ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : 'opacity-40 cursor-not-allowed bg-gray-100']">
+                                            <input type="checkbox" v-model="emailFilters.user" :disabled="!hasInfos.user" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
+                                            <span class="ml-4 text-gray-700 font-medium">ข้อมูลโปรไฟล์ส่วนตัว</span>
+                                            <span v-if="!hasInfos.user" class="ml-auto text-xs text-gray-400 italic">(ไม่มีข้อมูลในระบบ)</span>
+                                        </label>
+                                    
+                                        <!-- ข้อมูล รถยนต์ -->
+                                        <label :class="['flex items-center p-4 border rounded-md transition-all', hasInfos.vehicles ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : 'opacity-40 cursor-not-allowed bg-gray-100']">
+                                            <input type="checkbox" v-model="emailFilters.vehicles" :disabled="!hasInfos.vehicles" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
+                                            <span class="ml-4 text-gray-700 font-medium">ข้อมูลรถยนต์</span>
+                                            <span v-if="!hasInfos.vehicles" class="ml-auto text-xs text-gray-400 italic">(ไม่มีข้อมูลในระบบ)</span>
+                                        </label>
+                                    
+                                        <!-- ข้อมูล เส้นทาง -->
+                                        <label :class="['flex items-center p-4 border rounded-md transition-all', hasInfos.routes ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : 'opacity-40 cursor-not-allowed bg-gray-100']">
+                                            <input type="checkbox" v-model="emailFilters.routes" :disabled="!hasInfos.routes" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
+                                            <span class="ml-4 text-gray-700 font-medium">ข้อมูลการสร้างเส้นทาง</span>
+                                            <span v-if="!hasInfos.routes" class="ml-auto text-xs text-gray-400 italic">(ไม่มีข้อมูลในระบบ)</span>
+                                        </label>
+                                    
+                                        <!-- ข้อมูล การจอง -->
+                                        <label :class="['flex items-center p-4 border rounded-md transition-all', hasInfos.bookings ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : 'opacity-40 cursor-not-allowed bg-gray-100']">
+                                            <input type="checkbox" v-model="emailFilters.bookings" :disabled="!hasInfos.bookings" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
+                                            <span class="ml-4 text-gray-700 font-medium">ข้อมูลการจอง</span>
+                                            <span v-if="!hasInfos.bookings" class="ml-auto text-xs text-gray-400 italic">(ไม่มีข้อมูลในระบบ)</span>
+                                        </label>
+                                    </div>
+                                    
+                                    <p class="mt-4 text-xs text-gray-500 flex items-center">
+                                        <svg class="w-4 h-4 mr-1 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                                        ข้อมูลที่คุณเลือกจะถูกส่งเป็นเอกสารรายงานไปยังอีเมลของคุณหลังดำเนินการเสร็จสิ้น
+                                    </p>
+                                </div>
+
                                 <h1 class="text-2xl font-semibold text-gray-900 mb-6">กฏหมาย พ.ร.บ.คอมพิวเตอร์ เกี่ยวกับการลบข้อมูล</h1>
 
                                 <!-- พื้นที่แสดงข้อความกฎหมาย -->
@@ -128,7 +173,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 
 // --- State Variables ---
 const isAgreed = ref(false)
@@ -143,10 +188,47 @@ const statusErrorMessage = ref('')
 const config = useRuntimeConfig()
 const apiBase = config.public.apiBase
 
+// ตัวแปรเก็บว่า User มีข้อมูลอะไรบ้าง (จาก API GET check-infos)
+const hasInfos = reactive({
+    user: false,
+    vehicles: false,
+    routes: false,
+    bookings: false
+})
+
+// ตัวแปรสำหรับเลือก Filter ที่จะรับทาง Email
+const emailFilters = reactive({
+    user: false,
+    vehicles: false,
+    routes: false,
+    bookings: false
+})
+
 // ดึง Token จาก Cookie หรือ Store ที่คุณใช้ (ตัวอย่างใช้ useCookie/localStorage)
 const getUserToken = () => {
     const token = useCookie('token').value;
     return token;
+}
+
+// 1. ดึงข้อมูลว่า User มีข้อมูลอะไรบ้าง เพื่อเปิด/ปิด Checkbox
+const fetchUserInfos = async () => {
+    try {
+        const res = await $fetch(`${apiBase}/delete-request/check-infos`, {
+            headers: { Authorization: `Bearer ${getUserToken()}` }
+        })
+        hasInfos.user = res.user
+        hasInfos.vehicles = res.vehicles
+        hasInfos.routes = res.routes
+        hasInfos.bookings = res.bookings
+
+        // ตั้งค่าเริ่มต้นให้ติ๊กอันที่มีข้อมูลให้เลย
+        emailFilters.user = false
+        emailFilters.vehicles = false
+        emailFilters.routes = false
+        emailFilters.bookings = false
+    } catch (error) {
+        console.error("Failed to fetch user infos")
+    }
 }
 
 // --- API Functions ---
@@ -223,10 +305,18 @@ const verifyAndDestroy = async () => {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${getUserToken()}` },
                 body: {
-                    deleteUserRequest: true,
-                    deleteVehicleRequest: true,
-                    deleteRouteRequest: true,
-                    deleteBookingRequest: true
+                    "deleteRequest": {
+                        "deleteUserRequest": true,
+                        "deleteVehicleRequest": true,
+                        "deleteRouteRequest": true,
+                        "deleteBookingRequest": true
+                    },
+                    "dataRequest": {
+                        "dataUserRequest": emailFilters.user,
+                        "dataVehicleRequest": emailFilters.vehicles,
+                        "dataRouteRequest": emailFilters.routes,
+                        "dataBookingRequest": emailFilters.bookings
+                    }
                 }
             })
 
@@ -270,6 +360,7 @@ const closeModal = () => {
 }
 
 onMounted(() => {
+    fetchUserInfos()
     checkCanDelete()
 })
 

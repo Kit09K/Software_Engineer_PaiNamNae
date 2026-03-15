@@ -139,7 +139,7 @@ class DeleteRequestService {
     }
 
     // ฟังก์ชันหลักสำหรับส่งคำขอลบข้อมูล และทำการ Soft Delete ข้อมูลที่เกี่ยวข้อง
-    async sendDeleteRequest(deleteRequest,userId) {
+    async sendDeleteRequest(deleteRequest,dataRequest,userId) {
 
         // ตรวจสอบว่าผู้ใช้สามารถลบบัญชีได้หรือไม่ (เช่น ไม่มีเส้นทางที่เปิดอยู่ หรือการจองที่ยังไม่เสร็จสมบูรณ์)
         const canDeleteResult = await this.checkCanDeleteAccount(userId);
@@ -165,27 +165,47 @@ class DeleteRequestService {
             routesData: null,
             bookingsData: null
         };
-        const infoList = await this.checkInfoBeforeDelete(userId);
+        const sendData = {
+            deleteUserRequest : dataRequest.dataUserRequest,
+            deleteVehicleRequest : dataRequest.dataVehicleRequest,
+            deleteRouteRequest : dataRequest.dataRouteRequest,
+            deleteBookingRequest : dataRequest.dataBookingRequest
+        };
 
         const userInfo = await UserService.getUserById(userId);
 
-        if (deleteUserRequest) {
+        // เตรียมข้อมูลส่งในไฟล์ JSON แนบไปกับอีเมลตามคำขอลบที่ผู้ใช้เลือกไว้
+        if (sendData.deleteUserRequest) {
             backupData.userData = userInfo;
+        }
+
+        if (sendData.deleteVehicleRequest) {
+            backupData.vehiclesData = await VehicleService.getAllVehicles(userId);
+        }
+
+        if (sendData.deleteRouteRequest) {
+            backupData.routesData = await RouteService.getMyRoutes(userId);
+        }
+
+        if (sendData.deleteBookingRequest) {
+            backupData.bookingsData = await BookingService.getMyBookings(userId);
+        }
+
+
+        // ทำการ Soft Delete ข้อมูลที่เกี่ยวข้องตามคำขอลบ
+        if (deleteUserRequest) {
             await this.softDeleteService.softDeleteUser(userId);
         }
 
         if (deleteVehicleRequest) {
-            backupData.vehiclesData = await VehicleService.getAllVehicles(userId);
             await this.softDeleteService.softDeleteVehicles(userId);
         }
 
         if (deleteRouteRequest) {
-            backupData.routesData = await RouteService.getMyRoutes(userId);
             await this.softDeleteService.softDeleteRoutes(userId);
         }
 
         if (deleteBookingRequest) {
-            backupData.bookingsData = await BookingService.getMyBookings(userId);
             await this.softDeleteService.softDeleteBookings(userId);
         }
 
@@ -194,10 +214,10 @@ class DeleteRequestService {
             to: userInfo.email,
             subject: "คำขอลบข้อมูลของคุณได้รับการดำเนินการแล้ว",
             text: `เรียน คุณ${userInfo.firstName} ${userInfo.lastName},\n\nเราได้ดำเนินการตามคำขอลบข้อมูลของคุณเรียบร้อยแล้ว ข้อมูลที่ถูกลบมีดังนี้:\n\n` +
-                `${infoList.user ? "- ข้อมูลบัญชีผู้ใช้\n" : ""}` +
-                `${infoList.vehicles ? "- ข้อมูลรถยนต์\n" : ""}` +
-                `${infoList.routes ? "- ข้อมูลเส้นทาง\n" : ""}` +
-                `${infoList.bookings ? "- ข้อมูลการจอง\n" : ""}` +
+                `${backupData.userData ? "- ข้อมูลบัญชีผู้ใช้\n" : ""}` +
+                `${backupData.vehiclesData ? "- ข้อมูลรถยนต์\n" : ""}` +
+                `${backupData.routesData ? "- ข้อมูลเส้นทาง\n" : ""}` +
+                `${backupData.bookingsData ? "- ข้อมูลการจอง\n" : ""}` +
                 'โดยรูปภาพของคุณจะถูกลบออกจากระบบทั้งหมดภายใน 90 วัน กรุณาดาวน์โหลดข้อมูลที่คุณต้องการไว้ก่อนตาม link ที่อยู่ในไฟล์ JSON ที่ส่งมา และไม่สามารถกู้คืนได้อีกต่อไป\n\n' +
                 `\nหากคุณมีคำถามเพิ่มเติมหรือต้องการความช่วยเหลือ กรุณาติดต่อทีมสนับสนุนของเราได้ตลอดเวลา\n\nขอบคุณที่ใช้บริการของเรา\nทีมงาน painamnae`,
             attachments: [{
