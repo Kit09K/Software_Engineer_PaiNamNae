@@ -120,8 +120,6 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRuntimeConfig, useCookie } from '#app' 
 
-const toast = useToast()
-
 const notifications = ref([])
 const loading = ref(true)
 const config = useRuntimeConfig()
@@ -153,10 +151,20 @@ const closeConfirm = () => {
 }
 
 const executeConfirm = async () => {
-  if (confirmAction.value) {
-    await confirmAction.value() // ทำงานฟังก์ชันลบที่ส่งเข้ามา
-  }
+  const actionToRun = confirmAction.value
+  
+  // 2. สั่งปิดกล่อง Modal "ทันที!" (ไม่ต้องรอ API ทำงาน)
   closeConfirm()
+
+  // 3. สั่งรันคำสั่งลบข้อมูล
+  if (actionToRun) {
+    try {
+      await actionToRun() 
+    } catch (e) {
+      // ดักจับ Error ไว้ตรงนี้ เพื่อไม่ให้มันลามไปพังส่วนอื่นของหน้าเว็บ
+      console.error("เกิดข้อผิดพลาดตอนทำงาน:", e)
+    }
+  }
 }
 
 // ดึง Token
@@ -206,7 +214,9 @@ const readSingle = async (id) => {
         const item = notifications.value.find(n => n.id === id)
         if (item) item.readAt = new Date().toISOString()
         window.dispatchEvent(new Event('notification-updated'))
-    } catch (e) { toast.error("เกิดข้อผิดพลาด") }
+    } catch (e) {
+
+    }
 }
 
 // 🟢 แก้ไข API: ลบรายการเดียว เรียก Modal แทน confirm()
@@ -222,9 +232,8 @@ const deleteSingle = (id) => {
             })
             notifications.value = notifications.value.filter(n => n.id !== id)
             window.dispatchEvent(new Event('notification-updated'))
-            toast.success('ลบการแจ้งเตือนสำเร็จ')
         } catch (e) { 
-            toast.error('ลบไม่สำเร็จ กรุณาลองใหม่')
+
         }
       }
     )
@@ -238,9 +247,8 @@ const markAllAsRead = async () => {
         })
         notifications.value.forEach(n => n.readAt = new Date().toISOString())
         window.dispatchEvent(new Event('notification-updated'))
-        toast.success('ทำเครื่องหมายอ่านแล้วทั้งหมด')
     } catch (e) { 
-        toast.error('เกิดข้อผิดพลาดในการทำเครื่องหมายอ่านแล้ว')
+
     }
 }
 
@@ -264,10 +272,8 @@ const deleteAll = () => {
             await Promise.all(deletePromises);
             notifications.value = [];
             window.dispatchEvent(new Event('notification-updated'));
-            toast.success('ลบการแจ้งเตือนทั้งหมดแล้ว')
         } catch (e) { 
             console.error("Delete all error:", e);
-            toast.error("เกิดข้อผิดพลาดในการลบข้อมูล");
         } finally {
             loading.value = false;
         }
@@ -296,12 +302,12 @@ const submitReply = async (n) => {
     const bookingId = n.metadata?.bookingId 
 
     if (!bookingId) {
-      toast.error('ไม่พบข้อมูลการจอง (Booking ID)')
+      alert('ไม่พบข้อมูลการจอง (Booking ID)')
       return
     }
 
     if (!message?.trim()) {
-      toast.error('กรุณาพิมพ์ข้อความตอบกลับ')
+      alert('กรุณาพิมพ์ข้อความตอบกลับ')
       return
     }
 
@@ -331,9 +337,6 @@ const submitReply = async (n) => {
     }
     
     await refreshNotifications()
-
-    const driverName = n.title.replace('ข้อความจากผู้ขับ: ', '').trim() || 'คนขับ'
-    toast.success('ส่งข้อความสำเร็จ', `ส่งถึง ${driverName} แล้ว`)
   } catch (e) {
     console.error('Failed to reply to driver', e)
   } finally {
