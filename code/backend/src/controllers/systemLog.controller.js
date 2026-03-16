@@ -5,7 +5,6 @@ const ApiError = require('../utils/ApiError');
 // ดึงรายการ Logs ทั้งหมดสำหรับหน้า Admin Panel
 const getLogs = asyncHandler(async (req, res) => {
     // รับค่าจาก Query Params เพื่อใช้ในการกรองข้อมูล (filter)
-    // trim the search string to avoid problems with leading/trailing whitespace
     const rawSearch = req.query.search;
     const trimmedSearch = rawSearch ? rawSearch.trim() : '';
     const filter = {
@@ -27,10 +26,20 @@ const getLogs = asyncHandler(async (req, res) => {
 
     const result = await systemLogService.queryLogs(filter, options);
 
+    const enhancedData = result.results.map(log => {
+        const queryTrace = `${req.method} ${req.baseUrl}${req.path}?${new URLSearchParams(req.query).toString()}`;
+        const whereClause = `queryLogs where= ${JSON.stringify(filter)}`;
+
+        return {
+            ...log,
+            backend_query_log: `${queryTrace} | ${whereClause}`
+        };
+    });
+
     res.status(200).json({
         success: true,
         message: "System logs retrieved successfully",
-        data: result.results,
+        data: enhancedData,
         pagination: {
             page: result.page,
             limit: result.limit,
@@ -74,14 +83,15 @@ const exportLogs = asyncHandler(async (req, res) => {
     await systemLogService.createLog({
         userId: req.user.sub,
         action: 'EXPORT_LOGS',
+        apiPath: req.originalUrl,
         level: 'WARNING',
         resource: 'SystemLog',
         ipAddress: req.ip || req.socket.remoteAddress,
         userAgent: req.get('User-Agent'),
         protocol: `${req.protocol.toUpperCase()}/${req.httpVersion}`,
         status: 'SUCCESS',
-        details: { 
-            message: 'Admin exported system logs securely', 
+        details: {
+            message: 'Admin exported system logs securely',
             filterUsed: filter,
             generatedHash: fileHash
         }
@@ -89,18 +99,19 @@ const exportLogs = asyncHandler(async (req, res) => {
 
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Content-Disposition', `attachment; filename=painamnae_logs_${Date.now()}.json`);
-    
+
     res.setHeader('X-File-SHA256', fileHash);
-    
-    res.status(200).send(fileContent); 
+
+    res.status(200).send(fileContent);
 });
 const deleteOldLogs = asyncHandler(async (req, res) => {
     const daysToKeep = 90;
     const result = await systemLogService.deleteLogsOlderThan(daysToKeep);
 
     await systemLogService.createLog({
-        userId: req.user ? req.user.sub : null, 
+        userId: req.user ? req.user.sub : null,
         action: 'DELETE_DATA',
+        apiPath: req.originalUrl,
         level: 'INFO',
         resource: 'SystemLog',
         ipAddress: req.ip || 'CRON_JOB',

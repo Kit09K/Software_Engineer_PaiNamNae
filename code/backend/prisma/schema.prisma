@@ -273,6 +273,7 @@ model SystemLog {
   userId       String?
   user         User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   action       LogAction
+  apiPath      String?   // เพิ่ม : API endpoint ที่ทำให้เกิด log (เช่น /api/users/admin/123)
   level        LogLevel  @default(INFO) // เพิ่ม : ระดับความรุนแรง
   status       String    @default("SUCCESS") // "SUCCESS" หรือ "FAILED"
   protocol     String?   // เช่น "HTTP/1.1"
@@ -285,11 +286,22 @@ model SystemLog {
   details      Json?     @db.JsonB
   errorMessage String? // เพิ่ม : เก็บข้อความ Error กรณีเกิดข้อผิดพลาด
 
+  prevHash     String?   // Hash ของ log ก่อนหน้า (Tamper-Evident Chain)
+  currentHash  String?   // Hash ของ log รายการนี้ (Tamper-Evident Chain)
+
   @@index([userId])
   @@index([action])
   @@index([timestamp])
-  @@index([level]) // เพิ่ม : รองรับการ Filter ตามระดับ
-  @@index([resource]) // เพิ่ม : รองรับการ Filter ตาม Module
+}
+
+// Tamper-Evident: Anchor point ทุก 100 logs
+model LogAnchor {
+  id         String   @id @default(cuid())
+  lastLogId  String
+  anchorHash String
+  createdAt  DateTime @default(now())
+
+  @@index([lastLogId])
 }
 
 // สำหรับตรวจการขอลบและใช้เช็คตอน hard delete

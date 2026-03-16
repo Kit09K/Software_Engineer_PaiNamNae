@@ -35,6 +35,7 @@ const createBooking = asyncHandler(async (req, res) => {
     await systemLogService.createLog({
       userId: passengerId,
       action: 'BOOKING_REQUEST',
+      apiPath: req.originalUrl,
       level: 'INFO',
       resource: 'Booking',
       ipAddress: req.ip || req.socket.remoteAddress,
@@ -102,6 +103,7 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
       await systemLogService.createLog({
         userId: driverId,
         action,
+        apiPath: req.originalUrl,
         level: 'INFO',
         resource: 'Booking',
         ipAddress: req.ip || req.socket.remoteAddress,

@@ -2,7 +2,7 @@ const { Prisma } = require('@prisma/client');
 const ApiError = require('../utils/ApiError');
 const systemLogService = require('../services/systemLog.service');
 
-const errorHandler = async(err, req, res, next) => { // เปลี่ยนเป็น async เพื่อใช้ await
+const errorHandler = async (err, req, res, next) => { // เปลี่ยนเป็น async เพื่อใช้ await
     if (process.env.NODE_ENV !== 'production') {
         console.error('💥 AN ERROR OCCURRED 💥:', err);
     }
@@ -50,15 +50,16 @@ const errorHandler = async(err, req, res, next) => { // เปลี่ยนเ
     if (statusCode >= 500 || statusCode === 409) {
         try {
             await systemLogService.createLog({
-                userId: req.user ? req.user.sub : null, // บันทึก ID ผู้ใช้ (ถ้ามี)
-                action: 'UPDATE_DATA', // หรือเพิ่ม enum 'SYSTEM_ERROR' ใน schema
-                level: statusCode >= 500 ? 'CRITICAL' : 'ERROR', // กำหนดระดับความรุนแรงตาม HTTP Status
-                resource: 'System_Error', // ระบุว่ามาจาก Error Handler เพื่อให้ Filter หาง่าย
-                ipAddress: req.ip || req.connection.remoteAddress, // เก็บ IP ตาม พ.ร.บ. คอมฯ
+                userId: req.user ? req.user.sub : null,
+                action: 'SYSTEM_ERROR',                          // ใช้ enum ที่ถูกต้อง (มีอยู่ใน schema แล้ว)
+                apiPath: req.originalUrl,                        // เพิ่ม : บันทึก API path ที่ทำให้เกิด error
+                level: statusCode >= 500 ? 'CRITICAL' : 'ERROR',
+                resource: 'System_Error',
+                ipAddress: req.ip || req.connection.remoteAddress,
                 userAgent: req.get('User-Agent'),
-                errorMessage: err.message, // แยกเก็บ message เพื่อความชัดเจนใน Database
-                details: { 
-                    statusCode, 
+                errorMessage: err.message,
+                details: {
+                    statusCode,
                     stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
                     path: req.originalUrl,
                     method: req.method

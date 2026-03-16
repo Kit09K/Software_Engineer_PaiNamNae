@@ -25,6 +25,7 @@ const login = asyncHandler(async (req, res) => {
             await systemLogService.createLog({
                 userId: user ? user.id : null,
                 action: 'LOGIN',
+                apiPath: req.originalUrl,
                 level: 'WARNING',
                 resource: 'Auth',
                 ipAddress: req.ip || req.socket.remoteAddress,
@@ -42,7 +43,7 @@ const login = asyncHandler(async (req, res) => {
 
     const token = signToken({ sub: user.id, role: user.role, email: user.email });
     const {
-        password:_,
+        password: _,
         gender,
         phoneNumber,
         otpCode,
@@ -55,8 +56,8 @@ const login = asyncHandler(async (req, res) => {
         lastLogin,
         createdAt,
         updatedAt,
-        username:__,
-        email:___,
+        username: __,
+        email: ___,
         ...safeUser
     } = user;
 
@@ -65,6 +66,7 @@ const login = asyncHandler(async (req, res) => {
         await systemLogService.createLog({
             userId: user.id,
             action: 'LOGIN',
+            apiPath: req.originalUrl,
             level: 'INFO',
             resource: 'Auth',
             ipAddress: req.ip || req.socket.remoteAddress,
@@ -89,6 +91,7 @@ const logout = asyncHandler(async (req, res) => {
         await systemLogService.createLog({
             userId: req.user ? req.user.sub : null,
             action: 'LOGOUT',
+            apiPath: req.originalUrl,
             level: 'INFO',
             resource: 'Auth',
             ipAddress: req.ip || req.socket.remoteAddress,
