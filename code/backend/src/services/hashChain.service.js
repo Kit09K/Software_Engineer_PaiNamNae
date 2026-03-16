@@ -3,20 +3,33 @@ const prisma = require('../utils/prisma');
 
 const SYSTEM_SECRET = process.env.LOG_HASH_SECRET || 'default_secret_change_me';
 
-/**
- * คำนวณ SHA256 Hash สำหรับ log entry
- * @param {object} logData - ข้อมูล log ที่ต้องการ hash
- * @param {string|null} prevHash - hash ของ log ก่อนหน้า
- * @returns {string} SHA256 hash string
- */
+
+const sortKeys = (obj) => {
+  if (obj === null || obj === undefined || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(sortKeys);
+  return Object.keys(obj).sort().reduce((sorted, key) => {
+    sorted[key] = sortKeys(obj[key]);
+    return sorted;
+  }, {});
+};
+
+const deterministicStringify = (obj) => JSON.stringify(sortKeys(obj));
+
+
 const computeHash = (logData, prevHash) => {
+  // Canonical field extraction — explicitly pick only the fields that form the hash.
+  // This ensures the same fields are used whether logData comes from createLog() or from a DB query.
+  const canonicalTimestamp = logData.timestamp
+    ? new Date(logData.timestamp).toISOString()
+    : '';
+
   const payload =
-    (logData.timestamp ? logData.timestamp.toISOString() : '') +
+    canonicalTimestamp +
     (logData.userId || '') +
     (logData.action || '') +
     (logData.apiPath || '') +
     (logData.ipAddress || '') +
-    JSON.stringify(logData.details || {}) +
+    deterministicStringify(logData.details || {}) +  // sorted keys — immune to JSONB reordering
     (prevHash || '') +
     SYSTEM_SECRET;
 
@@ -27,18 +40,15 @@ const computeHash = (logData, prevHash) => {
  * ดึง currentHash ของ log ล่าสุด
  * @returns {string|null}
  */
-const getLastLogHash = async () => {
-  const lastLog = await prisma.systemLog.findFirst({
-    orderBy: { timestamp: 'desc' },
+const getLastLogHash = async (tx = prisma) => {
+  const lastLog = await tx.systemLog.findFirst({
+    orderBy: [{ timestamp: 'desc' }, { id: 'desc' }], // deterministic: id tiebreaker matches verifyFullChain
     select: { currentHash: true },
   });
   return lastLog ? lastLog.currentHash : null;
 };
 
-/**
- * สร้าง LogAnchor ถ้าจำนวน log หารด้วย 100 ลงตัว
- * @param {object} log - log ที่เพิ่งถูกสร้าง
- */
+
 const createAnchorIfNeeded = async (log) => {
   const totalLogs = await prisma.systemLog.count();
   if (totalLogs > 0 && totalLogs % 100 === 0) {
@@ -52,11 +62,7 @@ const createAnchorIfNeeded = async (log) => {
   }
 };
 
-/**
- * ตรวจสอบ integrity ของทุก anchor block
- * ถ้า logs < 100 จะใช้ full-chain verification แทน
- * @returns {object} { mode, status, ... }
- */
+
 const verifyAnchors = async () => {
   const totalLogs = await prisma.systemLog.count();
 
@@ -184,12 +190,6 @@ const verifyFullChain = async () => {
   };
 };
 
-/**
- * ตรวจสอบ hash chain ของ block ที่ระบุ (start-end เป็นลำดับที่ของ log)
- * @param {number} start - ลำดับเริ่มต้น (1-based)
- * @param {number} end - ลำดับสิ้นสุด (1-based)
- * @returns {object} ผลการตรวจสอบ
- */
 const verifyBlock = async (start, end) => {
   // ดึง log ตามลำดับ timestamp + id (deterministic tiebreaker เพื่อให้ผลลัพธ์สม่ำเสมอ)
   const allLogs = await prisma.systemLog.findMany({

@@ -4,47 +4,61 @@ const hashChainService = require('./hashChain.service');
 
 
 const createLog = async (logData) => {
-  const { userId, action, apiPath, level, resource, ipAddress, userAgent, targetTable, targetId, details, errorMessage, status, protocol } = logData;
+  return await prisma.$transaction(async (tx) => {
+    const { userId, action, apiPath, level, resource, ipAddress, userAgent, targetTable, targetId, details, errorMessage, status, protocol } = logData;
 
-  // Step 1: ดึง hash ของ log ก่อนหน้า
-  const prevHash = await hashChainService.getLastLogHash();
+    // Step 1: ดึง hash ของ log ก่อนหน้า (within transaction to prevent race conditions)
+    const prevHash = await hashChainService.getLastLogHash(tx);
 
-  // Step 2: สร้าง log data สำหรับคำนวณ hash
-  const timestamp = new Date();
-  const logDetails = details || {};
+    // Step 2: สร้าง log data สำหรับคำนวณ hash
+    const timestamp = new Date();
+    const logDetails = details || {};
 
-  // Step 3: คำนวณ currentHash
-  const currentHash = hashChainService.computeHash(
-    { timestamp, userId, action, apiPath, ipAddress, details: logDetails },
-    prevHash
-  );
+    // Step 3: คำนวณ currentHash
+    const currentHash = hashChainService.computeHash(
+      { timestamp, userId, action, apiPath, ipAddress, details: logDetails },
+      prevHash
+    );
 
-  // Step 4: สร้าง log พร้อม hash chain
-  const newLog = await prisma.systemLog.create({
-    data: {
-      timestamp,
-      userId,
-      action,
-      apiPath,           // เพิ่ม API Path
-      level: level || 'INFO',
-      resource: resource || targetTable || 'System',
-      ipAddress,
-      userAgent,
-      targetTable,
-      targetId,
-      details: logDetails,
-      errorMessage,
-      status: status || 'SUCCESS',
-      protocol: protocol || 'HTTP/1.1',
-      prevHash,
-      currentHash,
-    },
+    // Step 4: สร้าง log พร้อม hash chain
+    const newLog = await tx.systemLog.create({
+      data: {
+        timestamp,
+        userId,
+        action,
+        apiPath,           // เพิ่ม API Path
+        level: level || 'INFO',
+        resource: resource || targetTable || 'System',
+        ipAddress,
+        userAgent,
+        targetTable,
+        targetId,
+        details: logDetails,
+        errorMessage,
+        status: status || 'SUCCESS',
+        protocol: protocol || 'HTTP/1.1',
+        prevHash,
+        currentHash,
+      },
+    });
+
+    // Step 5: สร้าง LogAnchor ถ้าถึงทุก 100 logs (within transaction)
+    const totalLogs = await tx.systemLog.count();
+    if (totalLogs > 0 && totalLogs % 100 === 0) {
+      await tx.logAnchor.create({
+        data: {
+          lastLogId: newLog.id,
+          anchorHash: newLog.currentHash,
+        },
+      });
+      console.log(`📌 LogAnchor created at log #${totalLogs} (id: ${newLog.id})`);
+    }
+
+    return newLog;
+  }, {
+    isolationLevel: 'Serializable',  // Prevents concurrent reads of stale prevHash
+    timeout: 10000,                   // 10s timeout for safety
   });
-
-  // Step 5: สร้าง LogAnchor ถ้าถึงทุก 100 logs
-  await hashChainService.createAnchorIfNeeded(newLog);
-
-  return newLog;
 };
 
 const queryLogs = async (filter, options) => {
