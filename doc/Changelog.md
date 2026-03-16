@@ -1,5 +1,5 @@
-Sprint 2 - Story 1
-Version: v1.2.0
+Sprint 3 - Story 1
+Version: v1.2.1
 
 Story: As an admin, I want a log that complies to the related law.
 
@@ -55,8 +55,8 @@ Security & Compliance Improvements
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Sprint 2 - Story 16
-Version: v1.2.0
+Sprint 3 - Story 16
+Version: v1.2.1
 
 Story: As a user, I want my account and information to be removed from the system when I no longer want to be a part of this community.
 
