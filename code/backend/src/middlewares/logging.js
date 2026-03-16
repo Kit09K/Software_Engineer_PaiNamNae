@@ -17,10 +17,15 @@ const logActivity = (actionType, targetTable, level = 'INFO') => {
             const method = req.method;
             const url = req.originalUrl;
 
-            // ดึง Protocol 
+            // ดึง API Path (full URL พร้อม query string) สำหรับเก็บเป็น column แยก
+            const apiPath = req.originalUrl;
+            // Route pattern ที่ Express จับคู่ได้ เช่น /admin/:id (เก็บไว้ใน details)
+            const routePattern = req.route?.path || null;
+
+            // ดึง Protocol
             const protocol = `${req.protocol.toUpperCase()}/${req.httpVersion}`;
 
-            // ประเมินว่าสำเร็จหรือล้มเหลวจาก HTTP Status Code 
+            // ประเมินว่าสำเร็จหรือล้มเหลวจาก HTTP Status Code
             const isSuccess = res.statusCode >= 200 && res.statusCode < 400;
             const status = isSuccess ? 'SUCCESS' : 'FAILED';
 
@@ -37,6 +42,7 @@ const logActivity = (actionType, targetTable, level = 'INFO') => {
                 await systemLogService.createLog({
                     userId,
                     action: finalAction,
+                    apiPath,         // เพิ่ม API Path เป็น field แยก
                     level: isSuccess ? level : (res.statusCode >= 500 ? 'CRITICAL' : 'ERROR'),
                     status,          // เพิ่ม Status เข้าไป
                     protocol,        // เพิ่ม Protocol เข้าไป
@@ -47,6 +53,7 @@ const logActivity = (actionType, targetTable, level = 'INFO') => {
                     userAgent,
                     details: {
                         path: url,
+                        routePattern,            // เช่น /admin/:id – ช่วยระบุ route pattern
                         method: method,
                         statusCode: res.statusCode,
                         payload: isSuccess && method !== 'GET' ? filterSensitiveData(req.body) : undefined,
@@ -66,7 +73,7 @@ const filterSensitiveData = (data) => {
     if (!data) return {};
     const sensitiveFields = ['password', 'token', 'otp', 'creditCard'];
     const filtered = { ...data };
-    
+
     sensitiveFields.forEach(field => {
         if (filtered[field]) filtered[field] = '********';
     });

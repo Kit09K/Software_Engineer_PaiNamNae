@@ -158,6 +158,12 @@
                                             class="px-4 py-2 text-sm text-white transition duration-200 bg-blue-600 rounded-md hover:bg-blue-700">
                                             แชทกับผู้ขับ
                                         </button>
+                                        <button
+                                            class="px-4 py-2 text-sm text-white transition duration-200 bg-green-600 rounded-md hover:bg-green-700"
+                                            @click.stop="replyToDriver(trip)"
+                                        >
+                                            ตอบกลับผู้ขับ
+                                        </button>
                                     </template>
 
                                     <!-- REJECTED / CANCELLED: ลบได้ -->
@@ -219,6 +225,15 @@
         <ConfirmModal :show="isModalVisible" :title="modalContent.title" :message="modalContent.message"
             :confirmText="modalContent.confirmText" :variant="modalContent.variant" @confirm="handleConfirmAction"
             @cancel="closeConfirmModal" />
+
+        <MessageModal
+            :show="isMessageModalVisible"
+            :title="messageModalTitle"
+            :subtitle="messageModalSubtitle"
+            :quickTags="['รับทราบครับ', 'โอเคครับ', 'กำลังเดินไปครับ', 'รอสักครู่ครับ ขอเวลา 2 นาที']"
+            @send="handleSendMessage"
+            @close="closeMessageModal"
+        />
     </div>
 </template>
 
@@ -228,6 +243,7 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/th'
 import buddhistEra from 'dayjs/plugin/buddhistEra'
 import ConfirmModal from '~/components/ConfirmModal.vue'
+import MessageModal from '~/components/MessageModal.vue'
 import { useToast } from '~/composables/useToast'
 
 // Setup dayjs for Thai locale
@@ -242,6 +258,12 @@ const activeTab = ref('pending')
 const selectedTripId = ref(null)
 const isLoading = ref(false)
 const mapContainer = ref(null)
+
+// Message Modal states
+const isMessageModalVisible = ref(false)
+const messageModalTitle = ref('ตอบกลับผู้ขับ')
+const messageModalSubtitle = ref('ส่งข้อความตอบกลับถึงผู้ขับ')
+const currentTripForMessage = ref(null)
 let map = null
 let currentPolyline = null
 let currentMarkers = []
@@ -672,6 +694,40 @@ async function submitCancel() {
     } finally {
         isSubmittingCancel.value = false
     }
+}
+
+const replyToDriver = async (trip) => {
+    // แสดง modal ให้พิมข้อความตอบกลับผู้ขับ
+    currentTripForMessage.value = trip
+    isMessageModalVisible.value = true
+}
+
+const handleSendMessage = async (message) => {
+    const trip = currentTripForMessage.value
+    if (!trip?.id) return
+
+    try {
+        await $api('/push-notifications/send-message', {
+            method: 'POST',
+            body: {
+                bookingId: trip.id,
+                message: message,
+                messageType: 'passenger_to_driver'
+            },
+        })
+        toast.success('ส่งข้อความสำเร็จ', `ส่งถึงผู้ขับ ${trip.driver?.name} แล้ว`)
+        window.dispatchEvent(new Event('notifications:refresh'))
+        isMessageModalVisible.value = false
+        currentTripForMessage.value = null
+    } catch (err) {
+        console.error('Failed to send message:', err)
+        toast.error('ส่งข้อความไม่สำเร็จ', err?.data?.message || 'ลองใหม่อีกครั้ง')
+    }
+}
+
+const closeMessageModal = () => {
+    isMessageModalVisible.value = false
+    currentTripForMessage.value = null
 }
 
 function formatDistance(input) {

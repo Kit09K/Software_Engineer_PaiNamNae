@@ -35,12 +35,18 @@ class PushNotificationService {
 
     async sendPushToUser(userId, payload) {
         try {
+        
+        if (!prisma.pushSubscription || typeof prisma.pushSubscription.findMany !== 'function') {
+            console.warn('PushSubscription model not found in Prisma. Skipping push send.');
+            return { success: false, message: 'PushSubscription model not available' };
+        }
+
         // หาอุปกรณ์ทั้งหมดของ User คนนี้
         const subscriptions = await prisma.pushSubscription.findMany({
             where: { userId: userId }
         });
 
-        if (subscriptions.length === 0) {
+        if (!subscriptions || subscriptions.length === 0) {
             return { success: false, message: 'No subscriptions found for this user' };
         }
 
@@ -72,6 +78,43 @@ class PushNotificationService {
         } catch (error) {
         console.error('Service Error:', error);
         throw new Error('Could not send push notification');
+        }
+    }
+
+    // เพิ่ม: ฟังก์ชันสำหรับบันทึกลง Database และส่ง Push Notification ไปพร้อมกัน
+    async sendAndSaveNotification({ userId, type, title, body, link, metadata }) {
+        try {
+            // 1. บันทึกข้อมูลลงตาราง Notification
+            const notification = await prisma.notification.create({
+                data: {
+                    userId,
+                    type: type || 'SYSTEM', 
+                    title,
+                    body,
+                    link,
+                    metadata: metadata ? metadata : undefined
+                }
+            });
+
+            // 2. จัดรูปแบบ Payload สำหรับ Push Notification
+            const payload = {
+                title: notification.title,
+                body: notification.body,
+                url: notification.link || '/',
+                notificationId: notification.id // ส่ง ID ไปให้ Frontend 
+            };
+
+            // 3. ส่ง Push Notification ไปยัง User (ถ้ามี subscription)
+            try {
+                await this.sendPushToUser(userId, payload);
+            } catch (pushError) {
+                console.warn('Push send failed (non-blocking):', pushError.message || pushError);
+            }
+
+            return notification;
+        } catch (error) {
+            console.error('Service Error (sendAndSaveNotification):', error);
+            throw new Error('Could not save and send notification');
         }
     }
 }

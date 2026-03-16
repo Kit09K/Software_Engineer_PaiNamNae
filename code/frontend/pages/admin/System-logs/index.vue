@@ -40,6 +40,10 @@
                                     <option value="DELETE_DATA">DELETE DATA</option>
                                     <option value="VIEW_DATA">VIEW_DATA</option>
                                     <option value="EXPORT_LOGS">EXPORT_LOGS</option>
+                                    <option value="BOOKING_CONFIRM">BOOKING_CONFIRM</option>
+                                    <option value="BOOKING_REQUEST">BOOKING_REQUEST</option>
+                                    <option value="ROUTE_CREATE">ROUTE_CREATE</option>
+                                    <option value="VERIFY_APPROVE">VERIFY_APPROVE</option>
                                 </select>
                             </div>
 
@@ -97,6 +101,12 @@
                                     title="Export JSON">
                                     <i class="fas fa-file-code"></i>
                                 </button>
+                                <button @click="checkLogIntegrity"
+                                    class="flex-none bg-emerald-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-emerald-700 transition shadow-sm"
+                                    title="Check Log Integrity"
+                                    :disabled="isVerifying">
+                                    <i :class="isVerifying ? 'fas fa-spinner fa-spin' : 'fas fa-shield-alt'"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -108,13 +118,14 @@
                                     <th class="px-6 py-4 whitespace-nowrap">Timestamp</th>
                                     <th class="px-6 py-4">User / IP</th>
                                     <th class="px-6 py-4">Action</th>
+                                    <th class="px-6 py-4">API Path</th>
                                     <th class="px-6 py-4 w-1/2">Details</th>
                                 </tr>
                             </thead>
 
                             <tbody class="divide-y divide-gray-100">
                                 <tr v-if="logs.length === 0">
-                                    <td colspan="4" class="px-6 py-12 text-center text-gray-500">
+                                    <td colspan="5" class="px-6 py-12 text-center text-gray-500">
                                         <div class="flex flex-col items-center justify-center">
                                             <i class="fas fa-search text-3xl mb-3 text-gray-300"></i>
                                             <p>ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</p>
@@ -151,6 +162,15 @@
                                             <i :class="actionIcon(log.action)"></i>
                                             {{ log.action }}
                                         </span>
+                                    </td>
+
+                                    <td class="px-6 py-4">
+                                        <span v-if="log.apiPath"
+                                            class="inline-block text-xs font-mono text-slate-600 bg-slate-50 border border-slate-200 px-2 py-1 rounded max-w-[220px] truncate"
+                                            :title="log.apiPath">
+                                            {{ log.apiPath }}
+                                        </span>
+                                        <span v-else class="text-xs text-gray-300">—</span>
                                     </td>
 
                                     <td class="px-6 py-4">
@@ -249,6 +269,194 @@
             </div>
         </div>
     </div>
+
+    <!-- Log Integrity Verification Modal -->
+    <div v-if="showIntegrityModal" class="fixed inset-0 z-[999] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="showIntegrityModal = false"></div>
+
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden border border-gray-100">
+            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <i class="fas fa-shield-alt text-emerald-500"></i>
+                    Log Integrity Status
+                </h3>
+                <button @click="showIntegrityModal = false" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="p-6">
+                <!-- Loading -->
+                <div v-if="isVerifying" class="flex flex-col items-center justify-center py-8">
+                    <div class="inline-block border-4 border-gray-200 border-t-emerald-500 rounded-full w-12 h-12 animate-spin"></div>
+                    <p class="mt-4 text-gray-600 font-medium">กำลังตรวจสอบ integrity...</p>
+                </div>
+
+                <!-- ========== FULL-CHAIN MODE (logs < 100, or anchor-fallback) ========== -->
+                <div v-else-if="integrityResult && integrityResult.mode === 'full-chain'">
+
+                    <!-- Anchor-missing warning (only when anchorWarning is set, i.e. >= 100 logs but no anchors) -->
+                    <div v-if="integrityResult.anchorWarning" class="mb-4 p-4 rounded-xl bg-amber-50 border border-amber-200">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-exclamation-triangle text-amber-500 text-xl mt-0.5"></i>
+                            <div>
+                                <p class="font-semibold text-amber-800">⚠ Anchor checkpoints missing.</p>
+                                <p class="text-sm text-amber-700 mt-1">{{ integrityResult.anchorWarning }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Normal info banner (< 100 logs, no anchors yet — expected state) -->
+                    <div v-else class="mb-4 p-4 rounded-xl bg-blue-50 border border-blue-200">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-info-circle text-blue-500 text-xl mt-0.5"></i>
+                            <div>
+                                <p class="font-semibold text-blue-800">ℹ Anchor checkpoints not yet created.</p>
+                                <p class="text-sm text-blue-600 mt-1">System verified the entire log chain directly.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Overall Status -->
+                    <div class="mb-4 p-4 rounded-xl" :class="integrityResult.valid ? 'bg-emerald-50 border border-emerald-200' : 'bg-red-50 border border-red-200'">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <i :class="integrityResult.valid ? 'fas fa-check-circle text-emerald-500 text-2xl' : 'fas fa-exclamation-triangle text-red-500 text-2xl'"></i>
+                                <div>
+                                    <span class="font-bold text-lg" :class="integrityResult.valid ? 'text-emerald-700' : 'text-red-700'">
+                                        Chain Status: {{ integrityResult.valid ? '✅ VALID' : '❌ CORRUPTED' }}
+                                    </span>
+                                    <p class="text-sm text-gray-500">Total Logs Checked: {{ integrityResult.totalLogs }}</p>
+                                </div>
+                            </div>
+                            <span v-if="!integrityResult.valid && integrityResult.corruptedRow" class="text-sm font-mono text-red-600">
+                                First corruption at row #{{ integrityResult.corruptedRow }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Hash Chain Verification Table -->
+                    <div v-if="integrityResult.rows && integrityResult.rows.length > 0">
+                        <h4 class="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                            <i class="fas fa-link text-gray-400"></i>
+                            Hash Chain Verification
+                        </h4>
+                        <div class="overflow-auto max-h-72 rounded-lg border border-gray-200">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-50 sticky top-0">
+                                    <tr class="text-gray-500 text-xs uppercase font-bold">
+                                        <th class="px-3 py-2.5 whitespace-nowrap">Row</th>
+                                        <th class="px-3 py-2.5">Action</th>
+                                        <th class="px-3 py-2.5 font-mono whitespace-nowrap">Log ID</th>
+                                        <th class="px-3 py-2.5 font-mono whitespace-nowrap">Prev Hash</th>
+                                        <th class="px-3 py-2.5 font-mono whitespace-nowrap">Current Hash</th>
+                                        <th class="px-3 py-2.5 text-center whitespace-nowrap">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <tr v-for="row in integrityResult.rows" :key="row.row"
+                                        :class="row.status === 'CORRUPTED' ? 'bg-red-50' : 'hover:bg-gray-50'">
+                                        <td class="px-3 py-2 font-mono text-gray-700 font-medium">{{ row.row }}</td>
+                                        <td class="px-3 py-2">
+                                            <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-700 whitespace-nowrap">
+                                                {{ row.action }}
+                                            </span>
+                                        </td>
+                                        <td class="px-3 py-2 font-mono text-xs text-gray-400" :title="row.logId">
+                                            {{ row.logId ? row.logId.substring(0, 8) + '…' : '-' }}
+                                        </td>
+                                        <td class="px-3 py-2 font-mono text-xs"
+                                            :class="row.status === 'CORRUPTED' ? 'text-red-500' : 'text-gray-500'"
+                                            :title="row.prevHash">
+                                            {{ shortenHash(row.prevHash) }}
+                                        </td>
+                                        <td class="px-3 py-2 font-mono text-xs"
+                                            :class="row.status === 'CORRUPTED' ? 'text-red-500' : 'text-gray-500'"
+                                            :title="row.currentHash">
+                                            {{ shortenHash(row.currentHash) }}
+                                        </td>
+                                        <td class="px-3 py-2 text-center">
+                                            <span v-if="row.status === 'OK'" class="text-emerald-500 text-base">✅</span>
+                                            <span v-else class="text-red-500 text-base" :title="'Row ' + row.row + ' hash mismatch'">❌</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- No logs in system at all -->
+                    <div v-else class="text-center py-6">
+                        <i class="fas fa-database text-3xl text-gray-300 mb-2"></i>
+                        <p class="text-gray-500">ยังไม่มี log ในระบบ</p>
+                    </div>
+                </div>
+
+                <!-- ========== ANCHOR MODE (logs >= 100) ========== -->
+                <div v-else-if="integrityResult">
+                    <!-- Overall Status -->
+                    <div class="mb-4 p-4 rounded-xl" :class="integrityResult.status === 'OK' ? 'bg-emerald-50 border border-emerald-200' : 'bg-red-50 border border-red-200'">
+                        <div class="flex items-center gap-3">
+                            <i :class="integrityResult.status === 'OK' ? 'fas fa-check-circle text-emerald-500 text-2xl' : 'fas fa-exclamation-triangle text-red-500 text-2xl'"></i>
+                            <div>
+                                <span class="font-bold text-lg" :class="integrityResult.status === 'OK' ? 'text-emerald-700' : 'text-red-700'">
+                                    {{ integrityResult.status === 'OK' ? 'All Blocks Verified' : 'Integrity Issue Detected' }}
+                                </span>
+                                <p class="text-sm text-gray-500">ตรวจสอบทั้งหมด {{ integrityResult.blocksChecked }} blocks</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Block List -->
+                    <div class="space-y-2 max-h-64 overflow-y-auto">
+                        <div v-for="block in integrityBlocks" :key="block.start"
+                            class="flex items-center justify-between p-3 rounded-lg border"
+                            :class="block.corrupted ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200'">
+                            <div class="flex items-center gap-3">
+                                <i :class="block.corrupted ? 'fas fa-times-circle text-red-500' : 'fas fa-check-circle text-emerald-500'"></i>
+                                <span class="font-mono text-sm font-medium text-gray-700">
+                                    Block {{ block.start }} - {{ block.end }}
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-bold"
+                                    :class="block.corrupted ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'">
+                                    {{ block.corrupted ? 'CORRUPTED' : 'OK' }}
+                                </span>
+                                <button v-if="block.corrupted" @click="investigateBlock(block.start, block.end)"
+                                    class="px-3 py-1 text-xs font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 transition"
+                                    :disabled="block.investigating">
+                                    <i :class="block.investigating ? 'fas fa-spinner fa-spin' : 'fas fa-search'"></i>
+                                    Investigate
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Block Investigation Details -->
+                    <div v-if="blockDetail" class="mt-4 p-4 bg-gray-900 rounded-xl text-sm font-mono text-green-400 overflow-x-auto max-h-48">
+                        <p class="text-gray-400 mb-2"># Block Investigation Result</p>
+                        <p>Status: <span :class="blockDetail.status === 'OK' ? 'text-emerald-400' : 'text-red-400'">{{ blockDetail.status }}</span></p>
+                        <p>Logs Checked: {{ blockDetail.logsChecked }}</p>
+                        <div v-if="blockDetail.mismatches && blockDetail.mismatches.length > 0" class="mt-2">
+                            <p class="text-red-400">Mismatches found:</p>
+                            <div v-for="(m, idx) in blockDetail.mismatches" :key="idx" class="ml-2 mt-1 text-yellow-300">
+                                <p>- Position #{{ m.position }}: {{ m.issue }}</p>
+                                <p class="text-gray-500 text-xs ml-2">Log ID: {{ m.logId }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+                <button @click="showIntegrityModal = false"
+                    class="px-6 py-2.5 text-sm font-bold text-gray-600 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition">
+                    ปิด
+                </button>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script setup>
@@ -280,6 +488,13 @@ const filter = ref({
 
 const showExportModal = ref(false)
 const selectedExportFields = ref([])
+
+// --- Log Integrity State ---
+const showIntegrityModal = ref(false)
+const isVerifying = ref(false)
+const integrityResult = ref(null)
+const integrityBlocks = ref([])
+const blockDetail = ref(null)
 const exportFieldOptions = {
     fullName: 'ชื่อ - สกุล',
     idCard: 'เลขบัตรประชาชน',
@@ -415,6 +630,71 @@ const handleSearch = () => {
 const exportLogs = () => {
     console.log('Exporting JSON...')
     showExportModal.value = true // สั่งให้ Popup แสดงผล
+}
+
+// --- Log Integrity Functions ---
+
+// ตัดย่อ hash สำหรับแสดงผล
+const shortenHash = (hash) => {
+    if (!hash) return '-'
+    if (hash === 'GENESIS') return 'GENESIS'
+    if (hash.length <= 16) return hash
+    return hash.substring(0, 8) + '...' + hash.substring(hash.length - 5)
+}
+
+const checkLogIntegrity = async () => {
+    isVerifying.value = true
+    integrityResult.value = null
+    integrityBlocks.value = []
+    blockDetail.value = null
+    showIntegrityModal.value = true
+
+    try {
+        const response = await $api('/logs/verify-anchors')
+        integrityResult.value = response.data || response
+
+        // Anchor mode: สร้าง block list สำหรับแสดงผล
+        if (integrityResult.value.mode === 'anchor') {
+            const blocksChecked = integrityResult.value.blocksChecked || 0
+            const corrupted = integrityResult.value.corruptedBlocks || []
+            const corruptedSet = new Set(corrupted.map(c => `${c.start}-${c.end}`))
+
+            const blocks = []
+            for (let i = 0; i < blocksChecked; i++) {
+                const start = i * 100 + 1
+                const end = (i + 1) * 100
+                blocks.push({
+                    start,
+                    end,
+                    corrupted: corruptedSet.has(`${start}-${end}`),
+                    investigating: false,
+                })
+            }
+            integrityBlocks.value = blocks
+        }
+        // Full-chain mode: rows are already in integrityResult
+    } catch (error) {
+        console.error('Error verifying log integrity:', error)
+        integrityResult.value = { status: 'ERROR', mode: 'error', blocksChecked: 0 }
+    } finally {
+        isVerifying.value = false
+    }
+}
+
+const investigateBlock = async (start, end) => {
+    const block = integrityBlocks.value.find(b => b.start === start && b.end === end)
+    if (block) block.investigating = true
+    blockDetail.value = null
+
+    try {
+        const response = await $api(`/logs/verify-block?start=${start}&end=${end}`)
+        blockDetail.value = response.data || response
+    } catch (error) {
+        console.error('Error investigating block:', error)
+        blockDetail.value = { status: 'ERROR', logsChecked: 0, message: error.message }
+    } finally {
+        if (block) block.investigating = false
+    }
 }
 
 // เพิ่มฟังก์ชันยืนยันการ Export
