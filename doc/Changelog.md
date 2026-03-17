@@ -1,4 +1,4 @@
-Sprint 2 - Story 1
+## Sprint 2 - Story 1
 Version: v1.2.0
 
 Story: As an admin, I want a log that complies to the related law.
@@ -55,7 +55,7 @@ Security & Compliance Improvements
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Sprint 2 - Story 16
+## Sprint 2 - Story 16
 Version: v1.2.0
 
 Story: As a user, I want my account and information to be removed from the system when I no longer want to be a part of this community.
@@ -99,8 +99,31 @@ Updated
 Security Improvements
 - เพิ่มการยืนยันตัวตนด้วย OTP แทน password
 - OTP ถูก invalidate หลังใช้งาน
+  
+------------------------------------------------------------------------------------------------------------------------------------------------------
 
-AI Declaration
+## Sprint 3 - Story 1
+Version: v1.2.0
+
+Story: As an admin, I want a log that complies to the related law.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Sprint 3 - Story 12
+Version: v1.2.0
+
+Story: As a passenger, I want to get a notification when the driver is about to pick me up so that I can get myself ready or respond to the driver.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Sprint 3 - Story 16
+Version: v1.2.0
+
+Story: As a user, I want my account and information to be removed from the system when I no longer want to be a part of this community.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## AI Declaration
 
 รายงานฉบับนี้ ในการทำงานทั้ง 3 Sprint ที่ผ่านมาได้นําปัญญาประดิษฐ์ GPT-4.1, Gemini Pro , Claude มาใช้ในขั้นตอนดังต่อไปนี้ 
 
