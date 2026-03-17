@@ -132,6 +132,7 @@ const createRoute = asyncHandler(async (req, res) => {
     await systemLogService.createLog({
       userId: driverId,
       action: 'ROUTE_CREATE',
+      apiPath: req.originalUrl,
       level: 'INFO',
       resource: 'Route',
       ipAddress: req.ip || req.socket.remoteAddress,

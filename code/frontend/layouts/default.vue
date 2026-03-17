@@ -388,6 +388,39 @@
             </div>
         </header>
 
+        <div v-if="showDriverPopup" class="fixed bottom-4 right-4 z-50 max-w-xs w-[94vw] md:w-96 p-3 bg-white border border-gray-200 rounded-xl shadow-xl">
+            <div class="flex items-start justify-between gap-2">
+                <div>
+                    <p class="text-xs text-gray-500">ข้อความใหม่</p>
+                    <p class="text-sm font-semibold text-gray-800">{{ replayDriverName }}</p>
+                </div>
+                <button class="text-gray-500 hover:text-gray-700" @click="closeDriverPopup">✕</button>
+            </div>
+            <p class="mt-2 text-sm text-gray-700">{{ popupMessage }}</p>
+
+            <div class="flex flex-wrap gap-1.5 mt-3">
+                <button
+                    v-for="(tag, index) in passengerTags"
+                    :key="index"
+                    @click="replyText = tag" 
+                    class="px-2.5 py-1 text-[11px] font-medium text-blue-700 transition-colors bg-blue-50 border border-blue-200 rounded-full hover:bg-blue-100 whitespace-nowrap"
+                >
+                    {{ tag }}
+                </button>
+            </div>
+            <textarea 
+                v-model="replyText" 
+                rows="3" 
+                placeholder="พิมพ์ข้อความตอบกลับไปยังคนขับ" 
+                class="w-full mt-2 border border-gray-200 rounded-md px-2 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500 resize-none" 
+            />
+            
+            <div class="mt-2 flex justify-end gap-2">
+                <button @click="closeDriverPopup" class="px-3 py-1.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100">ปิ ด</button>
+                <button @click="sendReplyToDriver" :disabled="isSendingReply || !replyText.trim()" class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50">ส่งข้อความ</button>
+            </div>
+        </div>
+
         <main>
             <NuxtPage />
         </main>
@@ -395,7 +428,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRuntimeConfig, useCookie } from '#app'
 import { useAuth } from '~/composables/useAuth'
 
@@ -429,11 +462,26 @@ const handleResize = () => {
 const openNotif = ref(false)
 const openMenuId = ref(null)   // เมนูสามจุดของแต่ละรายการ
 const loading = ref(false)
+const initialLoading = ref(true)
 const bellBtn = ref(null)
 const notifPanel = ref(null)
-const notifications = ref([])  // [{ id, title, body, createdAt, readAt }]
+const notifications = ref([])  
 
 const unreadCount = computed(() => notifications.value.filter(n => !n.readAt).length)
+
+const showDriverPopup = ref(false)
+const popupMessage = ref('')
+const replayBookingId = ref(null)
+const replayDriverName = ref('')
+const replyText = ref('')
+const passengerTags = ref([
+  'รับทราบครับ',
+  'โอเคครับ',
+  'กำลังรีบเดินไปครับ',
+  'ขอเวลาสักครู่ครับ'
+])
+const isSendingReply = ref(false)
+const lastDriverMessageId = ref(null)
 
 function toggleNotif() {
     openNotif.value = !openNotif.value
@@ -448,10 +496,25 @@ async function onBellClick() {
 }
 
 /** GET /notifications (ผู้ใช้ทั่วไป: แสดงทั้งหมด ไม่กรอง initiatedBy) */
-async function fetchUserNotifications() {
+function shouldOpenDriverPopup(notification) {
+    if (!notification) return false
+    if (notification.readAt) return false
+    const lower = (notification.title || '').toLowerCase() + ' ' + (notification.body || '').toLowerCase()
+    return lower.includes('ข้อความจากผู้ขับ') || lower.includes('กำลังจะไปถึง') || lower.includes('แจ้งเตือน')
+}
+
+async function openDriverReplyPopup(notification) {
+    showDriverPopup.value = true
+    popupMessage.value = notification.body || 'คุณมีข้อความจากคนขับ'
+    replyText.value = ''
+    replayBookingId.value = notification.metadata?.bookingId || notification.link?.split('/').pop() || null
+    replayDriverName.value = notification.title?.replace(/^ข้อความจากผู้ขับ:\s*/, '') || 'คนขับ'
+}
+
+async function fetchUserNotifications({ useLoading = false } = {}) {
     try {
         if (!token.value) return
-        loading.value = true
+        if (useLoading) loading.value = true
 
         const apiBase = useRuntimeConfig().public.apiBase || 'http://localhost:3000/api'
         const tk = useCookie('token')?.value || (process.client ? localStorage.getItem('token') : '')
@@ -468,14 +531,63 @@ async function fetchUserNotifications() {
             title: it.title || '-',
             body: it.body || '',
             createdAt: it.createdAt || Date.now(),
-            readAt: it.readAt || null
+            readAt: it.readAt || null,
+            metadata: it.metadata || {}
         }))
+
+        const driverMessage = notifications.value.find(n => shouldOpenDriverPopup(n))
+        if (driverMessage && driverMessage.id !== lastDriverMessageId.value) {
+            lastDriverMessageId.value = driverMessage.id
+            openDriverReplyPopup(driverMessage)
+        }
     } catch (e) {
         console.error(e)
         notifications.value = []
     } finally {
-        loading.value = false
+        if (useLoading) {
+            loading.value = false
+        }
+        initialLoading.value = false
     }
+}
+
+async function sendReplyToDriver() {
+    try {
+        if (!replayBookingId.value || !replyText.value.trim()) {
+            return
+        }
+        isSendingReply.value = true
+        const apiBase = useRuntimeConfig().public.apiBase || 'http://localhost:3000/api'
+        const tk = useCookie('token')?.value || (process.client ? localStorage.getItem('token') : '')
+
+        await $fetch('/push-notifications/send-message', {
+            baseURL: apiBase,
+            method: 'POST',
+            headers: { Accept: 'application/json', ...(tk ? { Authorization: `Bearer ${tk}` } : {}) },
+            body: {
+                bookingId: replayBookingId.value,
+                message: replyText.value.trim()
+            }
+        })
+
+        replyText.value = ''
+        showDriverPopup.value = false
+        // กระจาย event ให้อัปเดต
+        window.dispatchEvent(new Event('notification-updated'))
+    } catch (e) {
+        console.error('Failed to reply to driver', e)
+        alert('ส่งข้อความไม่สำเร็จ กรุณาลองอีกครั้ง')
+    } finally {
+        isSendingReply.value = false
+    }
+}
+
+async function closeDriverPopup() {
+    showDriverPopup.value = false
+    popupMessage.value = ''
+    replyText.value = ''
+    replayBookingId.value = null
+    replayDriverName.value = ''
 }
 
 /** เมนูย่อยของแต่ละรายการ */
@@ -495,6 +607,8 @@ async function markAsRead(n) {
         })
         const i = notifications.value.findIndex(x => x.id === n.id)
         if (i > -1) notifications.value[i].readAt = new Date().toISOString()
+        
+        window.dispatchEvent(new Event('notification-updated'))
     } finally {
         openMenuId.value = null
     }
@@ -511,6 +625,8 @@ async function removeNotification(n) {
             credentials: 'include'
         })
         notifications.value = notifications.value.filter(x => x.id !== n.id)
+        
+        window.dispatchEvent(new Event('notification-updated'))
     } finally {
         openMenuId.value = null
     }
@@ -543,19 +659,128 @@ function timeAgo(ts) {
     return `${d} d ago`
 }
 
+/* ====== ระบบ Push Notification ====== */
+const urlBase64ToUint8Array = (base64String) => {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4)
+  const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/')
+  const rawData = window.atob(base64)
+  const outputArray = new Uint8Array(rawData.length)
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i)
+  }
+  return outputArray
+}
+
+const subscribeUserToPush = async () => {
+  try {
+    // เช็คว่าเบราว์เซอร์รองรับหรือไม่
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return
+
+    const registration = await navigator.serviceWorker.register('/sw.js');
+    console.log('Service Worker Registered');
+
+    // เช็คสิทธิ์และขออนุญาตถ้ายังไม่ได้ตัดสินใจ
+    let permission = Notification.permission
+    if (permission !== 'granted' && permission !== 'denied') {
+      permission = await Notification.requestPermission()
+    }
+
+    if (permission === 'granted') {
+      const registration = await navigator.serviceWorker.ready
+      const publicVapidKey = useRuntimeConfig().public.vapidKey 
+      
+      if (!publicVapidKey) {
+        console.warn('ไม่พบ VAPID Key ในตั้งค่า')
+        return
+      }
+
+      const convertedVapidKey = urlBase64ToUint8Array(publicVapidKey)
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: convertedVapidKey
+      })
+
+      const apiBase = useRuntimeConfig().public.apiBase || 'http://localhost:3000/api'
+      const tk = useCookie('token')?.value || (process.client ? localStorage.getItem('token') : '')
+
+      if (tk) {
+        await $fetch('/push-notifications/subscribe', {
+          baseURL: apiBase,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${tk}`
+          },
+          body: { subscription: subscription }
+        })
+        console.log('ลงทะเบียน Push Notification อัตโนมัติสำเร็จ')
+      }
+    }
+  } catch (error) {
+    console.error('ดำเนินการ Subscribe ไม่สำเร็จ:', error)
+  }
+}
+
 /* lifecycle */
+// นำตัวแปร notificationPollTimer ออกทั้งหมด
+
+const onNotificationsUpdated = () => {
+    fetchUserNotifications() // จะใช้ฟังก์ชันหลักในการอัปเดตแบบเงียบ
+}
+
+// รับข้อความจาก Service Worker ที่ส่งมา
+const handleServiceWorkerMessage = (event) => {
+    // เช็คข้อมูลที่ส่งมาจาก sw.js ตรง data.type
+    if (event.data && event.data.type === 'notification-updated') {
+        console.log('📱 อัปเดตแจ้งเตือนจากการ Push')
+        fetchUserNotifications() // รีเฟรชข้อมูลแจ้งเตือน
+    }
+}
+
+// ไม่จำเป็นต้องใช้ handleBrowserPushMessage เดิมอีกต่อไป เนื่องจากเรารับผ่าน Service Worker ตรงๆ แล้ว
+
 onMounted(() => {
     window.addEventListener('resize', handleResize)
     document.addEventListener('click', onClickOutside)
     document.addEventListener('keydown', onKey)
-    if (token.value) fetchUserNotifications()
+    window.addEventListener('notification-updated', onNotificationsUpdated)
+
+    // เพิ่มตัวรับ Event จาก Service Worker โดยตรง
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage)
+    }
+
+    if (token.value) {
+        fetchUserNotifications({ useLoading: true })
+        subscribeUserToPush()
+    }
+})
+
+watch(token, (newToken) => {
+    if (newToken) {
+        fetchUserNotifications({ useLoading: true })
+        subscribeUserToPush()
+    } else {
+        notifications.value = []
+        showDriverPopup.value = false
+    }
 })
 
 onUnmounted(() => {
     window.removeEventListener('resize', handleResize)
     document.removeEventListener('click', onClickOutside)
     document.removeEventListener('keydown', onKey)
+    window.removeEventListener('notification-updated', onNotificationsUpdated)
+    
+    // ลบตัวรับ Event ของ Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.removeEventListener('message', handleServiceWorkerMessage)
+    }
 })
+
+async function refreshNotifications() {
+    await fetchUserNotifications({ useLoading: false })
+}
 
 /* ใส่ฟอนต์ Kanit แบบเดิม */
 useHead({
@@ -564,6 +789,7 @@ useHead({
         //{ rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' }
     ]
 })
+
 </script>
 
 

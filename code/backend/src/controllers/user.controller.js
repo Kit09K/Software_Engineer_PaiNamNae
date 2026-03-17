@@ -96,6 +96,7 @@ const createUser = asyncHandler(async (req, res) => {
         await systemLogService.createLog({
             userId: newUser.id,
             action: 'REGISTER',
+            apiPath: req.originalUrl,
             level: 'INFO',
             resource: 'User',
             ipAddress: req.ip || req.socket.remoteAddress,
@@ -144,6 +145,7 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
         await systemLogService.createLog({
             userId: req.user.sub,
             action: 'PROFILE_UPDATE',
+            apiPath: req.originalUrl,
             level: 'INFO',
             resource: 'User',
             ipAddress: req.ip || req.socket.remoteAddress,
@@ -177,6 +179,7 @@ const adminDeleteUser = asyncHandler(async (req, res) => {
     await systemLogService.createLog({
         userId: req.user.sub, // บันทึก ID ของ Admin ที่เป็นคนกดลบ
         action: 'DELETE_DATA',
+        apiPath: req.originalUrl,
         level: 'WARNING',     // ให้ระดับความรุนแรงเป็น WARNING เพราะเป็นการลบข้อมูล
         resource: 'User',     // ระบุว่าทำกับโมดูล User
         targetTable: 'User',
