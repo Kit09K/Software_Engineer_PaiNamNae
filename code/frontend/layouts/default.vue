@@ -572,6 +572,7 @@ async function sendReplyToDriver() {
 
         replyText.value = ''
         showDriverPopup.value = false
+        // กระจาย event ให้อัปเดต
         window.dispatchEvent(new Event('notification-updated'))
     } catch (e) {
         console.error('Failed to reply to driver', e)
@@ -606,6 +607,8 @@ async function markAsRead(n) {
         })
         const i = notifications.value.findIndex(x => x.id === n.id)
         if (i > -1) notifications.value[i].readAt = new Date().toISOString()
+        
+        window.dispatchEvent(new Event('notification-updated'))
     } finally {
         openMenuId.value = null
     }
@@ -622,6 +625,8 @@ async function removeNotification(n) {
             credentials: 'include'
         })
         notifications.value = notifications.value.filter(x => x.id !== n.id)
+        
+        window.dispatchEvent(new Event('notification-updated'))
     } finally {
         openMenuId.value = null
     }
@@ -654,49 +659,108 @@ function timeAgo(ts) {
     return `${d} d ago`
 }
 
+/* ====== ระบบ Push Notification ====== */
+const urlBase64ToUint8Array = (base64String) => {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4)
+  const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/')
+  const rawData = window.atob(base64)
+  const outputArray = new Uint8Array(rawData.length)
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i)
+  }
+  return outputArray
+}
+
+const subscribeUserToPush = async () => {
+  try {
+    // เช็คว่าเบราว์เซอร์รองรับหรือไม่
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return
+
+    const registration = await navigator.serviceWorker.register('/sw.js');
+    console.log('Service Worker Registered');
+
+    // เช็คสิทธิ์และขออนุญาตถ้ายังไม่ได้ตัดสินใจ
+    let permission = Notification.permission
+    if (permission !== 'granted' && permission !== 'denied') {
+      permission = await Notification.requestPermission()
+    }
+
+    if (permission === 'granted') {
+      const registration = await navigator.serviceWorker.ready
+      const publicVapidKey = useRuntimeConfig().public.vapidKey 
+      
+      if (!publicVapidKey) {
+        console.warn('ไม่พบ VAPID Key ในตั้งค่า')
+        return
+      }
+
+      const convertedVapidKey = urlBase64ToUint8Array(publicVapidKey)
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: convertedVapidKey
+      })
+
+      const apiBase = useRuntimeConfig().public.apiBase || 'http://localhost:3000/api'
+      const tk = useCookie('token')?.value || (process.client ? localStorage.getItem('token') : '')
+
+      if (tk) {
+        await $fetch('/push-notifications/subscribe', {
+          baseURL: apiBase,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${tk}`
+          },
+          body: { subscription: subscription }
+        })
+        console.log('ลงทะเบียน Push Notification อัตโนมัติสำเร็จ')
+      }
+    }
+  } catch (error) {
+    console.error('ดำเนินการ Subscribe ไม่สำเร็จ:', error)
+  }
+}
+
 /* lifecycle */
-let notificationPollTimer = null
+// นำตัวแปร notificationPollTimer ออกทั้งหมด
 
 const onNotificationsUpdated = () => {
-    fetchUserNotifications()
+    fetchUserNotifications() // จะใช้ฟังก์ชันหลักในการอัปเดตแบบเงียบ
 }
 
-const handleBrowserPushMessage = (event) => {
-    const payload = event.data || {}
-    if (payload.type === 'notification-updated') {
-        fetchUserNotifications()
-    }
-    if (payload.type === 'driver-message' && payload.notification) {
-        openDriverReplyPopup(payload.notification)
+// รับข้อความจาก Service Worker ที่ส่งมา
+const handleServiceWorkerMessage = (event) => {
+    // เช็คข้อมูลที่ส่งมาจาก sw.js ตรง data.type
+    if (event.data && event.data.type === 'notification-updated') {
+        console.log('📱 อัปเดตแจ้งเตือนจากการ Push')
+        fetchUserNotifications() // รีเฟรชข้อมูลแจ้งเตือน
     }
 }
+
+// ไม่จำเป็นต้องใช้ handleBrowserPushMessage เดิมอีกต่อไป เนื่องจากเรารับผ่าน Service Worker ตรงๆ แล้ว
 
 onMounted(() => {
     window.addEventListener('resize', handleResize)
     document.addEventListener('click', onClickOutside)
     document.addEventListener('keydown', onKey)
     window.addEventListener('notification-updated', onNotificationsUpdated)
-    window.addEventListener('message', handleBrowserPushMessage)
+
+    // เพิ่มตัวรับ Event จาก Service Worker โดยตรง
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage)
+    }
 
     if (token.value) {
         fetchUserNotifications({ useLoading: true })
-        if (!notificationPollTimer) {
-            notificationPollTimer = setInterval(refreshNotifications, 3000)
-        }
+        subscribeUserToPush()
     }
 })
 
 watch(token, (newToken) => {
     if (newToken) {
         fetchUserNotifications({ useLoading: true })
-        if (!notificationPollTimer) {
-            notificationPollTimer = setInterval(refreshNotifications, 3000)
-        }
+        subscribeUserToPush()
     } else {
-        if (notificationPollTimer) {
-            clearInterval(notificationPollTimer)
-            notificationPollTimer = null
-        }
         notifications.value = []
         showDriverPopup.value = false
     }
@@ -707,10 +771,10 @@ onUnmounted(() => {
     document.removeEventListener('click', onClickOutside)
     document.removeEventListener('keydown', onKey)
     window.removeEventListener('notification-updated', onNotificationsUpdated)
-    window.removeEventListener('message', handleBrowserPushMessage)
-    if (notificationPollTimer) {
-        clearInterval(notificationPollTimer)
-        notificationPollTimer = null
+    
+    // ลบตัวรับ Event ของ Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.removeEventListener('message', handleServiceWorkerMessage)
     }
 })
 
@@ -725,6 +789,7 @@ useHead({
         //{ rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' }
     ]
 })
+
 </script>
 
 

@@ -174,7 +174,7 @@ class PushNotificationController {
                 body = message;
             }
 
-            const link = `/my-trip`; 
+            const link = `https://csse0168.cpkku.com/`; 
             const metadata = { 
                 bookingId: booking.id, 
                 routeId: booking.routeId,
