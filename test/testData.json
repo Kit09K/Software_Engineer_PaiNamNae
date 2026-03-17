@@ -1,0 +1,40 @@
+{
+  "users": {
+    "valid_user": {
+      "id": "USER_ID_THAT_HAVE_BOOKING",
+      "username": "tester",
+      "password": "tester555"
+    },
+    "invalid_user": {
+      "id": "invalid_user_999"
+    },
+    "admin": {
+      "username": "ADMIN_USERNAME",
+      "password": "ADMIN_PASSWORD"
+    }
+  },
+  "booking": {
+    "valid_booking_id": "VALID_BOOKING_ID",
+    "other_booking_id": "OTHER_VALID_BOOKING_ID",
+    "invalid_booking_id": "invalid_booking_999"
+  },
+  "push_notification": {
+    "valid_subscription": {
+      "endpoint": "https://fcm.googleapis.com/fcm/send/fake",
+      "keys": {
+        "p256dh": "BGM_fake_key",
+        "auth": "rmwk_fake_auth"
+      }
+    }
+  },
+  "payloads": {
+    "send_push_valid": {
+      "title": "Test Title",
+      "body": "Test Body",
+      "url": "/"
+    },
+    "send_push_missing_title": {
+      "body": "Test Body"
+    }
+  }
+}
