@@ -164,6 +164,34 @@ Version: v1.2.1
 
 Story: As a passenger, I want to get a notification when the driver is about to pick me up so that I can get myself ready or respond to the driver.
 
+1. Push Notification Service
+   - เพิ่ม service หลักสำหรับจัดการการส่งแจ้งเตือน (Web Push) และการเก็บบันทึกประวัติลงฐานข้อมูล
+        - saveSubscription: ฟังก์ชันสำหรับบันทึกข้อมูล Endpoint และ VAPID Keys (p256dh, auth) ของอุปกรณ์ผู้ใช้งานลงตาราง PushSubscription เพื่อเตรียมพร้อมรับข้อความ
+        - sendPushToUser: ฟังก์ชันหลักสำหรับยิง Push Notification ไปยังทุกอุปกรณ์ (Active Devices) ที่ผู้ใช้ล็อกอินและอนุญาตการแจ้งเตือนไว้
+        - sendAndSaveNotification: ฟังก์ชันแบบ 2-in-1 สำหรับบันทึกข้อมูลลงตาราง Notification (เพื่อเป็นประวัติ) และส่ง Push Notification ไปยังผู้ใช้งานพร้อมกันในขั้นตอนเดียว
+
+2. Driver-to-Passenger Notification
+   - เพิ่ม Endpoint เพื่อให้คนขับ (Driver) สามารถกดส่งการแจ้งเตือนไปยังผู้โดยสาร (Passenger) เมื่อใกล้ถึงจุดรับ
+        - เพิ่ม API: POST /api/push-notifications/notify-pickup
+        - รองรับการรับค่า bookingId เพื่อดึงข้อมูลผู้โดยสารเป้าหมายโดยอัตโนมัติ
+        - ระบบจะทำการส่งข้อความแจ้งเตือน (เช่น "คนขับกำลังจะไปถึงแล้ว!") และแสดง Pop-up บนหน้าจออุปกรณ์ของผู้โดยสาร
+        - ระบบจะแนบ URL Link และ Metadata (bookingId, routeId) เข้าไปในการแจ้งเตือน เพื่อให้ผู้โดยสารสามารถคลิกเพื่อเข้าไปดูสถานะการเดินทางหรือแชทกับคนขับได้ทันที
+        - บันทึกประวัติการแจ้งเตือนลง Database อัตโนมัติ โดยระบุ Notification Type เป็น BOOKING
+    
+3. Web Push Subscription Management
+  - เพิ่มระบบจัดการ Subscription ฝั่ง Backend เพื่อเชื่อมต่อกับ Service Worker ฝั่ง Frontend
+        - เพิ่ม API: POST /api/push-notifications/subscribe สำหรับรับค่าจากฝั่ง Client-side
+        - เพิ่มระบบจัดการ Subscription ขยะอัตโนมัติ หาก Server ยิง Push ไปแล้วพบว่า Endpoint ของอุปกรณ์นั้นหมดอายุ หรือผู้ใช้บล็อกการแจ้งเตือน ระบบจะทำการลบ Subscription นั้นออกจากฐานข้อมูลทันที
+
+Updated
+- อัปเดต Schema (Prisma): เพิ่มตาราง PushSubscription สำหรับเก็บข้อมูลอุปกรณ์ และปรับปรุงตาราง Notification ให้รองรับการเก็บข้อมูล metadata รูปแบบ JSON (JSONB)
+- เพิ่ม API: POST /api/push-notifications/send สำหรับทดสอบยิง Push Notification แบบระบุตัวบุคคล (Custom Payload) เพื่อใช้สำหรับการทดสอบหรือให้ Admin ใช้งาน
+- ตั้งค่าระบบ VAPID Authentication เพื่อยืนยันความปลอดภัยทางฝั่ง Server ก่อนส่งข้อความผ่าน Push Service Provider
+
+Security & Validations
+- Route Protection: บังคับใช้ Middleware protect กับทุก Endpoint ใน pushNotification.routes.js เพื่อให้มั่นใจว่าผู้ใช้ต้องยืนยันตัวตน (Login) แล้วเท่านั้น
+- Driver Authorization Logic: เพิ่มการดักจับและตรวจสอบสิทธิ์ในฟังก์ชัน notifyPassengerPickup ระบบจะทำการเช็คว่า User ID ที่กำลังกดยิงแจ้งเตือน เป็นคนขับรถ (Driver) ที่เป็นเจ้าของเส้นทาง (Route) ของคิวการจองนั้นจริงๆ หากไม่ใช่ ระบบจะปฏิเสธคำขอทันที (403 Forbidden) เพื่อป้องกันการแฮ็กหรือส่งแจ้งเตือนข้ามทริป
+
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Sprint 3 - Story 16
