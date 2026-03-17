@@ -431,6 +431,7 @@
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRuntimeConfig, useCookie } from '#app'
 import { useAuth } from '~/composables/useAuth'
+import { subscribeToWebPush } from '~/utils/push'
 
 const { token, user, logout } = useAuth()
 
@@ -671,19 +672,56 @@ const handleBrowserPushMessage = (event) => {
     }
 }
 
-onMounted(() => {
+
+const authCookie = useCookie('token')
+
+const setupPushNotification = async () => {
+  const userToken = authCookie.value || (process.client ? localStorage.getItem('token') : null)
+
+  if (!userToken) {
+    console.log('ผู้ใช้ยังไม่ได้ Login ขอข้ามการบันทึก Subscription')
+    return
+  }
+
+  const subscription = await subscribeToWebPush()
+  if (subscription) {
+    try {
+      await $fetch('http://localhost:8080/api/push-notifications/subscribe', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${userToken}`
+        },
+        body: {
+          subscription: subscription
+        }
+      })
+      console.log('ส่ง Subscription เข้า Database สำเร็จ!')
+    } catch (error) {
+      console.error('ไม่สามารถส่ง Subscription ให้ Backend ได้:', error)
+    }
+  }
+}
+
+onMounted(async() => {
+    setupPushNotification()
     window.addEventListener('resize', handleResize)
     document.addEventListener('click', onClickOutside)
     document.addEventListener('keydown', onKey)
     window.addEventListener('notification-updated', onNotificationsUpdated)
     window.addEventListener('message', handleBrowserPushMessage)
-
     if (token.value) {
         fetchUserNotifications({ useLoading: true })
         if (!notificationPollTimer) {
             notificationPollTimer = setInterval(refreshNotifications, 3000)
         }
-    }
+    } 
+})
+
+watch(authCookie, (newToken) => {
+  if (newToken) {
+    console.log('ตรวจพบการ Login ล่าสุด... กำลังส่ง Subscription ให้ Backend')
+    setupPushNotification()
+  }
 })
 
 watch(token, (newToken) => {

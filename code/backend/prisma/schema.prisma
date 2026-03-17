@@ -123,6 +123,7 @@ model User {
   driverVerification      DriverVerification?
   vehicles                Vehicle[]
   notification            Notification[]
+  pushSubscriptions       PushSubscription[]
   createdRoutes           Route[]             @relation("DriverRoutes")
   bookings                Booking[]           @relation("PassengerBookings")
 
@@ -319,4 +320,17 @@ model otp {
 
 
   @@index([email])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+
 }
