@@ -1,0 +1,574 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.4.1 (Python 3.14.0 on win32)" generated="2026-03-17T19:36:18.202159" rpa="false" schemaversion="5">
+<suite id="s1" name="testAPI" source="D:\Year 3 term 2\Software Engineering\Sprint 3\Software_Engineer_PaiNamNae\test\API Story 12\testAPI.robot">
+<test id="s1-t1" name="Subscribe Success" line="20">
+<kw name="Create Valid Subscription Payload">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.294618" level="INFO">${keys} = {'p256dh': 'BGM_fake_key', 'auth': 'rmwk_fake_auth'}</msg>
+<var>${keys}</var>
+<arg>p256dh=BGM_fake_key</arg>
+<arg>auth=rmwk_fake_auth</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.294260" elapsed="0.000389"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.295026" level="INFO">${subscription} = {'endpoint': 'https://fcm.googleapis.com/fcm/send/fake', 'expirationTime': None, 'keys': {'p256dh': 'BGM_fake_key', 'auth': 'rmwk_fake_auth'}}</msg>
+<var>${subscription}</var>
+<arg>endpoint=https://fcm.googleapis.com/fcm/send/fake</arg>
+<arg>expirationTime=${None}</arg>
+<arg>keys=${keys}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.294755" elapsed="0.000292"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.295313" level="INFO">${payload} = {'subscription': {'endpoint': 'https://fcm.googleapis.com/fcm/send/fake', 'expirationTime': None, 'keys': {'p256dh': 'BGM_fake_key', 'auth': 'rmwk_fake_auth'}}}</msg>
+<var>${payload}</var>
+<arg>subscription=${subscription}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.295124" elapsed="0.000205"/>
+</kw>
+<return>
+<value>${payload}</value>
+<status status="PASS" start="2026-03-17T19:36:18.295367" elapsed="0.000033"/>
+</return>
+<msg time="2026-03-17T19:36:18.295507" level="INFO">${payload} = {'subscription': {'endpoint': 'https://fcm.googleapis.com/fcm/send/fake', 'expirationTime': None, 'keys': {'p256dh': 'BGM_fake_key', 'auth': 'rmwk_fake_auth'}}}</msg>
+<var>${payload}</var>
+<status status="PASS" start="2026-03-17T19:36:18.293827" elapsed="0.001697"/>
+</kw>
+<kw name="Create Auth Header">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.296114" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05bDhhZHEwMDNidmoyZ2hiaWs3emVnIiwicm9sZSI6IkRSSVZFUiIsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc0ODk3MSwiZXhwIjoxN...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${token}</arg>
+<arg>Content-Type=application/json</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.295887" elapsed="0.000245"/>
+</kw>
+<return>
+<value>${headers}</value>
+<status status="PASS" start="2026-03-17T19:36:18.296165" elapsed="0.000027"/>
+</return>
+<msg time="2026-03-17T19:36:18.296269" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05bDhhZHEwMDNidmoyZ2hiaWs3emVnIiwicm9sZSI6IkRSSVZFUiIsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc0ODk3MSwiZXhwIjoxN...</msg>
+<var>${headers}</var>
+<arg>${PASSENGER_TOKEN}</arg>
+<status status="PASS" start="2026-03-17T19:36:18.295706" elapsed="0.000579"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2026-03-17T19:36:18.309065" level="INFO">POST Request : url=http://localhost:8080/api/push-notifications/subscribe 
+ path_url=/api/push-notifications/subscribe 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05bDhhZHEwMDNidmoyZ2hiaWs3emVnIiwicm9sZSI6IkRSSVZFUiIsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc0ODk3MSwiZXhwIjoxNzczNzUyNTcxfQ.F00nN9SHof48UwlNotMGk7NLcJBpJxeTU2bjfxJJEAg', 'Content-Type': 'application/json', 'Content-Length': '160'} 
+ body=b'{"subscription": {"endpoint": "https://fcm.googleapis.com/fcm/send/fake", "expirationTime": null, "keys": {"p256dh": "BGM_fake_key", "auth": "rmwk_fake_auth"}}}' 
+ </msg>
+<msg time="2026-03-17T19:36:18.309167" level="INFO">POST Response : url=http://localhost:8080/api/push-notifications/subscribe 
+ status=201, reason=Created 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '272', 'ETag': 'W/"110-61ushZrZFv+0V6RFUl1dW7mO8BM"', 'Date': 'Tue, 17 Mar 2026 12:36:18 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":true,"message":"Subscribed successfully","data":{"id":"cmmuke5t900exl8bel202io4f","userId":"cmm9l8adq003bvj2ghbik7zeg","endpoint":"https://fcm.googleapis.com/fcm/send/fake","p256dh":"BGM_fake_key","auth":"rmwk_fake_auth","createdAt":"2026-03-17T12:04:19.821Z"}} 
+ </msg>
+<msg time="2026-03-17T19:36:18.309272" level="INFO">${response} = &lt;Response [201]&gt;</msg>
+<var>${response}</var>
+<arg>url=${BASE_URL}/api/push-notifications/subscribe</arg>
+<arg>json=${payload}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=201</arg>
+<doc>Sends a POST request.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.296394" elapsed="0.012897"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${response.json()}</arg>
+<arg>success</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.309489" elapsed="0.000443"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${response.json()["success"]}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.310070" elapsed="0.000428"/>
+</kw>
+<doc>Save Subscription Success (201)</doc>
+<status status="PASS" start="2026-03-17T19:36:18.293298" elapsed="0.017326"/>
+</test>
+<test id="s1-t2" name="Subscribe Unauthorized" line="29">
+<kw name="Create Valid Subscription Payload">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.312493" level="INFO">${keys} = {'p256dh': 'BGM_fake_key', 'auth': 'rmwk_fake_auth'}</msg>
+<var>${keys}</var>
+<arg>p256dh=BGM_fake_key</arg>
+<arg>auth=rmwk_fake_auth</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.312279" elapsed="0.000233"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.312816" level="INFO">${subscription} = {'endpoint': 'https://fcm.googleapis.com/fcm/send/fake', 'expirationTime': None, 'keys': {'p256dh': 'BGM_fake_key', 'auth': 'rmwk_fake_auth'}}</msg>
+<var>${subscription}</var>
+<arg>endpoint=https://fcm.googleapis.com/fcm/send/fake</arg>
+<arg>expirationTime=${None}</arg>
+<arg>keys=${keys}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.312585" elapsed="0.000253"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.313084" level="INFO">${payload} = {'subscription': {'endpoint': 'https://fcm.googleapis.com/fcm/send/fake', 'expirationTime': None, 'keys': {'p256dh': 'BGM_fake_key', 'auth': 'rmwk_fake_auth'}}}</msg>
+<var>${payload}</var>
+<arg>subscription=${subscription}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.312903" elapsed="0.000223"/>
+</kw>
+<return>
+<value>${payload}</value>
+<status status="PASS" start="2026-03-17T19:36:18.313159" elapsed="0.000024"/>
+</return>
+<msg time="2026-03-17T19:36:18.313260" level="INFO">${payload} = {'subscription': {'endpoint': 'https://fcm.googleapis.com/fcm/send/fake', 'expirationTime': None, 'keys': {'p256dh': 'BGM_fake_key', 'auth': 'rmwk_fake_auth'}}}</msg>
+<var>${payload}</var>
+<status status="PASS" start="2026-03-17T19:36:18.312110" elapsed="0.001165"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.313556" level="INFO">${headers} = {'Content-Type': 'application/json'}</msg>
+<var>${headers}</var>
+<arg>Content-Type=application/json</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.313394" elapsed="0.000177"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2026-03-17T19:36:18.317457" level="INFO">POST Request : url=http://localhost:8080/api/push-notifications/subscribe 
+ path_url=/api/push-notifications/subscribe 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Type': 'application/json', 'Content-Length': '160'} 
+ body=b'{"subscription": {"endpoint": "https://fcm.googleapis.com/fcm/send/fake", "expirationTime": null, "keys": {"p256dh": "BGM_fake_key", "auth": "rmwk_fake_auth"}}}' 
+ </msg>
+<msg time="2026-03-17T19:36:18.317541" level="INFO">POST Response : url=http://localhost:8080/api/push-notifications/subscribe 
+ status=401, reason=Unauthorized 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '66', 'ETag': 'W/"42-VIvuqXCkSos5B2HjVRGsrV8/u7s"', 'Date': 'Tue, 17 Mar 2026 12:36:18 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"message":"Not authorized, no token","data":null} 
+ </msg>
+<msg time="2026-03-17T19:36:18.317651" level="INFO">${response} = &lt;Response [401]&gt;</msg>
+<var>${response}</var>
+<arg>url=${BASE_URL}/api/push-notifications/subscribe</arg>
+<arg>json=${payload}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=401</arg>
+<doc>Sends a POST request.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.313680" elapsed="0.003993"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<arg>${response.json()["message"]}</arg>
+<arg>Not authorized, no token</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.317869" elapsed="0.000475"/>
+</kw>
+<doc>Send API Subscribe Without Token (401)</doc>
+<status status="PASS" start="2026-03-17T19:36:18.311230" elapsed="0.007274"/>
+</test>
+<test id="s1-t3" name="Subscribe Bad Request" line="37">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.319713" level="INFO">${payload} = {'subscription': ''}</msg>
+<var>${payload}</var>
+<arg>subscription=${EMPTY}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.319276" elapsed="0.000457"/>
+</kw>
+<kw name="Create Auth Header">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.320279" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05bDhhZHEwMDNidmoyZ2hiaWs3emVnIiwicm9sZSI6IkRSSVZFUiIsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc0ODk3MSwiZXhwIjoxN...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${token}</arg>
+<arg>Content-Type=application/json</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.320060" elapsed="0.000239"/>
+</kw>
+<return>
+<value>${headers}</value>
+<status status="PASS" start="2026-03-17T19:36:18.320333" elapsed="0.000025"/>
+</return>
+<msg time="2026-03-17T19:36:18.320435" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05bDhhZHEwMDNidmoyZ2hiaWs3emVnIiwicm9sZSI6IkRSSVZFUiIsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc0ODk3MSwiZXhwIjoxN...</msg>
+<var>${headers}</var>
+<arg>${PASSENGER_TOKEN}</arg>
+<status status="PASS" start="2026-03-17T19:36:18.319894" elapsed="0.000556"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2026-03-17T19:36:18.324725" level="INFO">POST Request : url=http://localhost:8080/api/push-notifications/subscribe 
+ path_url=/api/push-notifications/subscribe 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05bDhhZHEwMDNidmoyZ2hiaWs3emVnIiwicm9sZSI6IkRSSVZFUiIsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc0ODk3MSwiZXhwIjoxNzczNzUyNTcxfQ.F00nN9SHof48UwlNotMGk7NLcJBpJxeTU2bjfxJJEAg', 'Content-Type': 'application/json', 'Content-Length': '20'} 
+ body=b'{"subscription": ""}' 
+ </msg>
+<msg time="2026-03-17T19:36:18.324794" level="INFO">POST Response : url=http://localhost:8080/api/push-notifications/subscribe 
+ status=400, reason=Bad Request 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '37', 'ETag': 'W/"25-wDlW6NCd2c0XNa6nn+5wLoYJV1o"', 'Date': 'Tue, 17 Mar 2026 12:36:18 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"error":"Invalid subscription data"} 
+ </msg>
+<msg time="2026-03-17T19:36:18.324881" level="INFO">${response} = &lt;Response [400]&gt;</msg>
+<var>${response}</var>
+<arg>url=${BASE_URL}/api/push-notifications/subscribe</arg>
+<arg>json=${payload}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=400</arg>
+<doc>Sends a POST request.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.320557" elapsed="0.004341"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<arg>${response.json()["error"]}</arg>
+<arg>Invalid subscription data</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.325099" elapsed="0.000458"/>
+</kw>
+<doc>Send API Subscribe With Lack Of Data (400)</doc>
+<status status="PASS" start="2026-03-17T19:36:18.319033" elapsed="0.006663"/>
+</test>
+<test id="s1-t4" name="Send Push Success" line="48">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.326651" level="INFO">${payload} = {'targetUserId': 'cmm934k81000fvj2gw5h5gmrg', 'title': 'Test Title', 'body': 'Test Body', 'url': '/'}</msg>
+<var>${payload}</var>
+<arg>targetUserId=${VALID_USER_ID}</arg>
+<arg>title=Test Title</arg>
+<arg>body=Test Body</arg>
+<arg>url=/</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.326366" elapsed="0.000314"/>
+</kw>
+<kw name="Create Auth Header">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.327855" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05MzRrODEwMDBmdmoyZ3c1aDVnbXJnIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0ZXN0ZXIyQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc1MDk2MCwiZXhwIjoxN...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${token}</arg>
+<arg>Content-Type=application/json</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.327566" elapsed="0.000312"/>
+</kw>
+<return>
+<value>${headers}</value>
+<status status="PASS" start="2026-03-17T19:36:18.327931" elapsed="0.000030"/>
+</return>
+<msg time="2026-03-17T19:36:18.328051" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05MzRrODEwMDBmdmoyZ3c1aDVnbXJnIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0ZXN0ZXIyQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc1MDk2MCwiZXhwIjoxN...</msg>
+<var>${headers}</var>
+<arg>${DRIVER_TOKEN}</arg>
+<status status="PASS" start="2026-03-17T19:36:18.327330" elapsed="0.000738"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2026-03-17T19:36:18.503460" level="INFO">POST Request : url=http://localhost:8080/api/push-notifications/send 
+ path_url=/api/push-notifications/send 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05MzRrODEwMDBmdmoyZ3c1aDVnbXJnIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0ZXN0ZXIyQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc1MDk2MCwiZXhwIjoxNzczNzU0NTYwfQ.9WSurdGjl9WliCHvtyifEwK_Z6sGit1NkYssrPtnLRw', 'Content-Type': 'application/json', 'Content-Length': '101'} 
+ body=b'{"targetUserId": "cmm934k81000fvj2gw5h5gmrg", "title": "Test Title", "body": "Test Body", "url": "/"}' 
+ </msg>
+<msg time="2026-03-17T19:36:18.503756" level="INFO">POST Response : url=http://localhost:8080/api/push-notifications/send 
+ status=200, reason=OK 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '64', 'ETag': 'W/"40-AL8RpzjAavOleO0XzHSYQzQhtSE"', 'Date': 'Tue, 17 Mar 2026 12:36:18 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":true,"message":"Push notification sent successfully"} 
+ </msg>
+<msg time="2026-03-17T19:36:18.504104" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>url=${BASE_URL}/api/push-notifications/send</arg>
+<arg>json=${payload}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a POST request.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.328201" elapsed="0.175930"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${response.json()["success"]}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.504488" elapsed="0.001651"/>
+</kw>
+<doc>Test Push Notification Success (200)</doc>
+<status status="PASS" start="2026-03-17T19:36:18.326154" elapsed="0.180657"/>
+</test>
+<test id="s1-t5" name="Send Push Missing Fields" line="56">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.513308" level="INFO">${payload} = {'targetUserId': 'cmm934k81000fvj2gw5h5gmrg', 'body': 'Test Body'}</msg>
+<var>${payload}</var>
+<arg>targetUserId=${VALID_USER_ID}</arg>
+<arg>body=Test Body</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.511747" elapsed="0.001668"/>
+</kw>
+<kw name="Create Auth Header">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.516387" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05MzRrODEwMDBmdmoyZ3c1aDVnbXJnIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0ZXN0ZXIyQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc1MDk2MCwiZXhwIjoxN...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${token}</arg>
+<arg>Content-Type=application/json</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.515201" elapsed="0.001279"/>
+</kw>
+<return>
+<value>${headers}</value>
+<status status="PASS" start="2026-03-17T19:36:18.516641" elapsed="0.000099"/>
+</return>
+<msg time="2026-03-17T19:36:18.517086" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05MzRrODEwMDBmdmoyZ3c1aDVnbXJnIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0ZXN0ZXIyQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc1MDk2MCwiZXhwIjoxN...</msg>
+<var>${headers}</var>
+<arg>${DRIVER_TOKEN}</arg>
+<status status="PASS" start="2026-03-17T19:36:18.514313" elapsed="0.002834"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2026-03-17T19:36:18.534586" level="INFO">POST Request : url=http://localhost:8080/api/push-notifications/send 
+ path_url=/api/push-notifications/send 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05MzRrODEwMDBmdmoyZ3c1aDVnbXJnIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0ZXN0ZXIyQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc1MDk2MCwiZXhwIjoxNzczNzU0NTYwfQ.9WSurdGjl9WliCHvtyifEwK_Z6sGit1NkYssrPtnLRw', 'Content-Type': 'application/json', 'Content-Length': '66'} 
+ body=b'{"targetUserId": "cmm934k81000fvj2gw5h5gmrg", "body": "Test Body"}' 
+ </msg>
+<msg time="2026-03-17T19:36:18.534720" level="INFO">POST Response : url=http://localhost:8080/api/push-notifications/send 
+ status=400, reason=Bad Request 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '41', 'ETag': 'W/"29-4AqrxpcDSbgx8ry5xTDAxEluYWI"', 'Date': 'Tue, 17 Mar 2026 12:36:18 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"error":"Missing targetUserId or title"} 
+ </msg>
+<msg time="2026-03-17T19:36:18.534886" level="INFO">${response} = &lt;Response [400]&gt;</msg>
+<var>${response}</var>
+<arg>url=${BASE_URL}/api/push-notifications/send</arg>
+<arg>json=${payload}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=400</arg>
+<doc>Sends a POST request.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.517701" elapsed="0.017227"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<arg>${response.json()["error"]}</arg>
+<arg>Missing targetUserId or title</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.535275" elapsed="0.000818"/>
+</kw>
+<doc>Test Push Without title (400)</doc>
+<status status="PASS" start="2026-03-17T19:36:18.509826" elapsed="0.026566"/>
+</test>
+<test id="s1-t6" name="Send Push User Not Found" line="64">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.539057" level="INFO">${payload} = {'targetUserId': 'invalid_user_999', 'title': 'Hello'}</msg>
+<var>${payload}</var>
+<arg>targetUserId=${INVALID_USER_ID}</arg>
+<arg>title=Hello</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.538614" elapsed="0.000474"/>
+</kw>
+<kw name="Create Auth Header">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.539908" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05MzRrODEwMDBmdmoyZ3c1aDVnbXJnIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0ZXN0ZXIyQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc1MDk2MCwiZXhwIjoxN...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${token}</arg>
+<arg>Content-Type=application/json</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.539595" elapsed="0.000338"/>
+</kw>
+<return>
+<value>${headers}</value>
+<status status="PASS" start="2026-03-17T19:36:18.539979" elapsed="0.000031"/>
+</return>
+<msg time="2026-03-17T19:36:18.540109" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05MzRrODEwMDBmdmoyZ3c1aDVnbXJnIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0ZXN0ZXIyQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc1MDk2MCwiZXhwIjoxN...</msg>
+<var>${headers}</var>
+<arg>${DRIVER_TOKEN}</arg>
+<status status="PASS" start="2026-03-17T19:36:18.539350" elapsed="0.000778"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2026-03-17T19:36:18.545949" level="INFO">POST Request : url=http://localhost:8080/api/push-notifications/send 
+ path_url=/api/push-notifications/send 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05MzRrODEwMDBmdmoyZ3c1aDVnbXJnIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0ZXN0ZXIyQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc1MDk2MCwiZXhwIjoxNzczNzU0NTYwfQ.9WSurdGjl9WliCHvtyifEwK_Z6sGit1NkYssrPtnLRw', 'Content-Type': 'application/json', 'Content-Length': '54'} 
+ body=b'{"targetUserId": "invalid_user_999", "title": "Hello"}' 
+ </msg>
+<msg time="2026-03-17T19:36:18.546019" level="INFO">POST Response : url=http://localhost:8080/api/push-notifications/send 
+ status=404, reason=Not Found 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '66', 'ETag': 'W/"42-2Qo4AqXO+6M2WqPLf+5OJD2ktO0"', 'Date': 'Tue, 17 Mar 2026 12:36:18 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"message":"No subscriptions found for this user"} 
+ </msg>
+<msg time="2026-03-17T19:36:18.546118" level="INFO">${response} = &lt;Response [404]&gt;</msg>
+<var>${response}</var>
+<arg>url=${BASE_URL}/api/push-notifications/send</arg>
+<arg>json=${payload}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=404</arg>
+<doc>Sends a POST request.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.540272" elapsed="0.005881"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<arg>${response.json()["message"]}</arg>
+<arg>No subscriptions found for this user</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.546348" elapsed="0.000464"/>
+</kw>
+<doc>Test Push to None Subscribe User (404)</doc>
+<status status="PASS" start="2026-03-17T19:36:18.537479" elapsed="0.009468"/>
+</test>
+<test id="s1-t7" name="Notify Pickup Success" line="75">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.548067" level="INFO">${payload} = {'bookingId': 'cmmtc1s4p002w66v5l9h5k1tr'}</msg>
+<var>${payload}</var>
+<arg>bookingId=${VALID_BOOKING_ID}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.547782" elapsed="0.000306"/>
+</kw>
+<kw name="Create Auth Header">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.548677" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05MzRrODEwMDBmdmoyZ3c1aDVnbXJnIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0ZXN0ZXIyQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc1MDk2MCwiZXhwIjoxN...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${token}</arg>
+<arg>Content-Type=application/json</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.548456" elapsed="0.000239"/>
+</kw>
+<return>
+<value>${headers}</value>
+<status status="PASS" start="2026-03-17T19:36:18.548743" elapsed="0.000028"/>
+</return>
+<msg time="2026-03-17T19:36:18.548850" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05MzRrODEwMDBmdmoyZ3c1aDVnbXJnIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0ZXN0ZXIyQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc1MDk2MCwiZXhwIjoxN...</msg>
+<var>${headers}</var>
+<arg>${DRIVER_TOKEN}</arg>
+<status status="PASS" start="2026-03-17T19:36:18.548283" elapsed="0.000581"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2026-03-17T19:36:18.559304" level="INFO">POST Request : url=http://localhost:8080/api/push-notifications/notify-pickup 
+ path_url=/api/push-notifications/notify-pickup 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05MzRrODEwMDBmdmoyZ3c1aDVnbXJnIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0ZXN0ZXIyQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc1MDk2MCwiZXhwIjoxNzczNzU0NTYwfQ.9WSurdGjl9WliCHvtyifEwK_Z6sGit1NkYssrPtnLRw', 'Content-Type': 'application/json', 'Content-Length': '42'} 
+ body=b'{"bookingId": "cmmtc1s4p002w66v5l9h5k1tr"}' 
+ </msg>
+<msg time="2026-03-17T19:36:18.559393" level="INFO">POST Response : url=http://localhost:8080/api/push-notifications/notify-pickup 
+ status=200, reason=OK 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '640', 'ETag': 'W/"280-+pXgzLAhnIOs80HJxKs42PGnbuw"', 'Date': 'Tue, 17 Mar 2026 12:36:18 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":true,"message":"Pickup notification sent and saved successfully","data":{"id":"cmmuljabg00jll8be6442h2fw","userId":"cmm9l8adq003bvj2ghbik7zeg","type":"BOOKING","title":"คนขับกำลังจะไปถึงแล้ว! 🚗","body":"เตรียมตัวให้พร้อม คนขับกำลังเดินทางไปรับคุณที่จุดนัดหมาย","link":"/bookings/cmmtc1s4p002w66v5l9h5k1tr","metadata":{"bookingId":"cmmtc1s4p002w66v5l9h5k1tr","routeId":"cmmtbyjh1002e66v5swxoms92"},"readAt":null,"createdAt":"2026-03-17T12:36:18.556Z","adminReviewedAt":null}} 
+ </msg>
+<msg time="2026-03-17T19:36:18.559619" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>url=${BASE_URL}/api/push-notifications/notify-pickup</arg>
+<arg>json=${payload}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a POST request.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.548985" elapsed="0.010657"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${response.json()["success"]}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.559906" elapsed="0.000472"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${response.json()["data"]}</arg>
+<arg>id</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.560533" elapsed="0.000366"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<arg>${response.json()["data"]["type"]}</arg>
+<arg>BOOKING</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.561026" elapsed="0.000412"/>
+</kw>
+<doc>Driver Send Notification Success (200)</doc>
+<status status="PASS" start="2026-03-17T19:36:18.547481" elapsed="0.014086"/>
+</test>
+<test id="s1-t8" name="Notify Pickup Forbidden" line="85">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.562512" level="INFO">${payload} = {'bookingId': 'cmmuleqiq00iil8be3p8gvhrv'}</msg>
+<var>${payload}</var>
+<arg>bookingId=${OTHER_BOOKING_ID}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.562285" elapsed="0.000246"/>
+</kw>
+<kw name="Create Auth Header">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.563100" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05MzRrODEwMDBmdmoyZ3c1aDVnbXJnIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0ZXN0ZXIyQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc1MDk2MCwiZXhwIjoxN...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${token}</arg>
+<arg>Content-Type=application/json</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.562855" elapsed="0.000264"/>
+</kw>
+<return>
+<value>${headers}</value>
+<status status="PASS" start="2026-03-17T19:36:18.563153" elapsed="0.000026"/>
+</return>
+<msg time="2026-03-17T19:36:18.563253" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05MzRrODEwMDBmdmoyZ3c1aDVnbXJnIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0ZXN0ZXIyQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc1MDk2MCwiZXhwIjoxN...</msg>
+<var>${headers}</var>
+<arg>${DRIVER_TOKEN}</arg>
+<status status="PASS" start="2026-03-17T19:36:18.562687" elapsed="0.000581"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2026-03-17T19:36:18.569848" level="INFO">POST Request : url=http://localhost:8080/api/push-notifications/notify-pickup 
+ path_url=/api/push-notifications/notify-pickup 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05MzRrODEwMDBmdmoyZ3c1aDVnbXJnIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0ZXN0ZXIyQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc1MDk2MCwiZXhwIjoxNzczNzU0NTYwfQ.9WSurdGjl9WliCHvtyifEwK_Z6sGit1NkYssrPtnLRw', 'Content-Type': 'application/json', 'Content-Length': '42'} 
+ body=b'{"bookingId": "cmmuleqiq00iil8be3p8gvhrv"}' 
+ </msg>
+<msg time="2026-03-17T19:36:18.569923" level="INFO">POST Response : url=http://localhost:8080/api/push-notifications/notify-pickup 
+ status=403, reason=Forbidden 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '63', 'ETag': 'W/"3f-/Vs+C2chf/eiuyR26Rzp3XlFXlU"', 'Date': 'Tue, 17 Mar 2026 12:36:18 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"error":"Unauthorized: You are not the driver for this route"} 
+ </msg>
+<msg time="2026-03-17T19:36:18.570015" level="INFO">${response} = &lt;Response [403]&gt;</msg>
+<var>${response}</var>
+<arg>url=${BASE_URL}/api/push-notifications/notify-pickup</arg>
+<arg>json=${payload}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=403</arg>
+<doc>Sends a POST request.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.563382" elapsed="0.006650"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${response.json()["error"]}</arg>
+<arg>Unauthorized: You are not the driver for this route</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.570224" elapsed="0.000590"/>
+</kw>
+<doc>Driver Notify Other Booking (403)</doc>
+<status status="PASS" start="2026-03-17T19:36:18.562064" elapsed="0.008940"/>
+</test>
+<test id="s1-t9" name="Notify Pickup Booking Not Found" line="93">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.572112" level="INFO">${payload} = {'bookingId': 'invalid_booking_999'}</msg>
+<var>${payload}</var>
+<arg>bookingId=invalid_booking_999</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.571765" elapsed="0.000376"/>
+</kw>
+<kw name="Create Auth Header">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-17T19:36:18.572952" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05MzRrODEwMDBmdmoyZ3c1aDVnbXJnIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0ZXN0ZXIyQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc1MDk2MCwiZXhwIjoxN...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${token}</arg>
+<arg>Content-Type=application/json</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.572706" elapsed="0.000267"/>
+</kw>
+<return>
+<value>${headers}</value>
+<status status="PASS" start="2026-03-17T19:36:18.573008" elapsed="0.000027"/>
+</return>
+<msg time="2026-03-17T19:36:18.573110" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05MzRrODEwMDBmdmoyZ3c1aDVnbXJnIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0ZXN0ZXIyQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc1MDk2MCwiZXhwIjoxN...</msg>
+<var>${headers}</var>
+<arg>${DRIVER_TOKEN}</arg>
+<status status="PASS" start="2026-03-17T19:36:18.572508" elapsed="0.000617"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2026-03-17T19:36:18.578808" level="INFO">POST Request : url=http://localhost:8080/api/push-notifications/notify-pickup 
+ path_url=/api/push-notifications/notify-pickup 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbW05MzRrODEwMDBmdmoyZ3c1aDVnbXJnIiwicm9sZSI6IkFETUlOIiwiZW1haWwiOiJ0ZXN0ZXIyQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc1MDk2MCwiZXhwIjoxNzczNzU0NTYwfQ.9WSurdGjl9WliCHvtyifEwK_Z6sGit1NkYssrPtnLRw', 'Content-Type': 'application/json', 'Content-Length': '36'} 
+ body=b'{"bookingId": "invalid_booking_999"}' 
+ </msg>
+<msg time="2026-03-17T19:36:18.578894" level="INFO">POST Response : url=http://localhost:8080/api/push-notifications/notify-pickup 
+ status=404, reason=Not Found 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '29', 'ETag': 'W/"1d-EV3nGNSSE3cMZKe/e/inDRwM5eg"', 'Date': 'Tue, 17 Mar 2026 12:36:18 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"error":"Booking not found"} 
+ </msg>
+<msg time="2026-03-17T19:36:18.579014" level="INFO">${response} = &lt;Response [404]&gt;</msg>
+<var>${response}</var>
+<arg>url=${BASE_URL}/api/push-notifications/notify-pickup</arg>
+<arg>json=${payload}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=404</arg>
+<doc>Sends a POST request.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.573243" elapsed="0.005788"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<arg>${response.json()["error"]}</arg>
+<arg>Booking not found</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-03-17T19:36:18.579254" elapsed="0.000463"/>
+</kw>
+<doc>Driver Notify Fake Booking (404)</doc>
+<status status="PASS" start="2026-03-17T19:36:18.571516" elapsed="0.008364"/>
+</test>
+<status status="PASS" start="2026-03-17T19:36:18.203126" elapsed="0.377414"/>
+</suite>
+<statistics>
+<total>
+<stat pass="9" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="testAPI" id="s1" pass="9" fail="0" skip="0">testAPI</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

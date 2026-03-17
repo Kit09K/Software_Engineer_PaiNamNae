@@ -17,15 +17,16 @@ ${USER_ID}				NONE
 ${OTP_CODE}				NONE
 ${ACCESS_TOKEN}         NONE
 
+# Test Data For Create
 ${username}				   tester
 ${email}                   tester1@gmail.com
-${password}               tester555
+${password}                tester555
 
-${username2}				tester2
-${password2}                tester555
+${username2}				ADMIN_USERNAME
+${password2}                ADMIN_PASSWORD
 
-${username3}				tester3
-${password3}                tester555
+${username3}				USERNAME
+${password3}                PASSWORD
 
 ${ADMIN_TOKEN}			NONE
 

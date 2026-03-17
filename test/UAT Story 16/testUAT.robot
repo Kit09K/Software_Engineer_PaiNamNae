@@ -20,15 +20,16 @@ ${OTP_CODE}          NONE
 ${ACCESS_TOKEN}      NONE
 ${ADMIN_TOKEN}       NONE
 
+# Test Data For Create
 ${USERNAME}          tester
 ${EMAIL}             tester1@gmail.com
 ${PASSWORD}          tester555
 
-${USERNAME2}         tester2
-${PASSWORD2}         tester555
+${USERNAME2}         ADMIN_USERNAME
+${PASSWORD2}         ADMIN_PASSWORD
 
-${USERNAME3}         tester3
-${PASSWORD3}         tester555
+${USERNAME3}         USER_THAT_HAVE_ROUTE
+${PASSWORD3}         USER_THAT_HAVE_ROUTE
 
 # --- UI Locators ---
 ${MENU_PROFILE}           //a[normalize-space()="บัญชีของฉัน"]

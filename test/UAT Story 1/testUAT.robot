@@ -8,10 +8,10 @@ ${BROWSER}           Chrome
 ${URL_FRONTEND}      http://localhost:3000
 
 # --- Test Data ---
-${USER_NORMAL}       tester3
-${PWD_NORMAL}        tester555
-${USER_ADMIN}        tester2
-${PWD_ADMIN}         tester555
+${USER_NORMAL}       NON_ADMIN_USERNAME
+${PWD_NORMAL}        NON_ADMIN_PASSWORD
+${USER_ADMIN}        ADMIN_USERNAME
+${PWD_ADMIN}         ADMIN_PASSWORD
 
 # --- Locators: Global & Navigation ---
 ${BTN_LOGIN_PAGE}    //a[normalize-space()="เข้าสู่ระบบ"]
